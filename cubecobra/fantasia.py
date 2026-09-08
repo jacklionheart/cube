@@ -23,7 +23,7 @@ Dry-run by default. Pass --apply to execute.
 import argparse
 from collections import Counter
 
-from cc import CubeCobra, clean_card, name_key
+from cc import CubeCobra, clean_card, name_key, remove_entry, validate_indexes
 
 FANTASIA = "fantasia"
 GATHERING_CUBE = "8661cb7a-fa8d-4a4e-bc33-9dab818fd1d7"  # "jacklionheart's New Cube"
@@ -90,19 +90,18 @@ def main():
 
     cc.login()
 
+    validate_indexes(current_main, "mainboard")
+    validate_indexes(current_maybe, "maybeboard")
     changes = {}
     if current_main:
         changes["mainboard"] = {
-            "removes": [
-                {"index": i, "oldCard": clean_card(c)}
-                for i, c in reversed(list(enumerate(current_main)))
-            ]
+            "removes": [remove_entry(c) for c in sorted(current_main, key=lambda c: -c["index"])]
         }
     maybe_changes = {}
     current_maybe_names = {name_key(c) for c in current_maybe}
     stale = [
-        {"index": i, "oldCard": clean_card(c)}
-        for i, c in reversed(list(enumerate(current_maybe)))
+        remove_entry(c)
+        for c in sorted(current_maybe, key=lambda c: -c["index"])
         if name_key(c) not in pool
     ]
     if stale:

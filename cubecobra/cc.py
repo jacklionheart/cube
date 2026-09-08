@@ -51,14 +51,31 @@ def name_key(card):
     return card_name(card).lower()
 
 
+def remove_entry(card):
+    """A commit `removes` entry. CRITICAL: cubeJSON returns boards sorted for
+    display, not in stored order — the card's own `index` field is its stored
+    position and is what the server splices on. Never use array position."""
+    return {"index": card["index"], "oldCard": clean_card(card)}
+
+
+def validate_indexes(board_cards, label="board"):
+    """Stored indexes must be unique non-negative ints or removes would splice
+    the wrong cards. Gaps are normal (null placeholder slots in the stored
+    array are filtered out of cubeJSON responses); duplicates are not.
+    Aborts rather than corrupting a cube."""
+    idxs = [c.get("index", -1) for c in board_cards]
+    if any(not isinstance(i, int) or i < 0 for i in idxs) or len(set(idxs)) != len(idxs):
+        raise RuntimeError(f"{label}: card index fields are missing or duplicated; refusing to compute removes")
+
+
 def board_delta(current, desired, key=card_key):
     """Compute (adds, removes) turning `current` into `desired`.
 
-    current: the target cube board as returned by cubeJSON (order matters —
-    remove indexes refer to positions in this list).
+    current: the target cube board as returned by cubeJSON.
     desired: card dicts specifying what the board should contain.
     Handles duplicate copies via counting.
     """
+    validate_indexes(current)
     cur_counts = Counter(key(c) for c in current)
     want_counts = Counter(key(c) for c in desired)
 
@@ -68,10 +85,10 @@ def board_delta(current, desired, key=card_key):
         if cur_counts[k] > want_counts.get(k, 0)
     }
     removes = []
-    for idx in range(len(current) - 1, -1, -1):
-        k = key(current[idx])
+    for card in sorted(current, key=lambda c: -c["index"]):
+        k = key(card)
         if remove_quota.get(k, 0) > 0:
-            removes.append({"index": idx, "oldCard": clean_card(current[idx])})
+            removes.append(remove_entry(card))
             remove_quota[k] -= 1
 
     add_quota = {
