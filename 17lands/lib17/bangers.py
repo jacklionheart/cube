@@ -13,17 +13,18 @@ BOTH populations:
     mythic   >= A+
 
 Data sources, in order of preference:
-  - card_tables.parquet: full-format website-table snapshots with
-    all/top/middle/bottom cohorts (scraped June 2026; the live
-    card_ratings API has since been gated and returns only stub counts).
-  - The 17Lands public S3 game logs (lib17.fetch.s3 / lib17.data) — the
-    long-term route to "every set ever"; per-set aggregation TBD.
+  - The live /api/card_data endpoint (the website's own table source),
+    via lib17.fetch.card_data — full population, all/top cohorts, cached.
+  - card_tables.parquet: full-format website-table snapshots scraped
+    June 2026 (fallback / reproducibility).
 
 Rows are normalized to {name, rarity, gih_wr, n_gih} regardless of source.
 """
 
 import statistics
 from pathlib import Path
+
+from . import fetch
 
 GRADES = ["F", "D-", "D", "D+", "C-", "C", "C+", "B-", "B", "B+", "A-", "A", "A+"]
 _C = GRADES.index("C")
@@ -37,6 +38,18 @@ RARITY_BAR = {
 }
 
 DATA = Path(__file__).parent.parent / "data"
+
+
+def rows_from_api(expansion, cohort, event_type="PremierDraft"):
+    """Normalized rows from the live website Card Data API."""
+    raw = fetch.card_data(expansion, event_type=event_type,
+                          user_group=None if cohort == "all" else cohort)
+    return [
+        {"name": r["name"], "rarity": (r.get("rarity") or "").lower(),
+         "gih_wr": r.get("ever_drawn_win_rate"),
+         "n_gih": r.get("ever_drawn_game_count")}
+        for r in raw
+    ]
 
 
 def rows_from_parquet(expansion, cohort, window="full"):
@@ -80,13 +93,18 @@ def assign_grades(rows, min_games):
     return out
 
 
-def bangers(expansion, min_games_all=500, min_games_top=100, window="full"):
+def bangers(expansion, min_games_all=500, min_games_top=100, source="api",
+            event_type="PremierDraft"):
     """Cards clearing their rarity bar for both all users and top users.
 
     Returns a list of dicts sorted by top-player grade, best first.
     """
-    all_rows = rows_from_parquet(expansion, "all", window)
-    top_rows = rows_from_parquet(expansion, "top", window)
+    if source == "api":
+        all_rows = rows_from_api(expansion, "all", event_type)
+        top_rows = rows_from_api(expansion, "top", event_type)
+    else:
+        all_rows = rows_from_parquet(expansion, "all")
+        top_rows = rows_from_parquet(expansion, "top")
 
     rarity = {r["name"]: r["rarity"] for r in all_rows}
     all_grades = assign_grades(all_rows, min_games_all)
