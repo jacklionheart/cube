@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sleeping on Cards — The Hidden Subsidy in Draft Win-Rate Stats</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#2b2622; --paper:#faf6ee; --paper2:#f3ecdd; --crim:#a4282e;
+  --fade:#8a8074; --rule:#d8cfbc; --gold:#9a7b2d;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:'Newsreader', Georgia, serif; font-size:17.5px; line-height:1.62;
+  background-image:radial-gradient(rgba(43,38,34,.035) 1px, transparent 1px);
+  background-size:5px 5px;
+}
+.page{max-width:760px; margin:0 auto; padding:0 28px 90px}
+header{padding:64px 0 30px; border-bottom:3px double var(--ink); margin-bottom:8px}
+.kicker{font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.22em;
+  text-transform:uppercase; color:var(--crim); margin-bottom:18px}
+h1{font-family:'Fraunces',serif; font-weight:900; font-size:52px; line-height:1.04;
+  margin:0 0 18px; letter-spacing:-.01em}
+.deck{font-size:21px; line-height:1.5; color:#4d453d; font-weight:400; margin:0 0 26px; font-style:italic}
+.byline{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--fade); letter-spacing:.05em}
+h2{font-family:'Fraunces',serif; font-weight:900; font-size:30px; line-height:1.15;
+  margin:64px 0 6px; letter-spacing:-.005em}
+h2 .no{color:var(--crim); font-size:18px; vertical-align:.45em; margin-right:10px;
+  font-family:'IBM Plex Mono',monospace; font-weight:600}
+h3{font-family:'Fraunces',serif; font-weight:600; font-size:21px; margin:40px 0 4px}
+h2+p, h3+p{margin-top:10px}
+p{margin:16px 0}
+a{color:var(--crim)}
+strong{font-weight:600}
+.lede:first-letter{
+  font-family:'Fraunces',serif; font-weight:900; font-size:64px; float:left;
+  line-height:.85; padding:6px 10px 0 0; color:var(--crim)}
+.rule{border:none; border-top:1px solid var(--rule); margin:40px 0}
+table{width:100%; border-collapse:collapse; margin:22px 0; font-size:15px}
+caption{caption-side:top; text-align:left; font-family:'IBM Plex Mono',monospace;
+  font-size:11.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--fade);
+  padding-bottom:10px}
+th{font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:.06em;
+  text-transform:uppercase; font-weight:600; text-align:left; padding:8px 10px;
+  border-top:2px solid var(--ink); border-bottom:1px solid var(--ink)}
+td{padding:7px 10px; border-bottom:1px solid var(--rule);
+  font-variant-numeric:tabular-nums}
+td.n, th.n{text-align:right; font-family:'IBM Plex Mono',monospace; font-size:13.5px}
+tr.hl td{background:rgba(164,40,46,.07)}
+.figure{margin:30px 0}
+.figure img{width:100%; border:1px solid var(--rule)}
+.figcap{font-size:14px; color:var(--fade); margin-top:8px; line-height:1.5}
+.figcap b{color:var(--ink); font-family:'IBM Plex Mono',monospace; font-size:11px;
+  letter-spacing:.14em; text-transform:uppercase; margin-right:8px}
+.callout{
+  background:var(--paper2); border-left:4px solid var(--crim); padding:18px 22px;
+  margin:28px 0; font-size:16.5px}
+.callout .tag{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--crim); display:block; margin-bottom:8px; font-weight:600}
+.defs{
+  background:var(--paper2); border:1px solid var(--rule); padding:20px 24px; margin:28px 0;
+  font-size:15.5px}
+.defs dt{font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:13px; margin-top:12px}
+.defs dt:first-child{margin-top:0}
+.defs dd{margin:2px 0 0 0}
+.statrow{display:flex; gap:14px; margin:34px 0; flex-wrap:wrap}
+.stat{flex:1; min-width:150px; border-top:3px solid var(--ink); padding-top:10px}
+.stat .v{font-family:'Fraunces',serif; font-weight:900; font-size:34px; color:var(--crim); line-height:1}
+.stat .l{font-size:13.5px; color:var(--fade); margin-top:6px; line-height:1.4}
+.mono{font-family:'IBM Plex Mono',monospace; font-size:.85em}
+.foot{margin-top:70px; padding-top:18px; border-top:3px double var(--ink);
+  font-size:14px; color:var(--fade)}
+.cols2{columns:2; column-gap:36px; font-size:15.5px}
+.cols2 p{break-inside:avoid; margin:0 0 14px}
+@media (max-width:640px){h1{font-size:38px}.cols2{columns:1}}
+@media print{body{background:none}.page{max-width:none}}
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+<div class="kicker">A 17Lands Data Investigation · June 2026</div>
+<h1>Sleeping on Cards</h1>
+<p class="deck">Late-picked cards post better win rates than they deserve. We measured the subsidy — how it works, how big it is, and which cards in the Powered Cube are riding it.</p>
+<div class="byline">FORMATS: SECRETS OF STRIXHAVEN · FINAL FANTASY · AVATAR: TLA · ARENA POWERED CUBE&nbsp;&nbsp;|&nbsp;&nbsp;2.2M GAMES (~25M CARD-GAME OBSERVATIONS) OF PUBLIC 17LANDS DATA</div>
+</header>
+
+<div class="statrow">
+<div class="stat"><div class="v">+0.08–0.14</div><div class="l">pp of measured win rate a card gains per pick of lateness, same card, all four formats</div></div>
+<div class="stat"><div class="v">−4.2</div><div class="l">pp of maindeck probability lost per pick of lateness — identical in all three retail sets</div></div>
+<div class="stat"><div class="v">~75%</div><div class="l">of a "discovered" card's stat decline is its archetype's fortunes, not the card (point estimate; CI is wide — §5)</div></div>
+<div class="stat"><div class="v">+2.2</div><div class="l">pp of free deck quality Boros cards rode in the Nov-2025 cube run (game-length-adjusted)</div></div>
+</div>
+
+<h2><span class="no">§1</span>The question</h2>
+<p class="lede">Every drafter who reads 17Lands has hit this puzzle: a card with an ALSA of 7 is posting a 62% games-in-hand win rate, right next to a premium pick with the same number. Is the late card secretly elite — a sleeper the format hasn't caught up to? Or is something about <em>being picked late</em> manufacturing that stat? Both stories produce the same table row. Strong cards get picked early <em>and</em> win games, so quality pushes ALSA and win rate in opposite directions across cards; meanwhile, if lateness itself inflates measured win rates, that pushes them in the same direction within a card. The observed stats are the sum of both forces, and you cannot separate them by staring at the format table — a high-WR/high-ALSA card is observationally identical under either story.</p>
+<p>This report quantifies the second force — call it the <strong>slept-on boost</strong> — so the first can be read cleanly. Throughout, we use 17Lands' standard metrics:</p>
+<dl class="defs">
+<dt>GP WR — games played</dt><dd>Win rate of games where the card was in the maindeck. A deck-level stat: the card may never have been drawn.</dd>
+<dt>GIH WR — games in hand</dt><dd>Win rate of games where the card reached hand (opening hand or drawn). The community's default quality metric.</dd>
+<dt>OH WR — opening hand</dt><dd>Win rate of games where it was in the kept opening seven.</dd>
+<dt>GNS WR — games not seen</dt><dd>Win rate of games where the card sat in the maindeck but was never seen. The card contributed nothing to these games — which makes this stat a measure of <em>everything around the card</em>: deck quality, archetype, pilot. It is the control group hiding in plain sight.</dd>
+<dt>ALSA / ATA</dt><dd>Average pick at which the card was last seen / actually taken.</dd>
+</dl>
+
+<h2><span class="no">§2</span>Why late picks get flattered: two mechanisms</h2>
+<p><strong>Mechanism one: opportunity cost.</strong> The deck that takes a card 10th paid almost nothing for it — picks one through nine went to premium cards, and all of that equity is still in the deck when the late pick's stats get measured. The deck that takes the same card 2nd paid a real price: every alternative in that pack. Late-acquired copies therefore sit in systematically better-surrounded decks, and every win-rate stat conditioned on those decks inherits the difference. This channel is universal — it applies to Lightning Bolt exactly as much as to a niche build-around.</p>
+<p><strong>Mechanism two: the deployment filter.</strong> A narrow card taken late only gets <em>played</em> when the deck actively wants it. Its published win rate is computed over the survivors of that filter — copies that landed in the right archetype, the right curve slot, the right matchup plan. Early copies get jammed; late copies get curated.</p>
+<p>The data lets us separate these. If the deployment filter were the whole story, cards with no filter — staples that get maindecked at the same high rate no matter when they're taken — should show no late premium. They don't cooperate with that theory. We defined a no-filter cohort in advance — cards whose maindeck rate starts above 70% and falls less than 10pp when taken late (nine SOS staples: Abrade, Stock Up, Bitter Triumph, Burst Lightning…) — and the cohort still wins <strong>+1.0pp more when taken late (se 0.36)</strong>. That residual is pure opportunity cost: better surrounding pieces, nothing else. The filter then stacks on top for narrow cards, and it is severe — see §4.</p>
+
+<h2><span class="no">§3</span>How do you measure this without confusing it with card quality?</h2>
+<p>Comparing across cards is hopeless — quality contaminates everything. Both of our designs instead compare <strong>the same card with itself</strong>, so card quality cancels by construction (a fixed effect per card), and only the circumstances of acquisition vary.</p>
+<h3>Design A: the as-picked comparison (draft logs)</h3>
+<p>The public 17Lands logs record every pick of every draft and every game outcome. So for each card we can ask: in drafts where this exact card was taken at picks 1–2, versus picks 10–14, how did its stats differ? We bucket every card's games by the pick at which it was taken, include card fixed effects, and estimate the pooled within-card slope. Its weaknesses: who takes a card early differs from who wheels it (drafter intent), and the win-rate stats condition on the card making the maindeck (survivorship — which we measure separately rather than ignore).</p>
+<h3>Design B: the re-pricing panel (weekly stat tables)</h3>
+<p>The 17Lands website tables accept date filters, so we scraped weekly snapshots and tracked each card's (ALSA, win rate) pair through time. Early in a format, the community re-prices cards — a sleeper's ALSA drops two picks in a week. With card and week fixed effects, the within-card co-movement of ALSA and win rate estimates the same boost from completely different variation: the crowd changing a card's price, rather than one draft acquiring it cheap. Its weaknesses: the identifying movement is concentrated in the first two weeks of a format, and anything else that changes when a card gets popular rides along — which turns out to matter a great deal (§5).</p>
+<p>Two designs, unrelated failure modes. Where they agree, we believe the number.</p>
+
+<h2><span class="no">§4</span>The boost, measured</h2>
+<p>The as-picked comparison, run on the full logs of four formats:</p>
+<table>
+<caption>Within-card slopes: pp of win rate per pick the card was actually taken later (card fixed effects)</caption>
+<tr><th>Metric</th><th class="n">SOS</th><th class="n">FIN</th><th class="n">TLA</th><th class="n">Powered Cube*</th></tr>
+<tr><td>GP WR</td><td class="n">+0.13</td><td class="n">+0.10</td><td class="n">+0.09</td><td class="n">+0.08</td></tr>
+<tr><td>GIH WR</td><td class="n">+0.14</td><td class="n">+0.10</td><td class="n">+0.08</td><td class="n">+0.07</td></tr>
+<tr><td>OH WR</td><td class="n">+0.10</td><td class="n">+0.08</td><td class="n">+0.06</td><td class="n">+0.05</td></tr>
+<tr class="hl"><td>GNS WR (card never seen)</td><td class="n">+0.15</td><td class="n">+0.12</td><td class="n">+0.12</td><td class="n">+0.09</td></tr>
+<tr><td>Maindeck rate</td><td class="n">−4.2</td><td class="n">−4.2</td><td class="n">−4.2</td><td class="n">−3.6</td></tr>
+</table>
+<p class="figcap" style="margin-top:-10px">* Public cube logs cover the first Powered Cube run (Nov 2025); card-clustered standard errors on these slopes are 0.006–0.011pp. Every per-pick number in this report is per pick the card was actually taken later (the ATA scale); §9 explains how to apply these to 17Lands' ALSA column.</p>
+<p>Three readings of this table:</p>
+<p><strong>The mechanism signs its work.</strong> The largest win-rate slope in every format is on GNS WR — games where the card was <em>never seen</em>. A card taken late wins more in games it doesn't even appear in. That is not a card effect; it is the surrounding deck, acquired at a discount, exactly as the opportunity-cost mechanism predicts.</p>
+<p><strong>The deployment filter is brutal and eerily constant.</strong> Each pick of lateness costs a card ~4.2pp of maindeck probability in every retail set (−4.19/−4.20/−4.22; part of that uniformity is mechanical — same pack size, same 23-playables constraint), and 3.6 in cube, where everything is playable and slots stay contested longer. At the extremes, survivorship takes over: <em>Fix What's Broken</em> (SOS) maindecks 44% of its early copies but <strong>9%</strong> of its late ones — and those few late survivors win 53.6% versus the early copies' 42.9%. Its glittering "late stats" describe a lottery ticket's winners.</p>
+<div class="figure"><img src="data:image/png;base64,{{FIG_FILTER}}" alt="maindeck rate by pick taken"><div class="figcap"><b>Fig 1</b>Maindeck rate by the pick a card was taken at. Narrow and speculative cards (crimson) fall off a cliff; universal staples (ink) barely move. The win-rate stats of the crimson cards are computed over the survivors.</div></div>
+<p><strong>It isn't an "open seat" signal in disguise.</strong> A natural alternative story: when a good card goes very late, the seat is open or the pod is weak, so the <em>whole draft</em> is discounted and the deck is better for reasons beyond this one cheap pick. We tested it: for every (draft, card) we computed a leave-one-out acquisition index — how much later than their format-wide average the <em>rest</em> of that draft's picks arrived — and added it to the regression. The index is a genuinely powerful deck-quality signal (its quintiles span 8.7pp of deck win rate), yet the within-card lateness slope is unchanged (+0.14 → +0.14). Two details make this test sharper than it looks: on Arena, your opponents are <em>not</em> drawn from your pod, so a generous pod improves your deck without weakening your opposition — and the slope is also unchanged by ladder-rank fixed effects (+0.14 → +0.14), so it isn't a skill-composition artifact either. It also survives <em>draft-week fixed effects</em> (+0.135 → +0.134) — so within-card pick variation is not smuggling in cross-week re-pricing or format drift — and it survives removing the maindeck condition entirely: event-level match results, conditioned only on the card having been <em>picked</em> at a given position, rise +0.12 to +0.14pp per pick in all four formats. (All of these checks are committed in <span class="mono">robustness.py</span>.) One alternative we can NOT yet rule out: <em>color-lane</em> openness. The pod index is color-agnostic; a good card arriving late also signals that its specific colors are open at your seat, and that component — if real — is genuine conditional equity rather than bias. Treat the slope as an upper bound on pure circumstance.</p>
+<p><strong>The effect is one-directional — almost.</strong> In SOS, 52 of 252 well-sampled cards have significantly <em>higher</em> GIH WR when taken late (~6 expected by chance), and literally zero are significantly lower. The cube has one structured exception, and it's a class, not a card list: in a pre-specified test, <strong>mana fixing (lands, Talismans, Signets) earns no late premium at all — +0.05pp (se 0.17) against +0.71pp (se 0.09) for everything else</strong>. (Individual "better taken early" cards don't clear a multiple-comparisons bar — 6 significant where ~12 are expected by chance — so we make no card-level claims here.) The likely mechanism is selection on intent: early fixing is taken by already-committed seats that use it perfectly; late fixing is a speculative grab. Either way, a blanket "penalize late picks" rule treats fixing wrongly.</p>
+<p><strong>And the premium is front-loaded.</strong> The per-pick numbers above are averages over the whole pick order, but the effect is strongly concave: moving a card's acquisition from pick 1 to pick 2 changes its measured GP WR by +0.2 to +0.4pp depending on format, picks 2→3 by ~+0.15, while a pick at the back end (8→12) moves it +0.01 to +0.05pp per pick. Early picks are where the opportunity cost lives — exactly the shape pick-equity models like DEq have assumed (a decaying curve from ~3% at pick 1); here it is measured rather than assumed.</p>
+<div class="figure"><img src="data:image/png;base64,{{FIG_CURVE}}" alt="lateness premium by pick position"><div class="figcap"><b>Fig 2</b>The lateness premium by position: same card, win rate of its decks by the pick it was taken at, relative to being taken first. Steep through picks 1–4, nearly flat past pick 8, in all four formats.</div></div>
+<div class="callout"><span class="tag">Bottom line</span>
+A card slept on by ~6 picks carries roughly <strong>+0.5 to +1pp of win rate that is circumstance, not quality</strong> (more when the gap spans the early picks, where the curve is steep) — and far more if its play rate is low, because then you're reading survivor stats. The late pick's <em>stats</em> benefit; the late pick itself does not: the same lateness that flatters the win rate costs the card 20–30pp of probability of being played at all.</div>
+
+<h2><span class="no">§5</span>When the crowd discovers a card: the archetype effect</h2>
+<p>The re-pricing panel — tracking cards through weekly table snapshots as the community re-prices them — tells a confusingly different story at first. It finds the same positive boost, but two to five times larger:</p>
+<table>
+<caption>The two designs disagree on magnitude (GP WR, pp per pick taken later)</caption>
+<tr><th>Format</th><th class="n">Re-pricing panel (tables)</th><th class="n">As-picked (logs)</th></tr>
+<tr><td>Secrets of Strixhaven</td><td class="n">+0.23 ± 0.06</td><td class="n">+0.13</td></tr>
+<tr><td>Final Fantasy</td><td class="n">+0.27 ± 0.05</td><td class="n">+0.10</td></tr>
+<tr><td>Avatar: TLA</td><td class="n">+0.43 ± 0.07</td><td class="n">+0.09</td></tr>
+<tr><td>Powered Cube (current run)</td><td class="n">+0.45 ± 0.31</td><td class="n">+0.08</td></tr>
+</table>
+<div class="figure"><img src="data:image/png;base64,{{FIG_E2E4}}" alt="two estimates compared"><div class="figcap"><b>Fig 3</b>The same quantity, two designs, one scale. The cube's panel estimate is wide for a structural reason: the cube list is known, so the community barely re-prices anything within a run — there's almost no movement to learn from; a pooled within-run variant across the cube runs reads much higher (≈+0.72 taken-at units ± 0.13) but measures week-to-week deployment selection, not re-pricing. (TLA, a crossover set full of novel cards, had the most re-pricing and the biggest panel estimate.)</div></div>
+<p>The designs aren't measuring the same thing, and the difference is informative. <strong>When a card becomes "known," its whole archetype becomes contested.</strong> Discovery doesn't move one card — drafters flow into the deck that wants it, the archetype's share of the metagame rises, its decks get diluted and its opponents adapt, and every card in it loses win rate together. The panel, watching cards across weeks, bundles this archetype-level tide in with the card-level boost. The as-picked design compares drafts <em>within</em> a format-state and nets the tide out.</p>
+<p>Three tests, run on SOS, where we have both the weekly tables and the full logs:</p>
+<p><strong>Discovery does pull drafters in</strong> — suggestively, at least: week over week, when an archetype's cards start getting picked earlier, that archetype's share of decks rises (correlation −0.33; only 25 archetype-week observations, so treat as direction rather than precision).</p>
+<p><strong>And the archetype tide is the bulk of the panel's excess.</strong> Recompute the panel with each card's <em>archetype-week average win rate</em> (from the logs) subtracted out of its never-seen win rate, and the slope collapses from +0.38 to <strong>+0.10</strong> — converging, from completely independent data and assumptions, on the as-picked design's +0.15.</p>
+<div class="figure"><img src="data:image/png;base64,{{FIG_CONGESTION}}" alt="archetype adjustment collapses the panel estimate"><div class="figcap"><b>Fig 4</b>Never-seen win rate, SOS, pp per pick taken later. Subtracting the archetype-week tide brings the panel into agreement with the as-picked estimate (the adjusted slope is also statistically consistent with zero — this is a consistency check, not a precise reconciliation).</div></div>
+<p>Three honest residuals. First, the "75%" is a ratio of two noisy slopes — its confidence interval runs from roughly 40% to 100%. Second, a competing mechanical story can produce part of the panel's excess: the community re-prices cards in response to <em>published</em> win rates, and transitory win-rate luck reverts — a dynamic the panel design cannot separate from real tides (its identification lives almost entirely in weeks 1–2, where both are strongest). Third, the direct mechanism test — does an archetype's win rate fall as its metagame share rises? — comes back null in our data (wrong-signed, huge standard error, ~10 archetypes); the inflow correlation above is direction, not proof. What survives all three: the as-picked design, which holds the week fixed, gives the same answer with none of these problems. The practical conclusion stands:</p>
+<div class="callout"><span class="tag">Which number to use</span>
+The card-level lateness correction is <strong>+0.08 to +0.14pp per pick taken later</strong>, front-loaded per Fig 2. The larger panel numbers answer a different question — "what happens to a card's printed stats when the crowd catches on" — and the answer is mostly: <em>its archetype gets arbitraged</em>. About 75% of a discovered card's stat decline is the deck around it, not the card.</div>
+
+<h2><span class="no">§6</span>Retail sets vs. the Powered Cube</h2>
+<p>The three retail sets are nearly interchangeable — same slopes, same one-sidedness, the identical −4.2pp/pick maindeck filter. The selection machinery is a property of <em>drafting</em>, not of any card pool. The cube differs in composition, in four ways that all point the same direction:</p>
+<p><strong>Deck context simply matters more.</strong> Splitting each card's win-rate elevation into a context piece (its never-seen win rate vs. the format mean) and a card piece (in-hand minus never-seen), context explains ~30% of the cross-card spread in retail sets and <strong>~50% in the cube</strong> — deck quality there runs from "has Black Lotus" to "does not," while the cards' own power band is compressed.</p>
+<p><strong>Pick order is a weaker quality signal.</strong> The win-rate gap between the earliest- and latest-picked cards is ~8pp in SOS but only ~4pp in the cube. An 8th-pick cube card is a real Magic card; its lateness tells you little.</p>
+<p><strong>The filter never relaxes.</strong> In retail sets, the deployment filter dies at the end of the draft — you must register 23 playables, so true filler gets jammed unselectively and its stats stop being flattered. In the cube, slots stay contested to pick 15, and the late-pick inflation keeps climbing to the very tail of the pick order.</p>
+<p><strong>And it has commitment cards</strong> — the fixing/colorless class from §4 that is genuinely better taken early. Retail sets showed no such class at all.</p>
+
+<h2><span class="no">§7</span>Cube deep dive: who's riding the subsidy</h2>
+<p>For card-level claims we need one more tool, because the cube's headline stats are doubly distorted. The fix: measure each card by <strong>within-deck contrasts</strong> — opening-hand and drawn-later win rates against <em>the same decks'</em> overall rate, so deck quality cancels — then correct two known biases of those slices: games-in-hand stats oversample long games (inflating slow blue decks' cards by 3–5pp), and opening-hand stats penalize expensive, scaling cards (a 3.7pp spread by mana value; both corrected against cost-bucket baselines that exclude Power — otherwise every normal cheap artifact gets taxed for not being Black Lotus — and shrunk toward zero in proportion to sampling noise before ranking). Translated back to familiar GIH units, that yields an adjusted quality number; multiplying by play rate gives a "value if you actually pick it early" number. With those in hand:</p>
+<h3>The deck-quality subsidy is one story: Boros</h3>
+<p>Group every card by the deck it actually ends up in (Nov-2025 run logs — the only public cube logs; the pattern replicates in current-run table data). <strong>Cards whose home was WR rode +2.2pp of ambient deck quality; every other home was negative</strong> (UB −4.3, UR −4.7, UG −4.1). These figures reweight never-seen games to the format's game-length distribution — without that correction the aggro subsidy reads ~+3.0pp, because fast decks' <em>wins</em> are short and short games hide cards: a bias this report corrects in GIH and originally missed in its own control group. The most context-inflated individuals are all the same package — Goblin Bombardment, Adeline, Figure of Destiny, Mother of Runes — late-picked aggro pieces whose decks won whether or not the card showed up, with measured own-effects ≈ 0 or negative. Two caveats ride along: per-card context is diluted relative to the WR <em>deck's</em> actual edge (+6.5pp game-level), and pilot skill is not netted out of the context split (strong players favor the best aggro deck).</p>
+<h3>Who gains most from being slept on</h3>
+<p>The biggest late-pick stat premiums belong to speculative build-arounds and color-hungry bombs, pre-filtered into decks that support them: Bomat Courier (+7.9pp taken late), Myr Battlesphere, Omnath (+5.9, and only 36% of late copies even get played), Necromancy, Tinker, Brazen Borrower, Atraxa — even Oko and Counterspell show +3–4pp. Taken early these are a plan that may not assemble; taken late they arrive into a finished machine.</p>
+<h3>The best non-Power cards, after all adjustments</h3>
+<p>Stripping deck context, the timing biases, and the lateness boost (current run): <strong>Tolarian Academy, Tinker, Orcish Bowmasters, Grindstone, Flash, Mishra's Workshop, Urza's Saga, Minsc &amp; Boo, Painter's Servant, Psychic Frog</strong> — then sleepers like <strong>Pinnacle Emissary</strong> and <strong>Aang, Swift Savior</strong> (average taken-at pick ~9; adjusted top-20 with a corrected effect around +3pp — strong, though the comparison stops there: it is played by only ~60% of pools, in curated tempo shells, so unlike a universal staple its effect is measured under — and conditional on — that curation, and it pays a real deployment tax if forced early).</p>
+<p>Workshop deserves its own sentence: raw GIH rank #190, adjusted #8. Its decks are bad — <em>because Workshop makes you register clunky artifacts that are unplayable without it</em> — but it wins the games where it appears. The within-deck contrast credits the card; the deck-level stats charge it for the clunkers. Both are true, and the gap between a card's GP-based and draw-based numbers is precisely the size of its deckbuilding tax (Tinker, Academy, and Flash decks run 1.3–3.1pp <em>below</em> their own color-pairs' baselines for the same reason). Read the adjusted ranks of all such build-arounds as <em>conditional</em>: Workshop is a top-10 card for the drafter who builds Workshop's deck, and the raw GP number is the honest warning about what happens to everyone else.</p>
+<p>A note on attribution, because stripping deck context can sound like "punishing cards in good decks." The corrections never subtract a card's archetype win rate from its stat line — a Boros card keeps everything that comes from Boros being good; it only loses the average <em>acquisition subsidy</em> at its pick position. Where archetype quality does get separated out (the role-player diagnosis above), the justification is marginal: if you don't take Hired Claw, you take another Boros playable and the deck rides the same +3pp — so the ambient quality isn't this card's to claim. The exception is scarcity: cards that <em>gate</em> their deck (the only fixer, the archetype-defining payoff) genuinely own part of their context, just as Workshop owns its tax. Measuring replaceability per card is the open frontier of this framework.</p>
+<h3>Where the crowd is most wrong</h3>
+<table>
+<caption>Divergence between adjusted quality and where people take it (replicated across two cube runs)</caption>
+<tr><th>Underpicked</th><th>Overpicked</th></tr>
+<tr><td>Sylvan Safekeeper · Willowrush Verge</td><td>Path to Exile · Chain Lightning</td></tr>
+<tr><td>Leyline Binding · Exploration</td><td>Chrome Mox · Vampiric Tutor</td></tr>
+<tr><td>Omnath, Locus of Creation</td><td>Umezawa's Jitte</td></tr>
+<tr><td>Grist, the Hunger Tide · Otawara</td><td>Adeline · Giver of Runes · Mother of Runes</td></tr>
+<tr><td>Proft's Eidetic Memory · Ertai Resurrected</td><td>Portal to Phyrexia · Sacred Foundry</td></tr>
+</table>
+<p>(Lists gated to ≥35% play rate and ≥1,000 in-hand games; an earlier draft of this analysis headlined Lotus Petal, Mox Diamond, and the baubles as overpicked — an artifact of demeaning zero-cost cards against a baseline set by Black Lotus and the Moxen. It does not survive Power-free baselines, and is retracted.) What does survive: underpicked skews to <strong>lands and unglamorous value</strong> (the Verges, Sylvan Safekeeper, Otawara, and Leyline Binding — whose printed cost of six overstates what it casts for in a typed-land cube, making even this estimate conservative), and overpicked mixes <strong>tutors, premium-priced removal, and the white aggro package itself</strong> — Adeline, Giver of Runes, and Mother of Runes land here precisely because their market price includes deck context the corrections strip; that verdict holds at the margin (the next Boros playable rides the same deck) and weakens if the table stops fighting for the lane. Tutors and Chrome Mox stay listed with the standing caveat that draw-based methods measure enablers worst.</p>
+
+<h2><span class="no">§8</span>A field guide to reading 17Lands stats</h2>
+<div class="cols2">
+<p><strong>Refund the lateness.</strong> Before comparing a late pick's stats to an early pick's, subtract ~0.1–0.15pp per pick of taken-at difference (front-loaded: most of it in the first four picks) — and be far more suspicious if the card's play rate is low, because then the stats describe filter survivors.</p>
+<p><strong>Check the control group.</strong> A card's GNS WR against the format mean tells you how much of its stat line is deck, not card. High GNS = the stats came with the neighborhood.</p>
+<p><strong>Know each metric's lean.</strong> GIH WR flatters cards from slow, grindy decks (long games oversampled). Opening-hand stats flatter cheap proactive cards and punish scaling ones. GP WR is mostly deck noise per card — but it's the only stat that charges build-arounds their deckbuilding tax.</p>
+<p><strong>Best-archetype role-players are the biggest mirage.</strong> When one deck is the format's best (Boros, currently), every replaceable card in it posts numbers it didn't earn.</p>
+<p><strong>Fixing earns no late premium.</strong> As a class, lands/Talismans/Signets show none of the lateness subsidy other cards enjoy (+0.05pp vs +0.71pp) — likely because early fixing is taken by committed seats that use it perfectly. Don't apply the lateness refund to fixing, and don't read a late-grabbed dual's stats as its committed-seat value.</p>
+<p><strong>Discovery is priced in fast.</strong> When the crowd catches on to a card, expect most of its stat edge to erode — not because the card got worse, but because its archetype gets arbitraged within weeks.</p>
+</div>
+
+<h2><span class="no">§9</span>Applying this to the 17Lands columns: ATA vs ALSA</h2>
+<p>This report works in taken-at picks (ATA) because that is what a drafter controls and what the logs record. The column most people read, though, is ALSA — average pick <em>last seen</em> — and the two scales are not interchangeable: passes pile up at the late end, compressing ALSA (it tops out near 9 while taken-at positions run past 13). Measured within-card across weeks, <strong>a 1-pick ALSA move corresponds to a 1.55-pick move in taken-at position</strong> (1.546 ± 0.028; cross-card static slopes run 1.49–1.65 by format, so treat the conversion as ±10%). So to apply this report's per-pick numbers to an ALSA gap between two cards, multiply the gap by 1.55 first — e.g., two cards 3 ALSA apart are ~4.7 taken-at picks apart, worth roughly 0.5–0.7pp of lateness subsidy on the GP/GIH columns (more if the gap spans the early picks, per Fig 2). All ALSA-denominated estimates that fed this report were converted the same way.</p>
+
+<h2><span class="no">§10</span>Caveats</h2>
+<p>All data is Premier Draft (best-of-one): the hand smoother and the absence of sideboarding shape every number, and play/draw and mulligan information sits unused in this analysis. Win-rate-by-pick numbers condition on the card making the maindeck, except the event-level check, which doesn't; the filter rates are reported alongside rather than ignored. Pick positions are pooled across packs (P1P10 and P3P10 are different situations) and across rarities, and multi-copy retail decks are booked at their earliest pick; per-card z-scores use binomial SEs without draft-level clustering, so per-card lists are looser than the pooled slopes. Deck-color groupings are a coarse proxy for archetypes, especially in cube. The public cube logs cover the November 2025 run while the table-based results cover the current (May–June 2026) run — every headline pattern replicates across both, which is itself evidence. The re-pricing panel's identification lives almost entirely in the first two weeks of a format. Zero-mana artifacts and tutors are where all draw-based methods are least reliable. And the boost magnitudes are format averages: individual cards range from "no filter, pure opportunity-cost +2pp" to "9%-playrate lottery ticket" — which is rather the point of measuring per card.</p>
+
+<div class="foot">
+<strong>Methods in one breath.</strong> Within-card fixed-effects panels on weekly 17Lands stat-table snapshots (identification: community re-pricing); as-picked curves from the public draft+game logs (win rates conditional on the pick at which the card was actually taken, ~25M games); card effect via within-deck contrasts (opening-hand and drawn-later vs. the same decks' baseline), corrected against mana-value-bucket baselines and quantile-mapped to GIH units; deck context via never-seen win rate against format and archetype-week baselines computed from the logs. All data from 17lands.com public tables and datasets; analysis code and per-card output files available on request.
+</div>
+
+</div>
+</body>
+</html>

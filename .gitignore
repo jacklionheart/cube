@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+17lands/data/
+17lands/out/
+.ipynb_checkpoints/
+.DS_Store
