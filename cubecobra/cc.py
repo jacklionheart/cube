@@ -141,6 +141,20 @@ class CubeCobra:
         """[{id, shortId, name, pinnedByCurrentUser}] for the logged-in user."""
         return self._request("GET", "/cube/api/mycubes").json()["cubes"]
 
+    def resolve_cards(self, names, default_printing="recent"):
+        """Resolve card names to printing details via /cube/api/getcardsforcube
+        (no auth). Returns {lowercased name: details-or-None}, parallel to the
+        server's response order."""
+        out = {}
+        names = list(names)
+        for i in range(0, len(names), 100):
+            batch = names[i:i + 100]
+            r = self._request("POST", "/cube/api/getcardsforcube",
+                              json={"names": batch, "defaultPrinting": default_printing})
+            for n, details in zip(batch, r.json()["cards"]):
+                out[n.lower()] = details
+        return out
+
     def backup(self, cube_id):
         """Snapshot a cube's full JSON and CSV to backups/<timestamp>/.
 

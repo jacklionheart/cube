@@ -12,6 +12,7 @@ Cards are tagged by provenance (tags union when a card has several sources):
   ⚛️ GUT     — in the GUT cube
   📐 Sacred  — in Sacred Geometry
   👑 LOL     — in Lords of Limited
+  🔥 Banger  — 17lands overperformer for its rarity (17lands/out/bangers_all.csv)
 
 Fantasia's mainboard is emptied — during design phase everything lives in
 the maybeboard. The gathering cube is left untouched (delete it later via
@@ -21,6 +22,8 @@ Dry-run by default. Pass --apply to execute.
 """
 
 import argparse
+import csv
+import pathlib
 from collections import Counter
 
 from cc import CubeCobra, clean_card, name_key, remove_entry, validate_indexes
@@ -33,6 +36,8 @@ INSPIRATION = [
     ("sacred-geometry", "📐 Sacred"),
     ("0efda005-7243-457e-9d11-875e37d1b768", "👑 LOL"),  # Lords of Limited
 ]
+BANGER_TAG = "🔥 Banger"
+BANGERS_CSV = pathlib.Path(__file__).resolve().parent.parent / "17lands" / "out" / "bangers_all.csv"
 
 
 def main():
@@ -69,6 +74,28 @@ def main():
         insp = cc.cube_json(cube_id)
         absorb(insp["cards"]["mainboard"], tag)
         print(f"absorbed {insp['name']}: {len(insp['cards']['mainboard'])} cards")
+
+    # --- 17lands bangers -------------------------------------------------
+    with open(BANGERS_CSV) as f:
+        banger_names = sorted({row["Name"] for row in csv.DictReader(f)})
+    already = [n for n in banger_names if n.lower() in pool]
+    for n in already:
+        tags[n.lower()].add(BANGER_TAG)
+    missing = [n for n in banger_names if n.lower() not in pool]
+    resolved = cc.resolve_cards(missing)
+    unresolved = [n for n in missing if not resolved.get(n.lower())]
+    new_cards = [
+        {"cardID": d["scryfall_id"], "name": d["name"],
+         "status": "Not Owned", "finish": "Non-foil"}
+        for n in missing
+        if (d := resolved.get(n.lower()))
+    ]
+    absorb(new_cards, BANGER_TAG)
+    print(f"absorbed bangers: {len(banger_names)} total, {len(already)} already in pool, "
+          f"{len(new_cards)} new")
+    if unresolved:
+        print(f"WARNING: {len(unresolved)} banger names not found on Cube Cobra: "
+              f"{', '.join(unresolved[:10])}{'…' if len(unresolved) > 10 else ''}")
 
     for k, template in pool.items():
         template["tags"] = sorted(tags[k])
