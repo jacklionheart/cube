@@ -82,7 +82,10 @@ def main():
         d_top = api_detail(code, "top")
         print(f"{code}: {len(found)} bangers")
         for r in found:
-            a, t = d_all[r["name"]], d_top[r["name"]]
+            a = d_all[r["name"]]
+            # No top cohort for this set -> leave top columns blank rather
+            # than showing the API's zeroed placeholder rows.
+            t = d_top[r["name"]] if r["grade_top"] is not None else {}
             card = sf.get(r["name"], {})
             rows.append({
                 "Set": code,

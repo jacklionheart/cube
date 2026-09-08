@@ -31,8 +31,10 @@ def main():
         rows.extend(found)
         print(f"\n=== {code}: {len(found)} bangers ===")
         for r in found:
-            print(f"  {r['rarity']:8s} {r['grade_top']:2s} (top) / {r['grade_all']:2s} (all)  "
-                  f"{r['gih_wr_top']:.1%} / {r['gih_wr_all']:.1%}  {r['name']}")
+            top_grade = r["grade_top"] or "—"
+            top_wr = f"{r['gih_wr_top']:.1%}" if r["gih_wr_top"] is not None else "—"
+            print(f"  {r['rarity']:8s} {top_grade:2s} (top) / {r['grade_all']:2s} (all)  "
+                  f"{top_wr} / {r['gih_wr_all']:.1%}  {r['name']}")
 
     if args.csv and rows:
         with open(args.csv, "w", newline="") as f:

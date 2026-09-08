@@ -108,26 +108,34 @@ def bangers(expansion, min_games_all=500, min_games_top=100, source="api",
 
     rarity = {r["name"]: r["rarity"] for r in all_rows}
     all_grades = assign_grades(all_rows, min_games_all)
-    top_grades = assign_grades(top_rows, min_games_top)
+    try:
+        top_grades = assign_grades(top_rows, min_games_top)
+    except ValueError:
+        # 17Lands has no top-player cohort before ~2022; qualify on the
+        # full population alone and leave the top-side fields empty.
+        top_grades = None
 
     found = []
-    for name in all_grades.keys() & top_grades.keys():
+    names = all_grades.keys() if top_grades is None else all_grades.keys() & top_grades.keys()
+    for name in names:
         bar = RARITY_BAR.get(rarity.get(name))
         if bar is None:  # basics, specials
             continue
         a_idx, a_wr, a_games = all_grades[name]
-        t_idx, t_wr, t_games = top_grades[name]
-        if a_idx >= bar and t_idx >= bar:
+        t_idx, t_wr, t_games = top_grades[name] if top_grades else (None, None, None)
+        if a_idx >= bar and (t_idx is None or t_idx >= bar):
             found.append({
                 "set": expansion,
                 "name": name,
                 "rarity": rarity[name],
                 "grade_all": GRADES[a_idx],
-                "grade_top": GRADES[t_idx],
+                "grade_top": GRADES[t_idx] if t_idx is not None else None,
                 "gih_wr_all": round(a_wr, 4),
-                "gih_wr_top": round(t_wr, 4),
+                "gih_wr_top": round(t_wr, 4) if t_wr is not None else None,
                 "games_all": int(a_games),
-                "games_top": int(t_games),
+                "games_top": int(t_games) if t_games is not None else None,
             })
-    found.sort(key=lambda r: (-top_grades[r["name"]][0], -r["gih_wr_top"]))
+    sort_grades = top_grades if top_grades is not None else all_grades
+    found.sort(key=lambda r: (-sort_grades[r["name"]][0],
+                              -(r["gih_wr_top"] or r["gih_wr_all"])))
     return found
