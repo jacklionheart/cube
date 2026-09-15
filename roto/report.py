@@ -181,7 +181,8 @@ def main():
                    f"{deck_link(k, p)} <span class='kept'>"
                    f"{colors_of(cards)} · {w}–{l}</span></h3>")
         out.append(f"<p class='meta'>{len(distinct)} of {len(cards)} "
-                   f"nonbasic cards are theirs alone:</p>")
+                   f"nonbasic cards sit outside every lane (in no core or "
+                   f"flex — though other decks may also run them):</p>")
         out += [chip(c, colors) for c in distinct]
         out.append("</div>")
 
