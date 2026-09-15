@@ -1,0 +1,9 @@
+Dom (slickshot): deck posted as image only -> dom-slickshot-deck.png, needs OCR into deckcache manual JSON
+mockingbird: COMPLETE - all 10 players (verified via /0 top jump)
+aven: COMPLETE - pod ran with 9 players, all 9 posted (JiRock has rebuild)
+slickshot: COMPLETE via /0 - 9 players with links + Dom (image only, dom-slickshot-deck.png)
+raven-eagle: COMPLETE via /0 - all 10 players
+hard-academic: COMPLETE via /0 - all 10 players
+goose-mother: COMPLETE via /0 - all 10 players
+yorion: COMPLETE via /0 - all 10 players
+skycoach: COMPLETE - all 10 players posted links
