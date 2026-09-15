@@ -484,7 +484,7 @@ def build_md_together(wb, drafts, cube, decks):
         n_flex = sum(len(b) for b in e["flex"])
         all_cards = list(cards) + [c for b in e["flex"] for c in b]
         ws.append([i + 1, pk.theme_str(all_cards, themes),
-                   pk.colors_str(all_cards, scry),
+                   pk.colors_str(cards, scry),  # colors from core only
                    "\n".join(sorted(cards)), "\n".join(flex_lines),
                    "\n".join(sorted(all_cards)),
                    len(cards), n_flex, len(all_cards),
