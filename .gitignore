@@ -6,3 +6,5 @@ __pycache__/
 .DS_Store
 cubecobra/backups/
 .lf/prompts/
+roto/sources/
+roto/out/
