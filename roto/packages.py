@@ -267,7 +267,16 @@ def deck_sets(owners):
     return by_deck
 
 
-def pair_packages(owners, min_core=3):
+MIN_PAIR_CORE = 5
+
+
+def pair_packages(owners, min_core=None):
+    if min_core is None:
+        min_core = MIN_PAIR_CORE
+    return _pair_packages(owners, min_core)
+
+
+def _pair_packages(owners, min_core):
     """Relaxed packages with k2=1: maximal card sets fully maindecked in
     one deck in 2 of the 3 drafts — i.e. cross-draft deck-pair
     intersections, subset-dominated cores removed. Adding k1=1 on top
@@ -310,6 +319,36 @@ def flex_packages(groups, owners):
             flex.append(sorted(others - decks[i]))
         out.append({"sig": sig, "cards": cards, "flex": flex})
     return out
+
+
+def straddles(owners, drafts):
+    """Decks whose 2-of-3 cores pair them with two or more different
+    decks of the same other draft — one drafter merging what another
+    draft's table split. Returns {(k, player): {k2: [(partner, core)]}}
+    keeping only same-draft partner lists of length >= 2."""
+    partners = defaultdict(lambda: defaultdict(list))
+    for e in pair_packages(owners):
+        (ka, pa), (kb, pb) = e["decks"]
+        partners[(ka, pa)][kb].append((pb, e["core"]))
+        partners[(kb, pb)][ka].append((pa, e["core"]))
+    return {
+        deck: {k2: plist for k2, plist in by_draft.items() if len(plist) >= 2}
+        for deck, by_draft in partners.items()
+        if any(len(plist) >= 2 for plist in by_draft.values())
+    }
+
+
+def report_straddles(owners, drafts):
+    themes = load_themes()
+    for (k, p), by_draft in sorted(straddles(owners, drafts).items()):
+        for k2, plist in sorted(by_draft.items()):
+            print(f"\n{drafts[k].name} {p} straddles {len(plist)} decks "
+                  f"of {drafts[k2].name}:")
+            for pb, core in sorted(plist, key=lambda x: -len(x[1])):
+                t = theme_str(core, themes) or "—"
+                cards = ", ".join(sorted(core)[:7])
+                more = "..." if len(core) > 7 else ""
+                print(f"   with {pb:18s} [{len(core)}] ({t}): {cards}{more}")
 
 
 def null_model(drafts, cube, decks, iters=2000, seed=0):
@@ -422,6 +461,10 @@ def main():
         print(f"observed: {len(groups)} packages, {len(edges)} edges, "
               f"{len(comps)} components\n")
         report_null(drafts, cube, decks, iters, seed)
+        return
+
+    if "--straddles" in sys.argv:
+        report_straddles(owners, drafts)
         return
 
     if "--relax" in sys.argv:

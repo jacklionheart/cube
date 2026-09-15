@@ -28,7 +28,7 @@ SOURCES = {
 TARGET_SHEET_ID = "1_w-YcYynXZgzObp13fPUB1q8XNxN6IH7gFkyHgH8E8w"
 TITLE = "LoL Cube Roto — Pick Summary"
 COMPUTED_TABS = ["Pick Summary", "Win Rates", "Color Analysis",
-                 "Maindecked Together", "Packages 2 of 3", "Packages ±1 Card"]
+                 "Maindecked Together", "Packages 2 of 3"]
 FUZZY_HEADERS = ("Avg", "Win Rate", "Score")  # float columns: rounding wiggle
 
 

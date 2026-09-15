@@ -30,7 +30,7 @@ Analysis of Lords of Limited cube rotisserie drafts → one Google Sheet:
   a permutation test (`--null [--iters N] [--seed S]`) that re-splits
   each player's picks into random same-size maindecks to check the
   observed package structure against chance (deckbuild stage only —
-  picks stay as drafted), and relaxed definitions (`--relax K1 K2`:
+  picks stay as drafted), straddle detection (`--straddles`: decks whose 2-of-3 cores pair them with two+ decks of one other draft), and relaxed definitions (`--relax K1 K2`:
   tolerate k1 missing cards per deck / k2 missing drafts — (0,1) yields
   cross-draft deck-pair intersections, (1,0) strict cores + per-draft
   flex buckets; both also ship as sheet tabs). Importable primitives:
