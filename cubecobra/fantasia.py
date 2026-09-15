@@ -1,150 +1,193 @@
 #!/usr/bin/env python3
-"""Rebuild Fantasia's maybeboard as the design-phase card pool.
+"""Sync Fantasia tags without backfilling its maybeboard.
 
-The maybeboard becomes the union (deduped by card name) of:
-  - everything currently in Fantasia itself (both boards)
-  - everything in the second gathering cube ("jacklionheart's New Cube")
-  - the mainboards of three inspiration cubes: GUT, Sacred Geometry,
-    and Lords of Limited
+Normal runs never change board membership. The --import-cube option performs
+an explicit one-time mainboard import, so a later manual removal stays removed.
+The --undo-additions option reverses additions found between saved snapshots.
 
-Cards are tagged by provenance (tags union when a card has several sources):
-  ✨ Picked   — hand-gathered in either of Jack's two gathering cubes
-  ⚛️ GUT     — in the GUT cube
-  📐 Sacred  — in Sacred Geometry
-  👑 LOL     — in Lords of Limited
-  🔥 Banger  — 17lands overperformer for its rarity (17lands/out/bangers_all.csv)
-
-Fantasia's mainboard is emptied — during design phase everything lives in
-the maybeboard. The gathering cube is left untouched (delete it later via
-gaelaria.py-style cleanup once you're confident in the merge).
+Maybeboard cards receive live provenance tags. Mainboard cards keep only the
+manual Allies and Enemies tags. The old Picked tag is removed everywhere, and
+Fantasia never tags itself.
 
 Dry-run by default. Pass --apply to execute.
 """
 
 import argparse
-import csv
+import json
 import pathlib
 from collections import Counter
 
-from cc import CubeCobra, clean_card, name_key, remove_entry, validate_indexes
+from cc import (
+    CubeCobra,
+    board_tag_edits,
+    clean_card,
+    name_key,
+    remove_entry,
+    tag_edit,
+    validate_indexes,
+)
+from tag_library import FANTASIA_TAG, load_tag_library
 
 FANTASIA = "fantasia"
-GATHERING_CUBE = "8661cb7a-fa8d-4a4e-bc33-9dab818fd1d7"  # "jacklionheart's New Cube"
-PICKED_TAG = "✨ Picked"
-INSPIRATION = [
-    ("GUT", "⚛️ GUT"),
-    ("sacred-geometry", "📐 Sacred"),
-    ("0efda005-7243-457e-9d11-875e37d1b768", "👑 LOL"),  # Lords of Limited
-]
-BANGER_TAG = "🔥 Banger"
+MAINBOARD_TAGS = frozenset({"🤝 Allies", "⚔️ Enemies"})
 BANGERS_CSV = pathlib.Path(__file__).resolve().parent.parent / "17lands" / "out" / "bangers_all.csv"
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--apply", action="store_true", help="actually push the rebuild")
-    args = parser.parse_args()
-
-    cc = CubeCobra()
-
-    fantasia = cc.cube_json(FANTASIA)
-    gathering = cc.cube_json(GATHERING_CUBE)
-
-    # name -> card template; first writer wins on printing, so own picks
-    # keep their chosen printings over inspiration-cube versions.
-    pool = {}
-    tags = {}  # name -> set of provenance tags
-
-    def absorb(cards, tag):
-        for card in cards:
-            k = name_key(card)
-            if k not in pool:
-                template = clean_card(card)
-                # provenance tags replace source-cube tags, which mean
-                # nothing outside their home cube
-                template["tags"] = []
-                pool[k] = template
-                tags[k] = set()
-            tags[k].add(tag)
-
-    for cube in (fantasia, gathering):
-        absorb(cube["cards"]["mainboard"] + cube["cards"].get("maybeboard", []), PICKED_TAG)
-
-    for cube_id, tag in INSPIRATION:
-        insp = cc.cube_json(cube_id)
-        absorb(insp["cards"]["mainboard"], tag)
-        print(f"absorbed {insp['name']}: {len(insp['cards']['mainboard'])} cards")
-
-    # --- 17lands bangers -------------------------------------------------
-    with open(BANGERS_CSV) as f:
-        banger_names = sorted({row["Name"] for row in csv.DictReader(f)})
-    already = [n for n in banger_names if n.lower() in pool]
-    for n in already:
-        tags[n.lower()].add(BANGER_TAG)
-    missing = [n for n in banger_names if n.lower() not in pool]
-    resolved = cc.resolve_cards(missing)
-    unresolved = [n for n in missing if not resolved.get(n.lower())]
-    new_cards = [
-        {"cardID": d["scryfall_id"], "name": d["name"],
-         "status": "Not Owned", "finish": "Non-foil"}
-        for n in missing
-        if (d := resolved.get(n.lower()))
+def mainboard_tag_edits(cards):
+    """Keep only the two manually managed role tags on mainboard cards."""
+    return [
+        edit
+        for card in cards
+        if (edit := tag_edit(card, MAINBOARD_TAGS.intersection(card.get("tags", []))))
     ]
-    absorb(new_cards, BANGER_TAG)
-    print(f"absorbed bangers: {len(banger_names)} total, {len(already)} already in pool, "
-          f"{len(new_cards)} new")
-    if unresolved:
-        print(f"WARNING: {len(unresolved)} banger names not found on Cube Cobra: "
-              f"{', '.join(unresolved[:10])}{'…' if len(unresolved) > 10 else ''}")
 
-    for k, template in pool.items():
-        template["tags"] = sorted(tags[k])
 
-    desired = list(pool.values())
-    combo_counts = Counter(tuple(c["tags"]) for c in desired)
-    print(f"\nDesired maybeboard: {len(desired)} unique cards")
-    for combo, n in combo_counts.most_common():
-        print(f"  {n:4d}  {' + '.join(combo)}")
+def maybeboard_tag_edits(cards, tags_by_name):
+    """Match derived provenance without redundantly tagging Fantasia itself."""
+    return board_tag_edits(cards, tags_by_name, excluded_tags={FANTASIA_TAG})
+
+
+def added_names_between(before, after):
+    """Names present on the later maybeboard but absent from the earlier one."""
+    before_names = {
+        name_key(card) for card in before["cards"].get("maybeboard", [])
+    }
+    return {
+        name_key(card) for card in after["cards"].get("maybeboard", [])
+    } - before_names
+
+
+def one_time_imports(occupied_names, source_boards, tags_by_name):
+    """Build deduped adds from explicitly requested source mainboards."""
+    occupied_names = set(occupied_names)
+    imports = []
+    for cards in source_boards:
+        for card in cards:
+            key = name_key(card)
+            if key in occupied_names:
+                continue
+            template = clean_card(card)
+            template["tags"] = sorted(tags_by_name.get(key, set()) - {FANTASIA_TAG})
+            imports.append(template)
+            occupied_names.add(key)
+    return imports
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--apply", action="store_true", help="actually push the sync")
+    parser.add_argument("--bangers-csv", type=pathlib.Path, default=BANGERS_CSV)
+    parser.add_argument(
+        "--import-cube",
+        action="append",
+        default=[],
+        metavar="CUBE_ID",
+        help="one-time import of a cube's mainboard (repeatable)",
+    )
+    parser.add_argument(
+        "--undo-additions",
+        nargs=2,
+        type=pathlib.Path,
+        metavar=("BEFORE_JSON", "AFTER_JSON"),
+        help="remove maybeboard names added between two saved snapshots",
+    )
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
+    cc = CubeCobra()
+    fantasia = cc.cube_json(FANTASIA)
+
+    cubes = {FANTASIA: fantasia}
+    import_cubes = []
+    for cube_id in args.import_cube:
+        cube = cc.cube_json(cube_id)
+        cubes[cube_id] = cube
+        import_cubes.append(cube)
+    tag_library, _, _ = load_tag_library(cc, args.bangers_csv, cubes=cubes)
 
     current_main = fantasia["cards"]["mainboard"]
     current_maybe = fantasia["cards"].get("maybeboard", [])
-    print(f"\nFantasia now: {len(current_main)} mainboard, {len(current_maybe)} maybeboard")
-    print(f"After: 0 mainboard, {len(desired)} maybeboard")
 
+    removal_names = set()
+    if args.undo_additions:
+        before_path, after_path = args.undo_additions
+        before = json.loads(before_path.read_text())
+        after = json.loads(after_path.read_text())
+        removal_names = added_names_between(before, after)
+        print(f"undo manifest: {len(removal_names)} names added between snapshots")
+
+    kept_maybe = [card for card in current_maybe if name_key(card) not in removal_names]
+    occupied_names = {name_key(card) for card in current_main + kept_maybe}
+    new_cards = one_time_imports(
+        occupied_names,
+        [cube["cards"].get("mainboard", []) for cube in import_cubes],
+        tag_library,
+    )
+    for cube in import_cubes:
+        size = len(cube["cards"].get("mainboard", []))
+        print(f"one-time import source: {cube.get('name')} ({size} cards)")
+
+    desired = []
+    for card in kept_maybe + new_cards:
+        template = clean_card(card)
+        template["tags"] = sorted(
+            tag_library.get(name_key(card), set()) - {FANTASIA_TAG}
+        )
+        desired.append(template)
+
+    combo_counts = Counter(tuple(card["tags"]) for card in desired)
+    print(f"\nDesired maybeboard: {len(desired)} unique cards")
+    for combo, count in combo_counts.most_common():
+        print(f"  {count:4d}  {' + '.join(combo)}")
+
+    print(f"\nFantasia now: {len(current_main)} mainboard, {len(current_maybe)} maybeboard")
+    print(f"After: {len(current_main)} mainboard, {len(desired)} maybeboard")
+
+    validate_indexes(current_main, "mainboard")
+    validate_indexes(current_maybe, "maybeboard")
+    changes = {}
+    main_edits = mainboard_tag_edits(current_main)
+    if main_edits:
+        changes["mainboard"] = {"edits": main_edits}
+    print(f"  mainboard tag updates: {len(main_edits)}")
+
+    maybe_changes = {}
+    stale = [
+        remove_entry(card)
+        for card in sorted(current_maybe, key=lambda card: -card["index"])
+        if name_key(card) in removal_names
+    ]
+    if stale:
+        maybe_changes["removes"] = stale
+    if new_cards:
+        maybe_changes["adds"] = new_cards
+    maybe_edits = maybeboard_tag_edits(kept_maybe, tag_library)
+    if maybe_edits:
+        maybe_changes["edits"] = maybe_edits
+    if maybe_changes:
+        changes["maybeboard"] = maybe_changes
+
+    print(
+        f"  maybeboard: +{len(new_cards)} / -{len(stale)} / "
+        f"{len(maybe_edits)} tag updates"
+    )
+
+    if not changes:
+        print("Nothing to do — already in desired state.")
+        return
     if not args.apply:
         print("\nDry run — nothing changed. Re-run with --apply to execute.")
         return
 
     cc.login()
-
-    validate_indexes(current_main, "mainboard")
-    validate_indexes(current_maybe, "maybeboard")
-    changes = {}
-    if current_main:
-        changes["mainboard"] = {
-            "removes": [remove_entry(c) for c in sorted(current_main, key=lambda c: -c["index"])]
-        }
-    maybe_changes = {}
-    current_maybe_names = {name_key(c) for c in current_maybe}
-    stale = [
-        remove_entry(c)
-        for c in sorted(current_maybe, key=lambda c: -c["index"])
-        if name_key(c) not in pool
-    ]
-    if stale:
-        maybe_changes["removes"] = stale
-    new_cards = [c for k, c in pool.items() if k not in current_maybe_names]
-    if new_cards:
-        maybe_changes["adds"] = new_cards
-    if maybe_changes:
-        changes["maybeboard"] = maybe_changes
-
-    if not changes:
-        print("Nothing to do — already in desired state.")
-        return
-
-    result = cc.commit(fantasia["id"], changes, fantasia.get("version", 0),
-                       title="Rebuild maybeboard as design pool")
+    result = cc.commit_batched(
+        fantasia["id"],
+        changes,
+        fantasia.get("version", 0),
+        title="Sync Fantasia boards and live tags",
+    )
     print(f"committed, new version {result.get('version')}")
 
 

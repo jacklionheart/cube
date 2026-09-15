@@ -10,7 +10,7 @@ There is no official user API; session-cookie automation is the only route.
 | Read cube + cards | `GET /cube/api/cubeJSON/:id` | No auth for public/unlisted. Rate limit 100/min. Accepts shortId or UUID. Contains `version` (for optimistic locking), `tagColors`, hydrated cards. |
 | List my cubes | `GET /cube/api/mycubes` | Session. `{success, cubes: [{id, shortId, name}]}`. Most stable interface. |
 | Login | `POST /user/login` | Form-urlencoded `username`+`password`. Always 302; success → `Location: /dashboard`. Session cookie `connect.sid`, 30-day TTL, doesn't invalidate browser sessions. No captcha/lockout. |
-| Commit changes | `POST /cube/api/commit` | JSON `{id, changes, title, blog, useBlog, expectedVersion}`. 200 `{success:'true', updateApplied, version}`; 409 on version conflict (re-read, recompute, retry). `useBlog:false` → no blog/feed, changelog still written. Applied per board: swaps → edits → removes (desc) → adds (append). 50 MB body limit. |
+| Commit changes | `POST /cube/api/commit` | JSON `{id, changes, title, blog, useBlog, expectedVersion}`. Per-board edits are `{index, oldCard, newCard}`. 200 `{success:'true', updateApplied, version}`; 409 on version conflict (re-read, recompute, retry). `useBlog:false` → no blog/feed, changelog still written. Applied per board: swaps → edits → removes (desc) → adds (append). 50 MB body limit. |
 | Delete cube | `POST /cube/remove/:id` | Session. **Hard delete, no undo.** 302 → `/dashboard` on success. No JSON variant. |
 | Resolve names → printings | `POST /cube/api/getcardsforcube` | `{names: [...], defaultPrinting: 'recent'}` → card details incl. scryfall ids. No auth. |
 | Tag colors | `POST /cube/api/savetagcolors/:id` | `{tag_colors: [{tag, color}]}`. Commit cards first — colors for tags on no card get filtered out. |
@@ -19,9 +19,9 @@ There is no official user API; session-cookie automation is the only route.
 
 1. **cubeJSON board arrays are display-sorted** (since 2026-08-26), NOT stored
    order. Every card carries `index` = its stored-array position; removes/edits
-   MUST use `card.index`, never array position. Gaps in the index sequence are
-   normal (null placeholder slots are filtered from the response); duplicates
-   are not.
+   MUST use `card.index`, never array position. Gaps are empty placeholder slots
+   filtered from the sorted response but still included in `cardCount`; remove
+   those missing indexes in descending order to compact the stored board.
 2. Never include a `nickname` field in any POST body — it's a honeypot that
    silently redirects. If CSRF is ever re-enabled upstream, all POSTs break.
 3. Commit is not idempotent (adds append). Chain commits with the returned
@@ -38,3 +38,10 @@ There is no official user API; session-cookie automation is the only route.
    fields (never row order) > CSV columns (append-only so far).
 9. Bulk read-only research data: `aws s3 sync s3://cubecobra-public/export/
    --no-sign-request` (~quarterly refresh) — not for live management.
+10. Safe reads retry transient connection failures and 429/5xx responses up to
+    five times, discarding pooled sockets between attempts. Mutations are never
+    blindly retried.
+11. Large writes are split into at most 100 card operations. The scripts back
+    up once, apply edits before descending-index removals and additions, and
+    chain each returned version into the next batch. If a response is lost,
+    they inspect the live version before deciding whether the batch landed.

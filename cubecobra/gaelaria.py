@@ -15,7 +15,7 @@ import pathlib
 import subprocess
 import sys
 
-from cc import CubeCobra, board_delta, describe_delta
+from cc import CubeCobra, board_delta, describe_delta, missing_slot_removals
 
 MASTER = "sealed"
 MODULES = {
@@ -65,10 +65,14 @@ def main():
     deltas = {}
     for short_id, tag in MODULES.items():
         module = cc.cube_json(short_id)
-        adds, removes = board_delta(module["cards"]["mainboard"], by_tag[tag])
+        mainboard = module["cards"]["mainboard"]
+        adds, removes = board_delta(mainboard, by_tag[tag])
+        stored_count = module.get("cardCount", len(mainboard))
+        slot_removes = missing_slot_removals(mainboard, stored_count, f"{short_id} mainboard")
+        removes.extend(slot_removes)
         deltas[short_id] = (module, adds, removes)
         print(f"\n{module['name']} ({short_id}) — should hold {len(by_tag[tag])} {tag} cards, "
-              f"currently {len(module['cards']['mainboard'])}:")
+              f"currently {len(mainboard)} visible / {stored_count} stored:")
         if adds or removes:
             describe_delta("sync", adds, removes)
         else:
@@ -92,8 +96,10 @@ def main():
             changes["mainboard"]["adds"] = adds
         if removes:
             changes["mainboard"]["removes"] = removes
-        result = cc.commit(module["id"], changes, module.get("version", 0),
-                           title="Automated sync from Gaelaria")
+        result = cc.commit_batched(
+            module["id"], changes, module.get("version", 0),
+            title="Automated sync from Gaelaria",
+        )
         print(f"  committed, new version {result.get('version')}")
 
     print("refreshing local CSVs…")
