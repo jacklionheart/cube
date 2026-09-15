@@ -11,7 +11,8 @@ Cube building and MTG limited analysis.
   - `fetch.sh` — refresh `cards.csv` for each cube from Cube Cobra
   - `cc.py` — Cube Cobra client (session auth, deltas, auto-backup before every mutation)
   - `gaelaria.py` — delete stale "Clone of Gaelaria" cubes; sync [/gaea](https://cubecobra.com/cube/list/gaea) and [/tolaria](https://cubecobra.com/cube/list/tolaria) from the master's 🌳/🧙 tags. Dry-run by default; `--apply` to execute.
-  - `fantasia.py` — rebuild Fantasia's maybeboard as the design pool: union of gathered picks (✨) + GUT (⚛️) + Sacred Geometry (📐) + Lords of Limited (👑), mainboard emptied. Dry-run by default.
+  - `elemental.py` — live-sync shared 🌍 Gaelaria/🌈 Elemental/✨ Fantasia and GUT/Sacred/LOL/Banger/📼 LSV Retro provenance tags onto Elemental's mainboard without changing membership or adding Elemental's self-tag. Dry-run by default.
+  - `fantasia.py` — preserve Fantasia's board membership while live-updating tags: mainboard keeps only Allies/Enemies, maybeboard receives cross-cube plus GUT/Sacred/LOL/Banger/LSV Retro provenance, and Picked/self-tags disappear. `--import-cube` performs an explicit one-time import; ordinary syncs never refill manually removed cards. Dry-run by default.
   - `API-NOTES.md` — Cube Cobra endpoint contracts and gotchas
   - Credentials via `CUBECOBRA_USERNAME` / `CUBECOBRA_PASSWORD` env vars (or interactive prompt)
 - `17lands/` — 17lands data analysis (migrated from the old `mtg_analysis` directory)
