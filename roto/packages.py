@@ -321,19 +321,25 @@ def flex_packages(groups, owners):
     return out
 
 
-def straddles(owners, drafts):
-    """Decks whose 2-of-3 cores pair them with two or more different
-    decks of the same other draft — one drafter merging what another
-    draft's table split. Returns {(k, player): {k2: [(partner, core)]}}
-    keeping only same-draft partner lists of length >= 2."""
+def team_partners(owners):
+    """Every deck's teams, keyed by the other draft:
+    {(k, player): {k2: [(partner, core)]}}, unfiltered."""
     partners = defaultdict(lambda: defaultdict(list))
     for e in pair_packages(owners):
         (ka, pa), (kb, pb) = e["decks"]
         partners[(ka, pa)][kb].append((pb, e["core"]))
         partners[(kb, pb)][ka].append((pa, e["core"]))
+    return partners
+
+
+def straddles(owners, drafts):
+    """Decks whose 2-of-3 cores pair them with two or more different
+    decks of the same other draft — one drafter merging what another
+    draft's table split. Returns {(k, player): {k2: [(partner, core)]}}
+    keeping only same-draft partner lists of length >= 2."""
     return {
         deck: {k2: plist for k2, plist in by_draft.items() if len(plist) >= 2}
-        for deck, by_draft in partners.items()
+        for deck, by_draft in team_partners(owners).items()
         if any(len(plist) >= 2 for plist in by_draft.values())
     }
 
