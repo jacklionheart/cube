@@ -1,7 +1,8 @@
 """Package analysis over the roto drafts' maindecks.
 
-A *package* is a maximal set of cards maindecked in the same deck in every
-draft (identical deck-owner signature). Edges connect packages whose
+A *package* is a maximal set of at least MIN_PACKAGE_SIZE (3) cards
+maindecked in the same deck in every draft (identical deck-owner
+signature). Edges connect packages whose
 signatures agree in 2 of 3 drafts — packages that traveled together but
 split once, i.e. real draft-time choices. Connected components are
 archetype super-clusters. *Halos* loosen the definition: cards that shared
@@ -68,14 +69,24 @@ def maindeck_owners(drafts, cube, decks):
     return owners
 
 
-def signature_groups(owners):
+MIN_PACKAGE_SIZE = 3
+
+
+def signature_groups(owners, min_size=None):
+    if min_size is None:
+        min_size = MIN_PACKAGE_SIZE
+    return _signature_groups(owners, min_size)
+
+
+def _signature_groups(owners, min_size):
     """Maximal packages: cards sharing one full (no-None) owner signature.
-    Returns [(signature, cards)] with >= 2 cards, largest first."""
+    Returns [(signature, cards)] with >= min_size cards, largest first."""
     sigs = defaultdict(list)
     for card, sig in owners.items():
         if None not in sig:
             sigs[sig].append(card)
-    groups = [(sig, cards) for sig, cards in sigs.items() if len(cards) >= 2]
+    groups = [(sig, cards) for sig, cards in sigs.items()
+              if len(cards) >= min_size]
     groups.sort(key=lambda g: -len(g[1]))  # stable: ties keep cube order
     return groups
 
@@ -222,6 +233,30 @@ def colors_str(cards, scry):
     return "".join(c for c in WUBRG if c in u) or "C"
 
 
+def load_themes():
+    """card -> theme, from hand-labeled themes.tsv (Jack's labels,
+    captured from the sheet's Maindecked Together Theme column)."""
+    path = HERE / "themes.tsv"
+    if not path.exists():
+        return {}
+    out = {}
+    for line in path.read_text().splitlines()[1:]:
+        if line.strip():
+            card, theme = line.split("\t")
+            out[card] = theme
+    return out
+
+
+def theme_str(cards, themes):
+    """Unique themes represented in a card set, alphabetical by card."""
+    seen = []
+    for c in sorted(cards):
+        t = themes.get(c)
+        if t and t not in seen:
+            seen.append(t)
+    return ", ".join(seen)
+
+
 def deck_sets(owners):
     """(draft index, player) -> set of cards maindecked in that deck."""
     by_deck = defaultdict(set)
@@ -357,7 +392,8 @@ def report_mermaid(groups, edges, comps):
 
 def report_null(drafts, cube, decks, iters, seed):
     observed, samples = null_model(drafts, cube, decks, iters=iters, seed=seed)
-    names = ["packages (size>=2)", "cards in packages", "largest package"]
+    names = [f"packages (size>={MIN_PACKAGE_SIZE})", "cards in packages",
+             "largest package"]
     print(f"NULL MODEL: {iters} random re-deckbuilds of the drafted pools "
           f"(seed {seed})")
     print("stat                 observed   null mean    sd   p95  max   p(null>=obs)")

@@ -452,44 +452,30 @@ def build_md_together(wb, drafts, cube, decks):
     """Maximal groups of cards maindecked together (same deck) in every
     draft. Cards group iff they share the same deck-owner signature across
     all drafts, so pairs/triplets/bigger clusters all fall out at once.
-    Pure co-occurrence analysis — computed here, not by sheet formulas."""
-    sigs = {}
-    for card, _, _ in cube:
-        owners = []
-        for d in drafts:
-            p = d.picks.get(card)
-            deck = decks.get((d.name, p.player)) if p else None
-            if not deck or deck.get(card) not in MAIN_ZONES:
-                owners = None
-                break
-            owners.append(p.player)
-        if owners:
-            sigs.setdefault(tuple(owners), []).append(card)
-
-    groups = []
-    for owners, cards in sigs.items():
-        if len(cards) < 2:
-            continue
-        w = l = 0
-        for d, p in zip(drafts, owners):
-            dw, dl = d.records.get(p, (0, 0))
-            w, l = w + dw, l + dl
-        wr = w / (w + l) if w + l else None
-        groups.append((cards, owners, w, l, wr))
-    groups.sort(key=lambda g: (-(g[4] if g[4] is not None else -1), -len(g[0]), g[0]))
-
+    Pure co-occurrence analysis — computed here, not by sheet formulas.
+    Group numbering and order match packages.py (P#: size desc)."""
     import packages as pk
+
+    owners_map = pk.maindeck_owners(drafts, cube, decks)
+    groups = pk.signature_groups(owners_map)
     scry = pk.load_scryfall()
+    themes = pk.load_themes()
 
     ws = wb.create_sheet("Maindecked Together")
-    header = ["Group", "Cards", "Size", "Colors"]
+    header = ["Group", "Cards", "Size", "Theme", "Colors"]
     header += [f"{d.name} Player" for d in drafts]
     header += ["Wins", "Losses", "Win Rate"]
     ws.append(header)
     style_header(ws)
-    for i, (cards, owners, w, l, wr) in enumerate(groups):
+    for i, (sig, cards) in enumerate(groups):
+        w = l = 0
+        for d, p in zip(drafts, sig):
+            dw, dl = d.records.get(p, (0, 0))
+            w, l = w + dw, l + dl
+        wr = w / (w + l) if w + l else None
         ws.append([i + 1, "\n".join(sorted(cards)), len(cards),
-                   pk.colors_str(cards, scry), *owners, w, l, wr])
+                   pk.theme_str(cards, themes), pk.colors_str(cards, scry),
+                   *sig, w, l, wr])
         r = ws.max_row
         ws.cell(r, 2).alignment = Alignment(wrap_text=True)
         for c in (1, 3, *range(4, len(header) + 1)):
@@ -497,8 +483,9 @@ def build_md_together(wb, drafts, cube, decks):
         ws.cell(r, len(header)).number_format = "0.0%"
     ws.freeze_panes = "A2"
     ws.column_dimensions["B"].width = 60
+    ws.column_dimensions["D"].width = 14
     for i in range(len(drafts)):
-        ws.column_dimensions[get_column_letter(5 + i)].width = 16
+        ws.column_dimensions[get_column_letter(6 + i)].width = 16
     ws.auto_filter.ref = ws.dimensions
     wr_col = get_column_letter(len(header))
     ws.conditional_formatting.add(
@@ -524,30 +511,33 @@ def build_package_tabs(wb, drafts, cube, decks):
     owners = pk.maindeck_owners(drafts, cube, decks)
     groups = pk.signature_groups(owners)
     scry = pk.load_scryfall()
+    themes = pk.load_themes()
 
     ws = wb.create_sheet("Packages 2 of 3")
-    header = ["#", "Size", "Colors", "Cards", "Deck A", "Deck B", "Contains Strict"]
+    header = ["#", "Size", "Theme", "Colors", "Cards", "Deck A", "Deck B",
+              "Contains Strict"]
     ws.append(header)
     style_header(ws)
     strict = [(i + 1, set(cards)) for i, (_, cards) in enumerate(groups)]
     for n, e in enumerate(pk.pair_packages(owners)):
         (ka, pa), (kb, pb) = e["decks"]
         contains = ", ".join(f"P{i}" for i, s in strict if s <= e["core"])
-        ws.append([n + 1, len(e["core"]), pk.colors_str(e["core"], scry),
+        ws.append([n + 1, len(e["core"]), pk.theme_str(e["core"], themes),
+                   pk.colors_str(e["core"], scry),
                    "\n".join(sorted(e["core"])),
                    f"{drafts[ka].name}: {pa}", f"{drafts[kb].name}: {pb}",
                    contains])
         r = ws.max_row
-        ws.cell(r, 4).alignment = Alignment(wrap_text=True)
-        for c in (1, 2, 3):
+        ws.cell(r, 5).alignment = Alignment(wrap_text=True)
+        for c in (1, 2, 3, 4):
             ws.cell(r, c).alignment = CENTER
     ws.freeze_panes = "A2"
-    for col, w in zip("ABCDEFG", (5, 6, 9, 42, 20, 20, 16)):
+    for col, w in zip("ABCDEFGH", (5, 6, 14, 9, 42, 20, 20, 16)):
         ws.column_dimensions[col].width = w
     ws.auto_filter.ref = ws.dimensions
 
     ws = wb.create_sheet("Packages ±1 Card")
-    ws.append(["P#", "Colors", "Core — in all 3 decks",
+    ws.append(["P#", "Theme", "Colors", "Core — in all 3 decks",
                "Flex — in 2 of 3 (marked: the deck that skipped it)",
                "Combined", "Core #", "Flex #", "Total #"])
     style_header(ws)
@@ -559,19 +549,20 @@ def build_package_tabs(wb, drafts, cube, decks):
             flex += [f"{card}  — not in {drafts[k].name}" for card in bucket]
         n_flex = sum(len(b) for b in e["flex"])
         all_cards = list(e["cards"]) + [c for b in e["flex"] for c in b]
-        entries.append((gi + 1, pk.colors_str(all_cards, scry),
+        entries.append((gi + 1, pk.theme_str(all_cards, themes),
+                        pk.colors_str(all_cards, scry),
                         "\n".join(core), "\n".join(flex),
                         "\n".join(sorted(all_cards)),
                         len(core), n_flex, len(all_cards)))
-    for row in sorted(entries, key=lambda x: -x[7]):
+    for row in sorted(entries, key=lambda x: -x[8]):
         ws.append(list(row))
         r = ws.max_row
-        for c in (3, 4, 5):
+        for c in (4, 5, 6):
             ws.cell(r, c).alignment = Alignment(wrap_text=True)
-        for c in (1, 2, 6, 7, 8):
+        for c in (1, 2, 3, 7, 8, 9):
             ws.cell(r, c).alignment = CENTER
     ws.freeze_panes = "A2"
-    for col, w in zip("ABCDEFGH", (5, 9, 34, 40, 34, 10, 10, 9)):
+    for col, w in zip("ABCDEFGHI", (5, 14, 9, 34, 40, 34, 10, 10, 9)):
         ws.column_dimensions[col].width = w
     ws.auto_filter.ref = ws.dimensions
 

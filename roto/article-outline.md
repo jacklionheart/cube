@@ -41,43 +41,32 @@
 - Honesty paragraph (Ben): n=3, one community's metagame, roto ≠ blind
   draft (full information + singleton). This is archaeology, not physics.
 
-## 2. The 25 packages, labeled
+## 2. The 11 packages, themed (min size 3; Jack's labels)
 
-- Table: P#, size, suggested archetype label (MY DRAFTS — relabel in your
-  own words), members. Order by component then size.
+- Definition update: packages now require >= 3 cards — every surviving
+  package carries one of Jack's hand-applied themes (Tokens, Spells,
+  Ramp, Graveyard, Sacrifice, Rectangles, Discard). Numbering unified:
+  sheet Group # = P#, size-desc.
 
-| P# | n | draft label (rewrite) | cards |
-|----|---|--------------------|-------|
-| P1 | 10 | Boros go-wide | Dog Walker, Forbidden Friendship, Inspiring Overseer, On the Job, Painter's Studio, Rally at the Hornburg, Resolute Reinforcements, Sacred Foundry, Salt Road Packbeast, Shock Brigade |
-| P2 | 8 | UR spells velocity | Consider, Demon Bolt, Expressive Iteration, Jwari Disruption, Mystic Sanctuary, Scalding Tarn, Think Twice, Thundering Falls |
-| P3 | 6 | 5c Fires ramp | Biomechan Engineer, Courier's Briefcase, Fires of Invention, Hunter's Talent, Path to the World Tree, Writhing Chrysalis |
-| P4 | 5 | WU spells / Acuity | Dovin's Acuity, Flooded Strand, Hallowed Fountain, Pyrrhic Strike, Raugrin Triome |
-| P5 | 5 | G self-mill value | Eccentric Farmer, Generous Ent, Rise of the Varmints, Satyr Wayfinder, Spider Spawning |
-| P6 | 4 | 5c Pizza shell | Cloud of Darkness, Everything Pizza, Evolving Wilds, Marshals' Pathcruiser |
-| P7 | 3 | WB aristocrat drain | Bastion of Remembrance, Shattered Landscape, Voice of Victory |
-| P8 | 3 | WB nightmare enchants | Hopeless Nightmare, Michiko's Reign of Truth, Shadowy Backstreet |
-| P9 | 3 | U tempo-counters | Censor, Quench, Shoreline Looter |
-| P10 | 3 | Sacrifice core | Deadly Dispute, Marionette Apprentice, Mayhem Devil |
-| P11 | 3 | BG grave payoffs | Broodspinner, Disruptive Stormbrood, Verdant Catacombs |
-| P12 | 2 | WB drain bodies | Cat Collector, Ruthless Lawbringer |
-| P13 | 2 | Yorion blink flag | Aang the Last Airbender, Yorion |
-| P14 | 2 | WU enchant payoff | Citizen's Crowbar, Dance of the Manse |
-| P15 | 2 | W tempo-auras | Essence Reliquary, The Princess Takes Flight |
-| P16 | 2 | W builders | Builder's Talent, The Birth of Meletis |
-| P17 | 2 | Blink fodder | Adagia Windswept Bastion, Pilgrim's Eye |
-| P18 | 2 | U oddments | Cryogen Relic, Fear of Isolation |
-| P19 | 2 | U counters | Refute, The Modern Age |
-| P20 | 2 | U card flow | Hieroglyphic Illumination, Lórien Revealed |
-| P21 | 2 | Sac vehicles | Phantom Train, Piggy Bank |
-| P22 | 2 | Treasure aggro | Magda the Hoardmaster, Torch the Tower |
-| P23 | 2 | Spells satellite | Perilous Landscape, Thunder Magic |
-| P24 | 2 | UB tempo pair | Haunt the Network, Polluted Delta |
-| P25 | 2 | UR spells lands | Steam Vents, Xander's Lounge |
+| P# | n | theme | colors | anchor cards |
+|----|---|-------|--------|--------------|
+| P1 | 10 | Tokens | WR | Dog Walker, Inspiring Overseer, Resolute Reinforcements… |
+| P2 | 8 | Spells | UR | Consider, Expressive Iteration, Think Twice… |
+| P3 | 6 | Ramp | URG | Fires of Invention, Path to the World Tree… |
+| P4 | 5 | Spells | WUR | Dovin's Acuity, Pyrrhic Strike… |
+| P5 | 5 | Graveyard | G | Spider Spawning, Satyr Wayfinder… |
+| P6 | 4 | Ramp | BG | Cloud of Darkness, Everything Pizza… |
+| P7 | 3 | Sacrifice | WB | Bastion of Remembrance, Voice of Victory… |
+| P8 | 3 | Rectangles | WB | Hopeless Nightmare, Michiko's Reign of Truth… |
+| P9 | 3 | Discard | U | Censor, Quench, Shoreline Looter |
+| P10 | 3 | Sacrifice | BR | Deadly Dispute, Mayhem Devil… |
+| P11 | 3 | Graveyard | BG | Broodspinner, Verdant Catacombs… |
 
-- Note for prose: sizes are power-law-ish — one 10-card monolith (P1
-  stayed intact through *three different drafters*), a few mid cores,
-  many pairs. The pairs are mostly *satellites* of bigger things (next
-  section shows how).
+- The dropped size-2 pairs aren't deleted knowledge: they reappear as
+  flex/halo members and inside the 2-of-3 view (sheet tabs). Note for
+  prose: theme pairs recur across color anchors (Spells in UR and WUR,
+  Ramp in URG and BG, Sacrifice in WB and BR, Graveyard mono-G and BG)
+  — the cube's themes are color-flexible, which is itself a finding.
 
 ## 2b. Are the packages real? (the null model)
 
@@ -87,16 +76,14 @@
 - Method, one sentence: keep everyone's exact picks, replace each
   maindeck with a random same-size subset of that player's own pool,
   re-count packages, 2,000 times (`packages.py --null`).
-- Results (observed vs. chance):
-  - packages (size ≥2): **25 observed** vs 15.7 ± 2.6 by chance (p ≈ .002)
-  - cards inside packages: **81** vs 40.6 ± 6.1 — *never reached once in
-    2,000 random worlds* (p < .0005)
-  - largest package: **10** vs 5.0 ± 1.0 — chance never built one bigger
-    than 9 (p < .0005)
-- The honest two-sided reading (use this framing): the *card mass* and
-  the *big cores* are unambiguous deckbuilding signal — but a random
-  world still produces ~15 "packages," so any individual 2-card pair
-  could be coincidence. Big packages: trust. Pairs: hold loosely.
+- Results at min size 3 (observed vs. chance, 2,000 permutations):
+  - packages: **11 observed** vs 5.6 ± 1.5 (p < .0005; chance max 10)
+  - cards inside packages: **53** vs 20.4 ± 5.3 (p < .0005; chance max 38)
+  - largest package: **10** vs 5.0 ± 1.1 (p < .0005; chance max 9)
+- With the size-3 floor, ALL THREE stats are outside anything chance
+  produced in 2,000 worlds — raising the floor removed the coincidence-
+  range tail that 2-card pairs had. (At size ≥2 the count stat was only
+  p ≈ .002; that's now a methods footnote, not a caveat.)
 - Scope caveat (state it): this tests the deckbuild stage only — picks
   stay as drafted, so it asks "given what people picked, are the shared
   maindecks surprising?", not "are picks correlated?"
@@ -210,10 +197,14 @@ First Pick).
 ## Production notes
 
 - Numbers to re-verify at publish time (data still accruing matches):
-  group count (25), edge count (19), component count (8), list sizes
-  (24/89/16/38, overlap 29/9), null-model table (25/81/10 vs
-  15.7/40.6/5.0). Note: match records don't change packages, but any
-  NEW rebuild deck link does — rerun after decks.tsv changes.
+  package count (11, min size 3), edges (3 — all same-theme: the two
+  Spells packages, two Ramp, two Graveyard), cut-list sizes
+  (24/89/16/38, overlap 29/9), null table (11/53/10 vs 5.6/20.4/5.0,
+  all p<.0005). §3's rich choice-graph narrative was written at min
+  size 2 — at size 3 the forks live mostly in the 2-of-3 and flex
+  views, so either present the graph over those or rework §3 around
+  the three same-theme edges. Match records don't change packages, but
+  any NEW rebuild deck link does — rerun after decks.tsv changes.
 - Regenerate everything:
   `python3 refresh.py && python3 packages.py --loose && python3 packages.py --null`.
 - No win rates in print. If directional language survives ("this cluster
