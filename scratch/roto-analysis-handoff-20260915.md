@@ -20,8 +20,8 @@ https://docs.google.com/spreadsheets/d/1_w-YcYynXZgzObp13fPUB1q8XNxN6IH7gFkyHgH8
 - **MUST always be updated in place** (`upload_sheet.py --update <id>`,
   or just `refresh.py`) — it has sharing settings; never create a new
   file for it.
-- Tab order: Pick Summary, Color Analysis, Maindecked Together,
-  Packages 2 of 3, Card List, Draft 1–3, Records,
+- Tab order: Pick Summary, Color Analysis, Deck Shells (all 3 drafts),
+  Packages (2 of 3), Card List, Draft 1–3, Records,
   Decks, Deck Links, Win Rates (raw data deliberately last).
 - Pick Summary & Win Rates are computed by **in-cell formulas** from the
   data tabs; sorts are baked at build time. Pick Summary sort:
@@ -112,7 +112,7 @@ https://docs.google.com/spreadsheets/d/1_w-YcYynXZgzObp13fPUB1q8XNxN6IH7gFkyHgH8
   (1,0)=strict cores + per-draft flex buckets (near-members absent from
   exactly one of the triple's decks); (1,1)=(0,1) cores + 2 free slots
   (flex is unconstrained at pair level, so only the size bound is
-  meaningful). Two analyses ship in the sheet: Maindecked Together (strict >=3 cores merged with their ±1 flex: Theme/Colors/Core/Flex/All + owners + record) and Packages 2 of 3 (pair cores, min size 5; packages.py --straddles lists decks pairing with >=2 decks of the same other draft — the merge/split seams).
+  meaningful). Two analyses ship in the sheet: Deck Shells (all 3 drafts) (strict >=3 cores merged with their ±1 flex: Theme/Colors/Core/Flex/All + owners + record) and Packages (2 of 3) (pair cores, min size 5 — Jack's naming: pair intersections are the package-sized units, core+flex is a deck shell; packages.py --straddles lists decks pairing with >=2 decks of the same other draft — the merge/split seams).
 - "Packages ±1 Card" tab layout (iterated with Jack): P#, Colors,
   Core — in all 3 decks, Flex — in 2 of 3 (each flex line marked with
   the deck that skipped it), Combined, Core #, Flex #, Total #; sorted
