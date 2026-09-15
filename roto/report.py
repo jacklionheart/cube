@@ -1,10 +1,14 @@
-"""Render out/merge-report.html: the by-person merge report.
+"""Render out/lane-report.html: the lane-centric analysis report.
 
-One section per merging deck (both-way blenders first) showing the full
-decklist as color-tinted card chips grouped by Team — for each other
-draft, the cards this deck shares with each partner deck there — plus
-the remainder no team claims. Lane-core cards carry a star badge,
-companions a diamond. Self-contained HTML, inline CSS only.
+Section 1 presents each of the 11 Lanes: theme, core-only colors, the
+three owning decks (linked to their sealeddeck pages, with match
+records), the core cards as embedded Scryfall images, and the flex
+orbit with links to the two decks that kept each flex card. Section 2
+shows the two-lanes-per-player structure, split into same-theme pairs
+(the theme pooled in one deck where other pods contested it) and
+cross-theme module combinations. Section 3 lists the decks owning no
+lane and their distinctive cards (maindecked cards in no lane core or
+flex). Scaffold text is minimal by design — the prose voice is Jack's.
 
 Usage: python3 report.py
 """
@@ -12,39 +16,41 @@ Usage: python3 report.py
 import html
 import pathlib
 
-from packages import (card_colors, deck_sets, load, load_scryfall,
-                      load_themes, maindeck_owners, signature_groups,
-                      straddles, team_partners, theme_str)
-from roto_summary import COLOR_FILLS
+from packages import (card_colors, deck_sets, flex_packages, load,
+                      load_scryfall, load_themes, maindeck_owners,
+                      never_drafted, never_maindecked, signature_groups,
+                      theme_str)
+from roto_summary import COLOR_FILLS, load_decks
 
 HERE = pathlib.Path(__file__).parent
 
 CSS = """
 body { font-family: -apple-system, Segoe UI, Helvetica, Arial, sans-serif;
        margin: 24px auto; max-width: 1080px; color: #222; }
-h1 { font-size: 24px; } h2 { font-size: 19px; margin: 28px 0 6px; }
-h3 { font-size: 15px; margin: 12px 0 4px; }
+h1 { font-size: 24px; } h2 { font-size: 20px; margin: 30px 0 8px; }
+h3 { font-size: 16px; margin: 18px 0 4px; }
+h4 { font-size: 13px; margin: 10px 0 4px; }
 table { border-collapse: collapse; margin: 8px 0 16px; }
 th, td { border: 1px solid #ccc; padding: 4px 10px; font-size: 13px;
          text-align: left; vertical-align: top; }
 th { background: #434343; color: #fff; }
+a { color: #1a56a0; text-decoration: none; }
+a:hover { text-decoration: underline; }
 .meta { color: #555; font-size: 13px; margin: 2px 0 10px; }
-.cols { display: flex; gap: 18px; align-items: flex-start; }
-.col { flex: 1; min-width: 0; }
-.team { border: 1px solid #ddd; border-radius: 8px; padding: 8px 10px;
-        margin: 8px 0; background: #fafafa; }
-.team h4 { margin: 0 0 6px; font-size: 13px; }
+.lane { border-top: 3px solid #434343; margin-top: 26px; padding-top: 6px; }
 .theme { display: inline-block; background: #434343; color: #fff;
-         border-radius: 8px; padding: 0 8px; font-size: 11px; }
+         border-radius: 8px; padding: 0 8px; font-size: 12px; }
+.cards { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.cards img { width: 160px; border-radius: 7px; }
+.flex-list { font-size: 13px; margin: 4px 0 12px; }
+.flex-list li { margin: 2px 0; }
 .chip { display: inline-block; border: 1px solid #bbb; border-radius: 10px;
         padding: 1px 8px; margin: 2px; font-size: 12px; }
-.lane-core { border: 2px solid #333; font-weight: 600; }
-.deck { border-top: 3px solid #434343; margin-top: 26px; padding-top: 6px; }
-.legend { font-size: 12px; color: #555; margin: 6px 0 18px; }
+.kept { color: #555; }
 """
 
 
-def chip(card, colors, lane_core=False, companion=False):
+def chip(card, colors):
     cs = colors.get(card, set())
     if len(cs) == 1:
         fill = COLOR_FILLS[next(iter(cs))]
@@ -52,22 +58,25 @@ def chip(card, colors, lane_core=False, companion=False):
         fill = COLOR_FILLS["multi"]
     else:
         fill = COLOR_FILLS["C"]
-    cls = "chip lane-core" if lane_core else "chip"
-    badges = ("★" if lane_core else "") + ("◆" if companion else "")
-    label = html.escape(card) + (f" {badges}" if badges else "")
-    return f'<span class="{cls}" style="background:#{fill}">{label}</span>'
+    return (f'<span class="chip" style="background:#{fill}">'
+            f'{html.escape(card)}</span>')
 
 
 def main():
     drafts, cube, decks = load()
     owners = maindeck_owners(drafts, cube, decks)
     groups = signature_groups(owners)
+    flex = flex_packages(groups, owners)
     by_deck = deck_sets(owners)
-    partners = team_partners(owners)
-    merged = straddles(owners, drafts)
     themes = load_themes()
     scry = load_scryfall()
     colors = {c: card_colors(c, scry) for c, _, _ in cube}
+
+    _, _, links = load_decks(HERE / "decks.tsv", cube)
+    url_map = {}
+    for draft, player, kind, url, used in links:
+        if used == "Y" and "manual-" not in url:
+            url_map[(draft, player)] = url
 
     def colors_of(cards):
         u = set()
@@ -75,108 +84,190 @@ def main():
             u |= colors.get(c, set())
         return "".join(x for x in "WUBRG" if x in u) or "C"
 
+    def deck_link(k, p, label=None):
+        label = html.escape(label if label is not None else p)
+        url = url_map.get((drafts[k].name, p))
+        if url:
+            return f'<a href="{url}">{label}</a>'
+        return f"{label} <span class='kept'>(OCR)</span>"
+
+    def lane_theme(gi):
+        return theme_str(groups[gi][1], themes) or "—"
+
     lanes_of = {}
     for gi, (sig, cards) in enumerate(groups):
         for k, p in enumerate(sig):
             lanes_of.setdefault((k, p), []).append(gi)
 
-    def lane_label(gi):
-        theme = theme_str(groups[gi][1], themes) or "—"
-        return f"P{gi + 1} {theme}"
-
-    blenders = sorted(d for d, bd in merged.items() if len(bd) == 2)
-    single = sorted(d for d, bd in merged.items() if len(bd) == 1)
-    all_decks = [(k, p) for k, d in enumerate(drafts) for p in d.players]
-    nonmergers = [d for d in all_decks if d not in merged]
-    drivers = sorted(d for d in nonmergers if d in lanes_of)
-    free = sorted(d for d in nonmergers if d not in lanes_of)
-
-    def name(deck):
-        k, p = deck
-        return f"{drafts[k].name}: {html.escape(p)}"
-
-    out = [f"<meta charset='utf-8'><title>LoL Roto — Merge Report</title>"
+    out = [f"<meta charset='utf-8'><title>LoL Roto — Lane Report</title>"
            f"<style>{CSS}</style>",
-           "<h1>Three Rotos, One Cube: the Merge Report</h1>",
-           "<p class='meta'>A <b>Lane</b> is a card core maindecked by three "
-           "different people, one per draft (plus its flex orbit). A "
-           "<b>Team</b> is the block of cards two decks from different "
-           "drafts agreed on (5+). A deck <b>merges</b> when it holds teams "
-           "with two different decks of the same other draft.</p>",
-           "<div class='legend'>★ lane-core card &nbsp; ◆ companion &nbsp; "
-           "chip tint = card color (gold = multicolor, tan = colorless)"
-           "</div>"]
+           "<h1>Three Rotos, One Cube: the Lanes</h1>",
+           "<p class='meta'>A <b>Lane</b> is a core of 3+ cards maindecked "
+           "together in all three drafts — by three different people — plus "
+           "its flex orbit (cards that rode with the full core in two of "
+           "the three decks). Deck links go to sealeddeck.tech.</p>"]
 
-    out.append("<h2>Player taxonomy</h2><table><tr><th>Category</th>"
-               "<th>#</th><th>Decks</th></tr>")
-    for label, ds in [("Both-way blenders", blenders),
-                      ("Single-side mergers", single),
-                      ("Pure lane-drivers", drivers),
-                      ("Free agents", free)]:
-        out.append(f"<tr><td>{label}</td><td>{len(ds)}</td>"
-                   f"<td>{', '.join(name(d) for d in ds)}</td></tr>")
-    out.append("</table>")
-
-    out.append("<h2>Lanes</h2><table><tr><th>Lane</th><th>Theme</th>"
-               "<th>Colors</th><th>Core #</th><th>Owners</th></tr>")
+    # -- Section 1: the lanes ------------------------------------------
+    out.append("<h2>1. The Lanes</h2>")
     for gi, (sig, cards) in enumerate(groups):
-        ownstr = " / ".join(html.escape(p) for p in sig)
-        out.append(f"<tr><td>P{gi + 1}</td>"
-                   f"<td>{theme_str(cards, themes) or '—'}</td>"
-                   f"<td>{colors_of(cards)}</td><td>{len(cards)}</td>"
-                   f"<td>{ownstr}</td></tr>")
+        e = flex[gi]
+        out.append(f"<div class='lane'><h3>P{gi + 1} "
+                   f"<span class='theme'>{lane_theme(gi)}</span> "
+                   f"<span class='kept'>{colors_of(cards)} · "
+                   f"core {len(cards)}</span></h3>")
+        own = []
+        for k, p in enumerate(sig):
+            w, l = drafts[k].records.get(p, (0, 0))
+            own.append(f"{drafts[k].name}: {deck_link(k, p)} ({w}–{l})")
+        out.append(f"<p class='meta'>{' · '.join(own)}</p>")
+        out.append("<div class='cards'>")
+        for c in sorted(cards):
+            img = scry[c].get("image")
+            out.append(f"<img src='{img}' alt='{html.escape(c)}' "
+                       f"title='{html.escape(c)}' loading='lazy'>")
+        out.append("</div>")
+        flex_items = []
+        for k, bucket in enumerate(e["flex"]):
+            for c in bucket:
+                kept = [deck_link(k2, sig[k2], f"{drafts[k2].name} {sig[k2]}")
+                        for k2 in range(len(drafts)) if k2 != k]
+                flex_items.append(
+                    f"<li>{chip(c, colors)} <span class='kept'>kept by "
+                    f"{' and '.join(kept)}</span></li>")
+        if flex_items:
+            out.append(f"<h4>Flex ({len(flex_items)})</h4>"
+                       f"<ul class='flex-list'>{''.join(flex_items)}</ul>")
+        out.append("</div>")
+
+    # -- Section 2: two lanes per player -------------------------------
+    two_lane = {d: gis for d, gis in lanes_of.items() if len(gis) == 2}
+    same = {d: g for d, g in two_lane.items()
+            if lane_theme(g[0]) == lane_theme(g[1]) != "—"}
+    cross = {d: g for d, g in two_lane.items() if d not in same}
+    n_owners = len(lanes_of)
+    out.append("<h2>2. Two lanes per player</h2>")
+    out.append(f"<p class='meta'>{n_owners} players own a lane; "
+               f"{len(two_lane)} of them own exactly two.</p>")
+    for title, sub in [("Same theme twice — the theme pooled here, "
+                        "contested elsewhere", same),
+                       ("Cross-theme — modules combined", cross)]:
+        out.append(f"<h3>{title}</h3><table><tr><th>Player</th><th>Draft"
+                   "</th><th>Lanes</th></tr>")
+        for (k, p), gis in sorted(sub.items(), key=lambda x: (x[0][0],
+                                                              x[0][1])):
+            lanestr = " + ".join(
+                f"P{gi + 1} {lane_theme(gi)} ({colors_of(groups[gi][1])})"
+                for gi in gis)
+            out.append(f"<tr><td>{deck_link(k, p)}</td>"
+                       f"<td>{drafts[k].name}</td><td>{lanestr}</td></tr>")
+        out.append("</table>")
+
+    # -- Section 3: decks that carved their own lanes ------------------
+    claimed = set()
+    for gi, (sig, cards) in enumerate(groups):
+        claimed |= set(cards)
+        for bucket in flex[gi]["flex"]:
+            claimed |= set(bucket)
+    no_lane = [(k, p) for k, d in enumerate(drafts) for p in d.players
+               if (k, p) not in lanes_of]
+    out.append("<h2>3. The decks that carved their own lanes</h2>")
+    out.append("<p class='meta'>No lane runs through these decks — their "
+               "distinctive cards below appear in no lane core or flex.</p>")
+    for k, p in no_lane:
+        cards = by_deck[(k, p)]
+        distinct = sorted(cards - claimed)
+        w, l = drafts[k].records.get(p, (0, 0))
+        out.append(f"<div class='lane'><h3>{drafts[k].name}: "
+                   f"{deck_link(k, p)} <span class='kept'>"
+                   f"{colors_of(cards)} · {w}–{l}</span></h3>")
+        out.append(f"<p class='meta'>{len(distinct)} of {len(cards)} "
+                   f"nonbasic cards are theirs alone:</p>")
+        out += [chip(c, colors) for c in distinct]
+        out.append("</div>")
+
+    # -- Section 4: what's missing? ------------------------------------
+    out.append("<h2>4. What's missing?</h2>")
+    out.append("<p class='meta'>Color groups no lane occupies are the "
+               "open, uncontested lanes.</p>")
+    lane_colors = [(gi, set(colors_of(cards)) - {"C"})
+                   for gi, (_, cards) in enumerate(groups)]
+
+    def coverage_row(label, want):
+        exact = [gi for gi, cs in lane_colors if cs == want]
+        inside = [gi for gi, cs in lane_colors if want < cs]
+        if exact:
+            status, cls = "lane", ""
+            lanes = exact + inside
+        elif inside:
+            status, cls = "inside a bigger lane", ""
+            lanes = inside
+        else:
+            status, cls = "absent", " class='absent'"
+            lanes = []
+        lanestr = ", ".join(f"P{gi + 1} {lane_theme(gi)}" for gi in lanes)
+        return (f"<tr{cls}><td>{label}</td><td>{status}</td>"
+                f"<td>{lanestr}</td></tr>")
+
+    out.append("<style>.absent td { background: #fbdcdc; }</style>")
+    out.append("<h3>Color coverage of the lanes</h3>"
+               "<table><tr><th>Colors</th><th>Status</th><th>Lanes</th></tr>")
+    for c in "WUBRG":
+        out.append(coverage_row(c, {c}))
+    pairs = ["WU", "UB", "BR", "RG", "WG", "WB", "UR", "BG", "WR", "UG"]
+    for pr in pairs:
+        out.append(coverage_row(pr, set(pr)))
     out.append("</table>")
 
-    n_cases = sum(len(bd) for bd in merged.values())
-    out.append(f"<p class='meta'>{n_cases} merge cases across "
-               f"{len(merged)} decks; {len(blenders)} blend in both other "
-               f"drafts.</p>")
+    # cut lists by color group vs cube baseline
+    def group_of(c):
+        cs = colors.get(c, set())
+        if len(cs) == 1:
+            return next(iter(cs))
+        return "Multi" if cs else "C"
 
-    for deck in blenders + single:
-        k, p = deck
-        cards = by_deck[deck]
-        lane_cores = set()
-        for gi in lanes_of.get(deck, []):
-            lane_cores |= set(groups[gi][1])
-        comps = {c for c, z in decks[(drafts[k].name, p)].items()
-                 if z == "companion"}
-        w, l = drafts[k].records.get(p, (0, 0))
-        lanes_txt = (", ".join(lane_label(gi) for gi in lanes_of.get(deck, []))
-                     or "none")
-        out.append(f"<div class='deck'><h2>{name(deck)}</h2>"
-                   f"<p class='meta'>{len(cards)} nonbasic maindeck cards · "
-                   f"colors {colors_of(cards)} · record {w}–{l} · "
-                   f"lanes: {lanes_txt}</p>")
-        covered = set()
-        out.append("<div class='cols'>")
-        for k2 in sorted(set(range(len(drafts))) - {k}):
-            out.append(f"<div class='col'><h3>Teams vs "
-                       f"{drafts[k2].name}</h3>")
-            plist = sorted(partners[deck].get(k2, []),
-                           key=lambda x: -len(x[1]))
-            if not plist:
-                out.append("<p class='meta'>no teams</p>")
-            for pb, core in plist:
-                covered |= core
-                t = theme_str(core, themes)
-                badge = f" <span class='theme'>{t}</span>" if t else ""
-                out.append(f"<div class='team'><h4>with "
-                           f"{html.escape(pb)} [{len(core)}]{badge}</h4>")
-                out += [chip(c, colors, c in lane_cores, c in comps)
-                        for c in sorted(core)]
-                out.append("</div>")
-            out.append("</div>")
-        out.append("</div>")
-        rest = cards - covered
-        if rest:
-            out.append(f"<div class='team'><h4>Unclaimed by any team "
-                       f"[{len(rest)}]</h4>")
-            out += [chip(c, colors, c in lane_cores, c in comps)
-                    for c in sorted(rest)]
-            out.append("</div>")
-        out.append("</div>")
+    all_cards = [c for c, _, _ in cube]
+    nd = never_drafted(drafts, cube)
+    nm = never_maindecked(drafts, cube, decks)
+    nm3 = [c for c in nm if sum(c in d.picks for d in drafts) == 3]
+    cols = [("Cube (baseline)", all_cards), ("Never drafted", nd),
+            ("Drafted, never maindecked", nm),
+            ("Taken in all 3, never maindecked", nm3)]
+    groups_order = list("WUBRG") + ["Multi", "C"]
 
-    dest = HERE / "out" / "merge-report.html"
+    def dist(cards):
+        d = {g: 0 for g in groups_order}
+        for c in cards:
+            d[group_of(c)] += 1
+        return d
+
+    dists = [(label, dist(cs), len(cs)) for label, cs in cols]
+    out.append("<h3>Unpicked and unplayed cards, by color</h3>")
+    out.append("<p class='meta'>Share per column; compare against the "
+               "cube baseline to see where the unloved cards concentrate."
+               "</p>")
+    out.append("<table><tr><th>Color</th>" + "".join(
+        f"<th>{label}</th>" for label, _, _ in dists) + "</tr>")
+    for g in groups_order:
+        cells = []
+        base_share = dists[0][1][g] / dists[0][2]
+        for i, (label, d, n) in enumerate(dists):
+            share = d[g] / n if n else 0
+            hot = i > 0 and share > base_share * 1.3 and d[g] >= 3
+            bar = (f"<span style='display:inline-block;background:#bcd;"
+                   f"height:8px;width:{int(share * 140)}px'></span>")
+            mark = " <b>↑</b>" if hot else ""
+            cells.append(f"<td>{d[g]} ({share:.0%}){mark}<br>{bar}</td>")
+        out.append(f"<tr><td>{g}</td>{''.join(cells)}</tr>")
+    out.append("</table>")
+
+    out.append("<h4>The never-drafted cards, by color</h4>")
+    for g in groups_order:
+        cs = [c for c in nd if group_of(c) == g]
+        if cs:
+            out.append(f"<p class='meta' style='margin:6px 0 0'>{g}:</p>"
+                       + "".join(chip(c, colors) for c in cs))
+
+    dest = HERE / "out" / "lane-report.html"
     dest.parent.mkdir(exist_ok=True)
     dest.write_text("\n".join(out))
     print(dest)
