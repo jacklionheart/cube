@@ -463,7 +463,7 @@ def build_md_together(wb, drafts, cube, decks):
 
     flex_by_group = pk.flex_packages(groups, owners_map)
 
-    ws = wb.create_sheet("Maindecked Together")
+    ws = wb.create_sheet("Packages (all 3 drafts)")
     header = ["Group", "Theme", "Colors", "Core — in all 3 decks",
               "Flex — in 2 of 3 (marked: the deck that skipped it)",
               "All Cards", "Core #", "Flex #", "Total #"]
@@ -528,7 +528,7 @@ def build_package_tabs(wb, drafts, cube, decks):
     scry = pk.load_scryfall()
     themes = pk.load_themes()
 
-    ws = wb.create_sheet("Packages 2 of 3")
+    ws = wb.create_sheet("Deck Shells (2 of 3)")
     header = ["#", "Size", "Theme", "Colors", "Cards", "Deck A", "Deck B",
               "Contains Strict"]
     ws.append(header)
@@ -749,8 +749,8 @@ def build_workbook(drafts, cube, availability, formulas=True, decks=None, links=
     for col, w in zip("ABCDE", (10, 18, 10, 36, 6)):
         ws.column_dimensions[col].width = w
 
-    order = ["Pick Summary", "Color Analysis", "Maindecked Together",
-             "Packages 2 of 3", "Card List"]
+    order = ["Pick Summary", "Color Analysis", "Packages (all 3 drafts)",
+             "Deck Shells (2 of 3)", "Card List"]
     order += [d.name for d in drafts]
     order += ["Records", "Decks", "Deck Links", "Win Rates"]
     wb._sheets = [wb[name] for name in order]
