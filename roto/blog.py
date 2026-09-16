@@ -626,26 +626,30 @@ showPairs('{order[0]}');
 </script>""")
 
     # --- the most original decks --------------------------------------
+    # Yorion-sized maindecks (35+ nonland) get more room for unique
+    # pairs than 40-card decks, and not linearly — exclude them from
+    # the scoring rather than trying to normalize.
     ue = unique_ensembles(owners)
     by_deck_all = deck_sets(owners)
+    yorion = {dk for dk, cards in by_deck_all.items() if len(cards) >= 30}
     lane_own_u = {(k, pl) for lsig, _ in lanes
                   for k, pl in enumerate(lsig)}
-    sizes = {dk: len(s) for dk, s in ue.items()}
-    share = {dk: sizes[dk] / len(by_deck_all[dk]) for dk in sizes}
-    avg_lane = (sum(share[dk] for dk in share if dk in lane_own_u)
-                / sum(1 for dk in share if dk in lane_own_u))
-    avg_free = (sum(share[dk] for dk in share if dk not in lane_own_u)
-                / sum(1 for dk in share if dk not in lane_own_u))
+    sizes = {dk: len(s) for dk, s in ue.items() if dk not in yorion}
+    avg_lane = (sum(v for dk, v in sizes.items() if dk in lane_own_u)
+                / sum(1 for dk in sizes if dk in lane_own_u))
+    avg_free = (sum(v for dk, v in sizes.items() if dk not in lane_own_u)
+                / sum(1 for dk in sizes if dk not in lane_own_u))
     out.append("<h2>The most original decks</h2>")
     out.append(
         "<p>Flip the question over. Instead of asking what recurred, "
         "ask what <i>never</i> did: for each deck, the largest group of "
         "cards no other deck ever ran any two of — its unique ensemble, "
         "the part of the deck that was genuinely invented at that "
-        "table. Core ownership turns out to be the opposite of "
-        "originality: core decks average "
-        f"{avg_lane:.0%} of their maindeck unique, "
-        f"decks outside the core system {avg_free:.0%}.</p>")
+        "table. (The three Yorion decks sit this one out: a 60-card "
+        "maindeck gets extra room for unique pairs just by being big.) "
+        "Core ownership turns out to be the opposite of originality: "
+        f"core decks average {avg_lane:.1f} unique cards, "
+        f"decks outside the core system {avg_free:.1f}.</p>")
     from collections import Counter as _Ch
     hist = _Ch(sizes.values())
     out.append("<div class='vchart'>")
@@ -660,28 +664,19 @@ showPairs('{order[0]}');
     out.append("</div>")
     out.append("<p class='meta'>Decks by size of their largest unique "
                "ensemble (nonland cards, no pair shared with any other "
-               "deck). Raw counts flatter big decks — the three "
-               "Yorion-sized builds ran 35&ndash;37 nonland cards and "
-               "sit to the right.</p>")
-    top_raw = max(sizes, key=sizes.get)
-    rk, rpl = top_raw
-    max_share = max(share.values())
-    leaders = sorted(dk for dk in share if share[dk] == max_share)
+               "deck). Yorion decks excluded.</p>")
+    max_size = max(sizes.values())
+    leaders = sorted(dk for dk in sizes if sizes[dk] == max_size)
     out.append(
-        f"<p>The raw record belongs to {deck_link(rk, rpl)} at "
-        f"{sizes[top_raw]} — but that's a "
-        f"{len(by_deck_all[top_raw])}-card Yorion maindeck, and bulk "
-        "is a kind of cheating: more cards, more room for pairs "
-        "nobody else could have duplicated. Score it as a share of "
-        "the maindeck instead and the crown changes hands"
-        + ("." if len(leaders) == 1 else
-           " — and splits.") + "</p>")
+        f"<p>The record is {max_size}"
+        + ("." if len(leaders) == 1 else ", and it's a tie.")
+        + "</p>")
     for lk, lpl in leaders:
         out.append(
-            f"<p>{deck_link(lk, lpl)}: {sizes[(lk, lpl)]} unique "
-            f"cards out of {len(by_deck_all[(lk, lpl)])} nonland — "
-            f"{share[(lk, lpl)]:.0%} of the deck invented on the "
-            "spot.</p>")
+            f"<p>{deck_link(lk, lpl)}: {sizes[(lk, lpl)]} of its "
+            f"{len(by_deck_all[(lk, lpl)])} nonland cards form a group "
+            "that exists nowhere else in ninety decks' worth of "
+            "building:</p>")
         out.append(gallery(ue[(lk, lpl)]))
 
     # --- the FOOMP section --------------------------------------------
