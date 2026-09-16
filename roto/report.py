@@ -451,14 +451,42 @@ showGrp('{present[0]}');
             claimed |= set(bucket)
     no_lane = [(k, p) for k, d in enumerate(drafts) for p in d.players
                if (k, p) not in lanes_of]
+    pair_classes = [(sig, cards) for sig, cards in team_classes
+                    if len(cards) == 2]
+    zero_team = [(k, p) for k, p in no_lane
+                 if not any(sig[k] == p for sig, _ in pair_classes)]
     out.append("<h2>The decks that carved their own lanes</h2>")
-    out.append("<p class='meta'>No lane runs through these decks — their "
-               "distinctive cards below appear in no lane core or flex.</p>")
+    out.append(f"<p class='meta'>No lane runs through these "
+               f"{len(no_lane)} decks. Most still hold pairs — shown "
+               "below per deck. "
+               + (f"{len(zero_team)} deck"
+                  f"{'s' if len(zero_team) != 1 else ''} "
+                  f"({', '.join(p for _, p in zero_team)}) belong"
+                  f"{'s' if len(zero_team) == 1 else ''} to no lane AND "
+                  "no pair — nothing they built was ever rebuilt."
+                  if zero_team else "") + "</p>")
     for k, p in no_lane:
         cards = by_deck[(k, p)]
         distinct = sorted(cards - claimed)
+        my_pairs = [pcards for sig, pcards in pair_classes
+                    if sig[k] == p]
         out.append(f"<div class='lane'><h3>{drafts[k].name}: "
-                   f"{mana(colors_of(cards))} {deck_link(k, p)}</h3>")
+                   f"{mana(colors_of(cards))} {deck_link(k, p)} "
+                   f"<span class='kept'>{len(my_pairs)} pair"
+                   f"{'s' if len(my_pairs) != 1 else ''}</span></h3>")
+        if my_pairs:
+            out.append("<div class='pairs'>")
+            for pcards in my_pairs:
+                imgs = "".join(
+                    f"<img src='{scry[c].get('image')}' "
+                    f"alt='{html.escape(c)}' title='{html.escape(c)}' "
+                    f"loading='lazy'>" for c in sorted(pcards))
+                out.append(f"<span class='pair'>{imgs}</span>")
+            out.append("</div>")
+        else:
+            out.append("<p class='meta'><b>No lanes and no pairs</b> — "
+                       "the only deck whose card combinations never "
+                       "recurred anywhere.</p>")
         out.append(f"<p class='meta'>{len(distinct)} of {len(cards)} "
                    f"nonland cards sit outside every lane (in no core or "
                    f"flex — though other decks may also run them):</p>")
