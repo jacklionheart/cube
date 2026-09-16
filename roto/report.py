@@ -58,6 +58,11 @@ a:hover { text-decoration-color: #1a1a1a; }
 .pairs { margin: 8px 0 16px; }
 .pair { display: inline-flex; gap: 2px; margin: 3px 10px 3px 0; }
 .pair img { width: 104px; border-radius: 5px; }
+#deckhover { position: fixed; display: none; z-index: 11;
+             pointer-events: none; background: #fff;
+             border: 1px solid #ddd; border-radius: 10px; padding: 6px;
+             box-shadow: 0 6px 18px rgba(0,0,0,.25); width: 480px; }
+#deckhover img { width: 64px; border-radius: 3px; margin: 1px; }
 #hovercard { position: fixed; display: none; z-index: 10;
              pointer-events: none; }
 #hovercard img { width: 250px; border-radius: 12px;
@@ -146,12 +151,17 @@ def main():
             u |= colors.get(c, set())
         return "".join(x for x in "WUBRG" if x in u) or "C"
 
+    deck_key = {}
+    for i, dk in enumerate(sorted(by_deck)):
+        deck_key[dk] = f"dk{i}"
+
     def deck_link(k, p, label=None):
         label = html.escape(label if label is not None else p)
+        dd = f" data-deck='{deck_key.get((k, p), '')}'"
         url = url_map.get((drafts[k].name, p))
         if url:
-            return f'<a href="{url}">{label}</a>'
-        return f"{label} <span class='kept'>(OCR)</span>"
+            return f'<a href="{url}"{dd}>{label}</a>'
+        return f"<a{dd}>{label}</a> <span class='kept'>(OCR)</span>"
 
     def lane_theme(gi):
         return theme_str(groups[gi][1], themes) or "—"
@@ -644,23 +654,42 @@ showGrp('{present[0]}');
         "are hand-labeled; win rates are deliberately absent. Everything "
         "regenerates from the draft sheets via packages.py.</p>")
 
-    out.append("""<div id='hovercard'><img alt=''></div>
-<script>
+    import json as _json
+    deck_imgs = {deck_key[dk]: [scry[c].get("image") for c in
+                                sorted(by_deck[dk]) if scry[c].get("image")]
+                 for dk in sorted(by_deck)}
+    out.append("<div id='hovercard'><img alt=''></div>"
+               "<div id='deckhover'></div>")
+    out.append("<script>const deckImgs = "
+               + _json.dumps(deck_imgs, separators=(",", ":"))
+               + ";</script>")
+    out.append("""<script>
 const hc = document.getElementById('hovercard');
 const hcImg = hc.querySelector('img');
+const dh = document.getElementById('deckhover');
 document.addEventListener('mouseover', e => {
+  const d = e.target.closest('a[data-deck]');
   const a = e.target.closest('a[data-img]');
-  if (a && a.dataset.img) { hcImg.src = a.dataset.img;
-    hc.style.display = 'block'; }
-  else if (!e.target.closest('#hovercard')) hc.style.display = 'none';
+  if (d && d.dataset.deck && deckImgs[d.dataset.deck]) {
+    dh.innerHTML = deckImgs[d.dataset.deck].map(
+      u => `<img src='${u}' loading='lazy'>`).join('');
+    dh.style.display = 'block'; hc.style.display = 'none';
+  } else if (a && a.dataset.img) {
+    hcImg.src = a.dataset.img;
+    hc.style.display = 'block'; dh.style.display = 'none';
+  } else { hc.style.display = 'none'; dh.style.display = 'none'; }
 });
 document.addEventListener('mousemove', e => {
-  if (hc.style.display !== 'block') return;
-  const w = 250, h = 349;
+  const el = dh.style.display === 'block' ? dh
+           : (hc.style.display === 'block' ? hc : null);
+  if (!el) return;
+  const r = el.getBoundingClientRect();
+  const w = r.width || 250, h = r.height || 349;
   let x = e.clientX + 16, y = e.clientY + 12;
   if (x + w > innerWidth - 8) x = e.clientX - w - 16;
   if (y + h > innerHeight - 8) y = innerHeight - h - 8;
-  hc.style.left = x + 'px'; hc.style.top = Math.max(8, y) + 'px';
+  el.style.left = Math.max(8, x) + 'px';
+  el.style.top = Math.max(8, y) + 'px';
 });
 </script>""")
 
