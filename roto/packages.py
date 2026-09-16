@@ -373,6 +373,44 @@ def report_straddles(owners, drafts):
                 print(f"   with {pb:18s} [{len(core)}] ({t}): {cards}{more}")
 
 
+def unique_ensembles(owners):
+    """deck -> the largest subset of its maindeck in which no two cards
+    were ever co-maindecked in any other deck (exact maximum independent
+    set over cross-deck pair conflicts; pairs bind, so no larger subset
+    can recur if no pair does)."""
+    by_deck = deck_sets(owners)
+    pair_decks = defaultdict(list)
+    for dk, cards in by_deck.items():
+        for a, b in combinations(sorted(cards), 2):
+            pair_decks[(a, b)].append(dk)
+    out = {}
+    for dk, deck_cards in by_deck.items():
+        cards = sorted(deck_cards)
+        idx = {c: i for i, c in enumerate(cards)}
+        n = len(cards)
+        adj = [0] * n
+        for a, b in combinations(cards, 2):
+            if any(d != dk for d in pair_decks.get((a, b), [])):
+                adj[idx[a]] |= 1 << idx[b]
+                adj[idx[b]] |= 1 << idx[a]
+        best = [0, 0]
+
+        def bb(avail, cur, size):
+            if size + bin(avail).count("1") <= best[0]:
+                return
+            if not avail:
+                best[0], best[1] = size, cur
+                return
+            v = max((i for i in range(n) if avail >> i & 1),
+                    key=lambda i: bin(adj[i] & avail).count("1"))
+            bb(avail & ~(1 << v) & ~adj[v], cur | (1 << v), size + 1)
+            bb(avail & ~(1 << v), cur, size)
+
+        bb((1 << n) - 1, 0, 0)
+        out[dk] = [cards[i] for i in range(n) if best[1] >> i & 1]
+    return out
+
+
 def null_model(drafts, cube, decks, iters=2000, seed=0):
     """Permutation test: keep every player's picks, replace each maindeck
     with a uniform random same-size subset of that player's picks, and

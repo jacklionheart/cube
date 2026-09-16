@@ -599,6 +599,47 @@ function showPairs(g) {{
 showPairs('{order[0]}');
 </script>""")
 
+    # --- the most original decks --------------------------------------
+    ue = unique_ensembles(owners)
+    lane_own_u = {(k, pl) for lsig, _ in lanes
+                  for k, pl in enumerate(lsig)}
+    sizes = {dk: len(s) for dk, s in ue.items()}
+    avg_lane = (sum(v for dk, v in sizes.items() if dk in lane_own_u)
+                / sum(1 for dk in sizes if dk in lane_own_u))
+    avg_free = (sum(v for dk, v in sizes.items() if dk not in lane_own_u)
+                / sum(1 for dk in sizes if dk not in lane_own_u))
+    out.append("<h2>The most original decks</h2>")
+    out.append(
+        "<p>Flip the question over. Instead of asking what recurred, "
+        "ask what <i>never</i> did: for each deck, the largest group of "
+        "cards no other deck ever ran any two of — its unique ensemble, "
+        "the part of the deck that was genuinely invented at that "
+        "table. Core ownership turns out to be the opposite of "
+        f"originality: core decks average {avg_lane:.1f} unique cards, "
+        f"decks outside the core system {avg_free:.1f}.</p>")
+    from collections import Counter as _Ch
+    hist = _Ch(sizes.values())
+    out.append("<div class='vchart'>")
+    mxh = max(hist.values())
+    for s in range(min(hist), max(hist) + 1):
+        n = hist.get(s, 0)
+        hpx = round(n / mxh * 130) if n else 0
+        bar = (f"<div class='vbar' style='height:{hpx}px'></div>"
+               if n else "<div style='height:0'></div>")
+        out.append(f"<div class='vcol'><span class='vnum'>{n or ''}"
+                   f"</span>{bar}<span class='vlab'>{s}</span></div>")
+    out.append("</div>")
+    out.append("<p class='meta'>Decks by size of their largest unique "
+               "ensemble (nonland cards, no pair shared with any other "
+               "deck).</p>")
+    top_dk = max(sizes, key=sizes.get)
+    tk, tpl = top_dk
+    out.append(
+        f"<p>The largest belongs to {deck_link(tk, tpl)} — "
+        f"{sizes[top_dk]} cards that exist as a group nowhere else in "
+        "ninety decks' worth of building:</p>")
+    out.append(gallery(ue[top_dk]))
+
     # --- the FOOMP section --------------------------------------------
     by_deck = deck_sets(owners)
     zero_team = []
