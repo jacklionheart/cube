@@ -257,14 +257,17 @@ def main():
     ident = Counter()
     n_team_cards = 0
     for _, cards in team_classes:
-        ident[colors_of(cards)] += len(cards)
+        cl = colors_of(cards)
+        if len(cl) < 2:
+            continue
+        ident[cl] += len(cards)
         n_team_cards += len(cards)
     rows_t = [(mana(cl), n) for cl, n in
               sorted(ident.items(), key=lambda x: -x[1])]
     top_cl = max(ident, key=ident.get)
     out.append(barchart(
-        f"The {n_team_cards} cards on teams (lanes + pairs), by the "
-        f"team's color identity — {guild(top_cl)} leads",
+        f"The {n_team_cards} cards on multicolor teams (lanes + pairs), "
+        f"by the team's color identity — {guild(top_cl)} leads",
         rows_t, "cards"))
 
     import statistics
