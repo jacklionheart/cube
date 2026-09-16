@@ -173,10 +173,11 @@ def main():
         c for c, sig in owners.items()
         if None not in sig and c not in core_cards
         and "Land" not in scry[c]["type_line"].split(" // ")[0])
-    out.append("<h2>3. Everywhere, but in no core</h2>")
+    out.append("<h2>3. Bangers</h2>")
     out.append(f"<p class='meta'>{len(ubiq)} nonland cards were maindecked "
-               "in every pod yet belong to no lane core — the universal "
-               "role-players. A P# tag means the card is in that lane's "
+               "in every pod yet belong to no lane core — good enough to "
+               "play everywhere, tied to nothing. A P# tag means the card "
+               "is in that lane's "
                "flex orbit; untagged cards float free.</p>")
     group_order = ["W", "U", "B", "R", "G", "Multi", "C"]
     by_grp = {g: [] for g in group_order}
