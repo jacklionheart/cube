@@ -11,8 +11,9 @@ import html
 import pathlib
 from urllib.parse import quote
 
-from packages import (card_colors, load, load_scryfall, maindeck_owners,
-                      nonland_owners, signature_groups)
+from packages import (card_colors, deck_sets, load, load_scryfall,
+                      maindeck_owners, nonland_owners, signature_groups)
+from roto_summary import load_decks
 
 HERE = pathlib.Path(__file__).parent
 
@@ -214,6 +215,33 @@ function showPairs(g) {{
 }}
 showPairs('{order[0]}');
 </script>""")
+
+    # --- the FOOMP section --------------------------------------------
+    by_deck = deck_sets(owners)
+    zero_team = []
+    for k, d in enumerate(drafts):
+        for pl in d.players:
+            if not any(sig[k] == pl for sig, _ in groups):
+                zero_team.append((k, pl))
+    _, _, links = load_decks(HERE / "decks.tsv", cube)
+    url_map = {(dr, pl): u for dr, pl, kind, u, used in links
+               if used == "Y" and "manual-" not in u}
+    for k, pl in zero_team:
+        dcards = by_deck[(k, pl)]
+        url = url_map.get((drafts[k].name, pl))
+        link = (f'<a href="{url}">sealeddeck</a>' if url else "")
+        out.append(f"<h2>The {html.escape(pl)} deck</h2>")
+        out.append("<p class='meta'><span class='todo'>TODO: "
+                   "celebration prose</span></p>")
+        out.append(
+            f"<p>Every other drafter — all 27 of them — built a deck "
+            f"containing at least one team: some two-card combination "
+            f"that also showed up, together, in both other pods. "
+            f"{html.escape(pl)} is the exception. Not one pair of "
+            f"nonland cards in this deck was ever maindecked together "
+            f"in both other pods. Twenty-eight decks, one true "
+            f"original. {link}</p>")
+        out.append(gallery(dcards))
 
     out.append("<p class='meta'><span class='todo'>TODO: continue — "
                "next sections from Jack's outline</span></p>")
