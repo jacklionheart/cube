@@ -408,28 +408,53 @@ document.addEventListener('click', e => {
                 f"font-size='11' font-family='-apple-system,sans-serif' "
                 f"letter-spacing='.08em' fill='#8a8a8a'>{label}</text>")
 
-    svg = ["<svg viewBox='0 0 660 330' style='max-width:660px;width:100%;"
-           "margin:16px 0'>"]
-    svg.append(region(6, 6, 236, 318, "#f7ebe8", "MARDU"))
-    svg.append(region(252, 6, 190, 318, "#ebf3e8", "GREEN"))
-    svg.append(region(452, 6, 202, 318, "#e8eff6", "BLUE"))
-    # bridge edge: Tokens -- Sac, labeled with the pair card images
-    svg.append("<line x1='86' y1='92' x2='86' y2='258' "
-               "stroke='#b08b85' stroke-width='2'/>")
-    y0 = 106
+    def node_cards(x, y, cl, name, cards):
+        cols = 3
+        rows = (len(cards) + cols - 1) // cols
+        w = 14 + cols * 46
+        h = 30 + rows * 66
+        s = [f"<rect x='{x}' y='{y}' width='{w}' height='{h}' rx='9' "
+             f"fill='#fff' stroke='#999'/>"]
+        s.append(svg_pips(cl, x + 10, y + 9))
+        s.append(f"<text x='{x + 14 + len(cl) * 15}' y='{y + 20}' "
+                 f"font-size='13' font-family='-apple-system,sans-serif' "
+                 f"fill='#1a1a1a'>{name}</text>")
+        for i, c in enumerate(sorted(cards)):
+            img = scry[c].get("image")
+            cx = x + 8 + (i % cols) * 46
+            cy = y + 28 + (i // cols) * 66
+            s.append(f"<image href='{img}' x='{cx}' y='{cy}' "
+                     f"width='44' height='62'><title>{html.escape(c)}"
+                     f"</title></image>")
+        return "".join(s), h
+
+    svg = ["<svg viewBox='0 0 680 620' style='max-width:680px;"
+           "width:100%;margin:16px 0'>"]
+    svg.append(region(6, 6, 216, 608, "#f7ebe8", "MARDU"))
+    svg.append(region(232, 6, 216, 608, "#ebf3e8", "GREEN"))
+    svg.append(region(458, 6, 216, 608, "#e8eff6", "BLUE"))
+    n_tok, h_tok = node_cards(30, 34, "WR", "Tokens", tokens[1])
+    n_sac, h_sac = node_cards(30, 500, "BR", "Sac", sac[1])
+    # bridge edge with pair card images
+    ey0 = 34 + h_tok
+    svg.append(f"<line x1='106' y1='{ey0}' x2='106' y2='500' "
+               f"stroke='#b08b85' stroke-width='2'/>")
+    y0 = ey0 + 10
     for psig, pcards in bridges:
         for xi, c in enumerate(sorted(pcards)):
             img = scry[c].get("image")
-            svg.append(f"<image href='{img}' x='{104 + xi * 50}' "
-                       f"y='{y0}' width='46' height='64'/>")
-        y0 += 72
-    svg.append(node(86, 70, "WR", "Tokens"))
-    svg.append(node(86, 280, "BR", "Sac"))
-    svg.append(node(347, 70, "URG", "Ramp"))
-    svg.append(node(347, 170, "BG", "Ramp"))
-    svg.append(node(347, 270, "BG", "Graveyard"))
-    svg.append(node(553, 110, "UR", "Spells"))
-    svg.append(node(553, 230, "U", "Discard"))
+            svg.append(f"<image href='{img}' x='{118 + xi * 48}' "
+                       f"y='{y0}' width='44' height='62'/>")
+        y0 += 70
+    svg.append(n_tok); svg.append(n_sac)
+    n1, h1 = node_cards(256, 34, "URG", "Ramp", temur_ramp[1])
+    n2, h2 = node_cards(256, 34 + h1 + 24, "BG", "Ramp", golgari_ramp[1])
+    n3, h3 = node_cards(256, 34 + h1 + 24 + h2 + 24, "BG", "Graveyard",
+                        graveyard[1])
+    svg += [n1, n2, n3]
+    n4, h4 = node_cards(482, 80, "UR", "Spells", blue_spells[1])
+    n5, h5 = node_cards(482, 80 + h4 + 40, "U", "Discard", blue_tempo[1])
+    svg += [n4, n5]
     svg.append("</svg>")
     out.append("".join(svg))
 
