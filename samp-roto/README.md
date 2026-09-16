@@ -32,14 +32,12 @@ Google Sheet, at feature parity with the LoL roto sheet (`../roto/`).
 - **Real maindecks**: `build_decks_tsv.py` maps Discord authors to
   grid players (hand aliases for by-elimination cases) and writes
   `decks.tsv`; `load_decks` then applies the LoL companion-aware
-  pipeline. Coverage: 126 of 129 decks, all 13 pods — Dom (Slickshot) and
-  aidybaby (Baleful Strix) are transcribed from their posted images
-  (`deckcache/manual-*.json`, validated against their 45 picks;
-  aidybaby's is his v2 list — a v3 image exists but its download was
-  blocked before Discord logged out). Still unknown: Rocketman and Rob
-  (Baleful Strix, images not yet captured) and tenderdrafter (Kishla,
-  posted nothing). Unknown
-  decks show blank MD, like LoL. `--md-picks` remains as a fallback
+  pipeline. Coverage: 129 of 129. Five decks are hand-transcribed from
+  posted images (`deckcache/manual-*.json`: Dom, aidybaby, Rob,
+  Rocketman, tenderdrafter — the last found via a from:+has:image
+  server search), each validated card-for-card against the player's 45
+  picks; aidybaby's is his v2 list (a v3 image was posted 27 minutes
+  later but never recovered). `--md-picks` remains as a fallback
   mode (drafted = maindecked). Alternate-name pools are aliased
   (DECK_CARD_ALIASES: 'the scouring stormsoul' = Sandman).
 - **Packages tab** (replaces Lanes/Teams): every nonland card set

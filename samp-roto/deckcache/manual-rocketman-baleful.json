@@ -1,0 +1,197 @@
+{
+ "poolId": "manual-rocketman-baleful",
+ "note": "Transcribed from rocketman7's sealeddeck-UI screenshots posted 2026-07-29 in #deck-baleful-strix-08-26 \u2014 discord-scrape/baleful-rocketman-{1,2}.png. Validated: 24 main spells + 6 nonbasic land picks + 15 sided cards = his 45 picks exactly (the 15-card elimination matches the visible sideboard strip card-for-card).",
+ "deck": [
+  {
+   "name": "Dragon's Rage Channeler",
+   "count": 1
+  },
+  {
+   "name": "Faithless Looting",
+   "count": 1
+  },
+  {
+   "name": "Grim Lavamancer",
+   "count": 1
+  },
+  {
+   "name": "Kumano Faces Kakkazan",
+   "count": 1
+  },
+  {
+   "name": "Lightning Bolt",
+   "count": 1
+  },
+  {
+   "name": "Marauding Mako",
+   "count": 1
+  },
+  {
+   "name": "Unholy Heat",
+   "count": 1
+  },
+  {
+   "name": "Abrade",
+   "count": 1
+  },
+  {
+   "name": "Cool but Rude",
+   "count": 1
+  },
+  {
+   "name": "Fear of Missing Out",
+   "count": 1
+  },
+  {
+   "name": "Inti, Seneschal of the Sun",
+   "count": 1
+  },
+  {
+   "name": "Ivora, Insatiable Heir",
+   "count": 1
+  },
+  {
+   "name": "Party Thrasher",
+   "count": 1
+  },
+  {
+   "name": "Hardened Academic",
+   "count": 1
+  },
+  {
+   "name": "Lightning Helix",
+   "count": 1
+  },
+  {
+   "name": "Scrapwork Mutt",
+   "count": 1
+  },
+  {
+   "name": "Smuggler's Copter",
+   "count": 1
+  },
+  {
+   "name": "Practiced Offense",
+   "count": 1
+  },
+  {
+   "name": "Casey Jones, Vigilante",
+   "count": 1
+  },
+  {
+   "name": "Fable of the Mirror-Breaker",
+   "count": 1
+  },
+  {
+   "name": "Monument to Endurance",
+   "count": 1
+  },
+  {
+   "name": "Tersa Lightshatter",
+   "count": 1
+  },
+  {
+   "name": "Hazoret the Fervent",
+   "count": 1
+  },
+  {
+   "name": "The Legend of Roku",
+   "count": 1
+  },
+  {
+   "name": "Ancient Tomb",
+   "count": 1
+  },
+  {
+   "name": "Arid Mesa",
+   "count": 1
+  },
+  {
+   "name": "Elegant Parlor",
+   "count": 1
+  },
+  {
+   "name": "Inspiring Vantage",
+   "count": 1
+  },
+  {
+   "name": "Sacred Foundry",
+   "count": 1
+  },
+  {
+   "name": "Scalding Tarn",
+   "count": 1
+  },
+  {
+   "name": "Plains",
+   "count": 2
+  },
+  {
+   "name": "Mountain",
+   "count": 8
+  }
+ ],
+ "sideboard": [
+  {
+   "name": "Duelist of the Mind",
+   "count": 1
+  },
+  {
+   "name": "Expressive Iteration",
+   "count": 1
+  },
+  {
+   "name": "Fire Magic",
+   "count": 1
+  },
+  {
+   "name": "Flame of Anor",
+   "count": 1
+  },
+  {
+   "name": "Ghostfire Slice",
+   "count": 1
+  },
+  {
+   "name": "Kiora, the Rising Tide",
+   "count": 1
+  },
+  {
+   "name": "Ledger Shredder",
+   "count": 1
+  },
+  {
+   "name": "Malcolm, Alluring Scoundrel",
+   "count": 1
+  },
+  {
+   "name": "Miscalculation",
+   "count": 1
+  },
+  {
+   "name": "Monastery Mentor",
+   "count": 1
+  },
+  {
+   "name": "Oliphaunt",
+   "count": 1
+  },
+  {
+   "name": "Shiko, Paragon of the Way",
+   "count": 1
+  },
+  {
+   "name": "Showdown of the Skalds",
+   "count": 1
+  },
+  {
+   "name": "Steam Vents",
+   "count": 1
+  },
+  {
+   "name": "Traumatic Critique",
+   "count": 1
+  }
+ ],
+ "hidden": []
+}

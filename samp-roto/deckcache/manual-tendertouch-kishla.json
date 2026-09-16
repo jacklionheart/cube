@@ -1,0 +1,201 @@
+{
+ "poolId": "manual-tendertouch-kishla",
+ "note": "Transcribed from Tendertouch's deck image posted in #decks-kishla-08-26 on 2026-08-13 (found via from:tendertouch has:image server search; missed by the link-only scrape) \u2014 discord-scrape/kishla-tendertouch.png. Validated: 23 main spells + 9 nonbasic land picks (Overgrown Tomb x2) + 13 sideboard = his 45 picks exactly.",
+ "deck": [
+  {
+   "name": "Moonshadow",
+   "count": 1
+  },
+  {
+   "name": "Delighted Halfling",
+   "count": 1
+  },
+  {
+   "name": "Ignoble Hierarch",
+   "count": 1
+  },
+  {
+   "name": "Quag Feast",
+   "count": 1
+  },
+  {
+   "name": "Bristly Bill, Spine Sower",
+   "count": 1
+  },
+  {
+   "name": "Fanatic of Rhonas",
+   "count": 1
+  },
+  {
+   "name": "Lotus Cobra",
+   "count": 1
+  },
+  {
+   "name": "Malevolent Rumble",
+   "count": 1
+  },
+  {
+   "name": "Scythecat Cub",
+   "count": 1
+  },
+  {
+   "name": "Agatha's Soul Cauldron",
+   "count": 1
+  },
+  {
+   "name": "Mole Man, Moloid Master",
+   "count": 1
+  },
+  {
+   "name": "Six",
+   "count": 1
+  },
+  {
+   "name": "Sandman, Shifting Scoundrel",
+   "count": 1
+  },
+  {
+   "name": "Grist, the Hunger Tide",
+   "count": 1
+  },
+  {
+   "name": "The Jolly Balloon Man",
+   "count": 1
+  },
+  {
+   "name": "Slimefoot and Squee",
+   "count": 1
+  },
+  {
+   "name": "Icetill Explorer",
+   "count": 1
+  },
+  {
+   "name": "Carnage, Crimson Chaos",
+   "count": 1
+  },
+  {
+   "name": "Halana and Alena, Partners",
+   "count": 1
+  },
+  {
+   "name": "Ark of Hunger",
+   "count": 1
+  },
+  {
+   "name": "Crabomination",
+   "count": 1
+  },
+  {
+   "name": "Noxious Gearhulk",
+   "count": 1
+  },
+  {
+   "name": "Etali, Primal Conqueror",
+   "count": 1
+  },
+  {
+   "name": "Shifting Woodland",
+   "count": 1
+  },
+  {
+   "name": "Overgrown Tomb",
+   "count": 2
+  },
+  {
+   "name": "Underground Mortuary",
+   "count": 1
+  },
+  {
+   "name": "Stomping Ground",
+   "count": 1
+  },
+  {
+   "name": "Temple Garden",
+   "count": 1
+  },
+  {
+   "name": "Verdant Catacombs",
+   "count": 1
+  },
+  {
+   "name": "Windswept Heath",
+   "count": 1
+  },
+  {
+   "name": "Wooded Foothills",
+   "count": 1
+  },
+  {
+   "name": "Plains",
+   "count": 1
+  },
+  {
+   "name": "Swamp",
+   "count": 2
+  },
+  {
+   "name": "Mountain",
+   "count": 3
+  },
+  {
+   "name": "Forest",
+   "count": 2
+  }
+ ],
+ "sideboard": [
+  {
+   "name": "Berserk",
+   "count": 1
+  },
+  {
+   "name": "Utopia Sprawl",
+   "count": 1
+  },
+  {
+   "name": "Esper Origins",
+   "count": 1
+  },
+  {
+   "name": "Scavenging Ooze",
+   "count": 1
+  },
+  {
+   "name": "Lumbering Worldwagon",
+   "count": 1
+  },
+  {
+   "name": "Glissa Sunslayer",
+   "count": 1
+  },
+  {
+   "name": "Migloz, Maze Crusher",
+   "count": 1
+  },
+  {
+   "name": "Bristlebud Farmer",
+   "count": 1
+  },
+  {
+   "name": "Questing Beast",
+   "count": 1
+  },
+  {
+   "name": "Titania, Protector of Argoth",
+   "count": 1
+  },
+  {
+   "name": "Korvold, Fae-Cursed King",
+   "count": 1
+  },
+  {
+   "name": "Vorinclex, Monstrous Raider",
+   "count": 1
+  },
+  {
+   "name": "Goldvein Hydra",
+   "count": 1
+  }
+ ],
+ "hidden": []
+}

@@ -1,0 +1,193 @@
+{
+ "poolId": "manual-rob-baleful",
+ "note": "Transcribed from Most Decrepit Old Rob's two images posted 2026-08-03 in #deck-baleful-strix-08-26 (maindeck view + sideboard list) \u2014 discord-scrape/baleful-rob-{1,2}.png. Lutri is the companion (paw icon; load_decks adjudicates via companion_ok). Validated: 24 main spells + 8 land pick-names (Watery Grave x2) + companion + 12 sided nonbasics = his 45 picks exactly. His two Polluted Delta copies split main/side; which physical copy is which is indistinguishable. One basic-land count was ambiguous in the photo; Swamp set to 4 to reach the stated 40 (basics are skipped by the loader).",
+ "deck": [
+  {
+   "name": "Jace, Vryn's Prodigy",
+   "count": 1
+  },
+  {
+   "name": "Kitsa, Otterball Elite",
+   "count": 1
+  },
+  {
+   "name": "Snapcaster Mage",
+   "count": 1
+  },
+  {
+   "name": "Emperor of Bones",
+   "count": 1
+  },
+  {
+   "name": "Baleful Strix",
+   "count": 1
+  },
+  {
+   "name": "Abhorrent Oculus",
+   "count": 1
+  },
+  {
+   "name": "Wan Shi Tong, Librarian",
+   "count": 1
+  },
+  {
+   "name": "Emeritus of Ideation",
+   "count": 1
+  },
+  {
+   "name": "Overlord of the Balemurk",
+   "count": 1
+  },
+  {
+   "name": "Troll of Khazad-d\u00fbm",
+   "count": 1
+  },
+  {
+   "name": "Grave Titan",
+   "count": 1
+  },
+  {
+   "name": "Sin, Spira's Punishment",
+   "count": 1
+  },
+  {
+   "name": "Force Spike",
+   "count": 1
+  },
+  {
+   "name": "Spell Pierce",
+   "count": 1
+  },
+  {
+   "name": "Inquisition of Kozilek",
+   "count": 1
+  },
+  {
+   "name": "Reanimate",
+   "count": 1
+  },
+  {
+   "name": "Counterspell",
+   "count": 1
+  },
+  {
+   "name": "Bitter Triumph",
+   "count": 1
+  },
+  {
+   "name": "Demonic Tutor",
+   "count": 1
+  },
+  {
+   "name": "Go for the Throat",
+   "count": 1
+  },
+  {
+   "name": "Persist",
+   "count": 1
+  },
+  {
+   "name": "Quag Feast",
+   "count": 1
+  },
+  {
+   "name": "Winternight Stories",
+   "count": 1
+  },
+  {
+   "name": "Toxic Deluge",
+   "count": 1
+  },
+  {
+   "name": "Otawara, Soaring City",
+   "count": 1
+  },
+  {
+   "name": "Spymaster's Vault",
+   "count": 1
+  },
+  {
+   "name": "Creeping Tar Pit",
+   "count": 1
+  },
+  {
+   "name": "Undercity Sewers",
+   "count": 1
+  },
+  {
+   "name": "Watery Grave",
+   "count": 2
+  },
+  {
+   "name": "Overgrown Tomb",
+   "count": 1
+  },
+  {
+   "name": "Polluted Delta",
+   "count": 1
+  },
+  {
+   "name": "Island",
+   "count": 4
+  },
+  {
+   "name": "Swamp",
+   "count": 4
+  }
+ ],
+ "sideboard": [
+  {
+   "name": "Lutri, the Spellchaser",
+   "count": 1
+  },
+  {
+   "name": "Cut Down",
+   "count": 1
+  },
+  {
+   "name": "Dark Ritual",
+   "count": 1
+  },
+  {
+   "name": "Duress",
+   "count": 1
+  },
+  {
+   "name": "Search for Azcanta",
+   "count": 1
+  },
+  {
+   "name": "Doom Blade",
+   "count": 1
+  },
+  {
+   "name": "Damnation",
+   "count": 1
+  },
+  {
+   "name": "Superior Spider-Man",
+   "count": 1
+  },
+  {
+   "name": "Murderous Cut",
+   "count": 1
+  },
+  {
+   "name": "Sublime Epiphany",
+   "count": 1
+  },
+  {
+   "name": "Wurmcoil Engine",
+   "count": 1
+  },
+  {
+   "name": "Virtue of Persistence",
+   "count": 1
+  },
+  {
+   "name": "Polluted Delta",
+   "count": 1
+  }
+ ],
+ "hidden": []
+}

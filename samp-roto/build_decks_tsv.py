@@ -53,6 +53,12 @@ MANUAL_DECKS = [
      "https://sealeddeck.tech/manual-dom-slickshot"),
     ("Baleful Strix", "aidybaby", "ocr",
      "https://sealeddeck.tech/manual-aidybaby-baleful"),
+    ("Baleful Strix", "Rob", "ocr",
+     "https://sealeddeck.tech/manual-rob-baleful"),
+    ("Baleful Strix", "Rocketman", "ocr",
+     "https://sealeddeck.tech/manual-rocketman-baleful"),
+    ("Kishla Skimmer", "tenderdrafter", "ocr",
+     "https://sealeddeck.tech/manual-tendertouch-kishla"),
 ]
 
 
