@@ -127,8 +127,8 @@ def main():
              if len(cards) >= 3]
     CORE_MARKERS = [("Rally at the Hornburg", "Tokens"),
                     ("Mayhem Devil", "Sac"),
-                    ("Fires of Invention", "Temur Ramp"),
-                    ("Everything Pizza", "Golgari Ramp"),
+                    ("Fires of Invention", "Fires Ramp"),
+                    ("Everything Pizza", "Pizza Ramp"),
                     ("Spider Spawning", "Graveyard"),
                     ("Expressive Iteration", "Control"),
                     ("Shoreline Looter", "Tempo")]
@@ -138,8 +138,8 @@ def main():
             if marker in cards:
                 return nm
         return "?"
-    FAMILY = {"Tokens": "Aggro", "Sac": "Aggro", "Temur Ramp": "Green",
-              "Golgari Ramp": "Green", "Graveyard": "Green",
+    FAMILY = {"Tokens": "Aggro", "Sac": "Aggro", "Fires Ramp": "Green",
+              "Pizza Ramp": "Green", "Graveyard": "Green",
               "Control": "Blue", "Tempo": "Blue"}
 
     def colors_of(cards):
@@ -195,8 +195,8 @@ def main():
     by_name = {core_name(cards): (sig, cards) for sig, cards in lanes}
     tokens = by_name["Tokens"]
     sac = by_name["Sac"]
-    temur_ramp = by_name["Temur Ramp"]
-    golgari_ramp = by_name["Golgari Ramp"]
+    temur_ramp = by_name["Fires Ramp"]
+    golgari_ramp = by_name["Pizza Ramp"]
     graveyard = by_name["Graveyard"]
     blue_spells = by_name["Control"]
     blue_tempo = by_name["Tempo"]
@@ -324,9 +324,9 @@ document.addEventListener('click', e => {
         "Tokens deck in another. The white and red halves bleed into "
         "each other; the black-red core just decides which half "
         "you're in.</p>")
-    out.append(f"<h3>{mana('WR')} Boros Tokens</h3>")
+    out.append(f"<h3>{mana('WR')} Tokens</h3>")
     out.append(lane_block(tokens))
-    out.append(f"<h3>{mana('BR')} Rakdos Sac</h3>")
+    out.append(f"<h3>{mana('BR')} Sac</h3>")
     out.append(lane_block(sac))
     out.append(family_bridges("Aggro"))
 
@@ -341,11 +341,11 @@ document.addEventListener('click', e => {
         "with Temur Ramp. Where "
         "Aggro splits into two clean decks, Green is one ecosystem "
         "with three stable expressions.</p>")
-    out.append(f"<h3>{mana('URG')} Five-color Temur Ramp</h3>")
+    out.append(f"<h3>{mana('URG')} Fires Ramp</h3>")
     out.append(lane_block(temur_ramp))
-    out.append(f"<h3>{mana('BG')} Five-color Golgari Ramp</h3>")
+    out.append(f"<h3>{mana('BG')} Pizza Ramp</h3>")
     out.append(lane_block(golgari_ramp))
-    out.append(f"<h3>{mana('G')} Golgari Graveyard</h3>")
+    out.append(f"<h3>{mana('G')} Graveyard</h3>")
     out.append(lane_block(graveyard))
     out.append(family_bridges("Green"))
 
