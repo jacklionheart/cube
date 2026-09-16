@@ -378,28 +378,26 @@ function showGrp(g) {{
 showGrp('{present[0]}');
 </script></details>""")
 
-    # -- Always-together pairs -----------------------------------------
-    pairs3 = sorted(pr for pr, n in co_maindeck_counts(owners).items()
-                    if n == 3)
-    corder = list("WUBRG") + ["Multi", "C"]
-
+    # -- Always-together pairs (unique: triads+ are the lanes) ---------
+    all_classes = signature_groups(owners, min_size=2)
+    pairs3 = sorted(tuple(sorted(cards)) for _, cards in all_classes
+                    if len(cards) == 2)
     def combo(pr):
-        g1, g2 = sorted((cgroup(pr[0]), cgroup(pr[1])),
-                        key=corder.index)
-        return (g1, g2)
+        u = colors.get(pr[0], set()) | colors.get(pr[1], set())
+        return "".join(x for x in "WUBRG" if x in u) or "C"
 
     from collections import Counter as _C
     combo_counts = _C(combo(pr) for pr in pairs3)
     out.append("<h2>Always together</h2>")
-    out.append(f"<p class='meta'>All {len(pairs3)} pairs of nonland cards "
-               "that shared a maindeck in every pod — the atomic bonds the "
-               "lanes are built from (pairs inside a lane count too). "
+    out.append(f"<p class='meta'>Every unique always-together unit: "
+               "groups of three or more nonland cards that shared a "
+               "maindeck in every pod are exactly the lanes above; what "
+               "remains are these "
+               f"{len(pairs3)} standalone pairs, each shown once. "
                "Counted by the colors of the two cards:</p>")
     out.append("<table><tr><th>Colors</th><th>Pairs</th></tr>")
-    for (g1, g2), n in sorted(combo_counts.items(), key=lambda x: -x[1]):
-        l1 = "Multi" if g1 == "Multi" else mana(g1)
-        l2 = "Multi" if g2 == "Multi" else mana(g2)
-        out.append(f"<tr><td>{l1} + {l2}</td><td>{n}</td></tr>")
+    for cl, n in sorted(combo_counts.items(), key=lambda x: -x[1]):
+        out.append(f"<tr><td>{mana(cl)} {guild(cl)}</td><td>{n}</td></tr>")
     out.append("</table>")
     out.append(f"<details><summary class='meta'>Show all {len(pairs3)} "
                "pairs</summary>")
@@ -407,11 +405,8 @@ showGrp('{present[0]}');
     for pr in pairs3:
         by_combo.setdefault(combo(pr), []).append(pr)
     for key in sorted(by_combo, key=lambda k: -len(by_combo[k])):
-        g1, g2 = key
-        l1 = "Multi" if g1 == "Multi" else mana(g1)
-        l2 = "Multi" if g2 == "Multi" else mana(g2)
-        out.append(f"<h4>{l1} + {l2} ({len(by_combo[key])})</h4>"
-                   f"<div class='pairs'>")
+        out.append(f"<h4>{mana(key)} {guild(key)} "
+                   f"({len(by_combo[key])})</h4><div class='pairs'>")
         for a, b in by_combo[key]:
             imgs = "".join(
                 f"<img src='{scry[c].get('image')}' "
