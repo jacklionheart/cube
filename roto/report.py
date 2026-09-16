@@ -162,7 +162,40 @@ def main():
                        f"<td>{drafts[k].name}</td><td>{lanestr}</td></tr>")
         out.append("</table>")
 
-    # -- Section 3: decks that carved their own lanes ------------------
+    # -- Section 3: maindecked in every pod, but in no lane core -------
+    core_cards = {c for _, cards in groups for c in cards}
+    flex_of = {}
+    for gi, e in enumerate(flex):
+        for bucket in e["flex"]:
+            for c in bucket:
+                flex_of.setdefault(c, gi)
+    ubiq = sorted(
+        c for c, sig in owners.items()
+        if None not in sig and c not in core_cards
+        and "Land" not in scry[c]["type_line"].split(" // ")[0])
+    out.append("<h2>3. Everywhere, but in no core</h2>")
+    out.append(f"<p class='meta'>{len(ubiq)} nonland cards were maindecked "
+               "in every pod yet belong to no lane core — the universal "
+               "role-players. A P# tag means the card is in that lane's "
+               "flex orbit; untagged cards float free.</p>")
+    group_order = ["W", "U", "B", "R", "G", "Multi", "C"]
+    by_grp = {g: [] for g in group_order}
+    for c in ubiq:
+        cc = colors[c]
+        g = ("Multi" if len(cc) > 1 else next(iter(cc)) if cc else "C")
+        by_grp[g].append(c)
+    for g in group_order:
+        if not by_grp[g]:
+            continue
+        items = []
+        for c in by_grp[g]:
+            tag = (f" <span class='kept'>P{flex_of[c] + 1}</span>"
+                   if c in flex_of else "")
+            items.append(f"{chip(c, colors)}{tag}")
+        out.append(f"<p class='meta'><b>{g}</b> ({len(by_grp[g])})</p>"
+                   f"<p>{' '.join(items)}</p>")
+
+    # -- Section 4: decks that carved their own lanes ------------------
     claimed = set()
     for gi, (sig, cards) in enumerate(groups):
         claimed |= set(cards)
@@ -170,7 +203,7 @@ def main():
             claimed |= set(bucket)
     no_lane = [(k, p) for k, d in enumerate(drafts) for p in d.players
                if (k, p) not in lanes_of]
-    out.append("<h2>3. The decks that carved their own lanes</h2>")
+    out.append("<h2>4. The decks that carved their own lanes</h2>")
     out.append("<p class='meta'>No lane runs through these decks — their "
                "distinctive cards below appear in no lane core or flex.</p>")
     for k, p in no_lane:
@@ -187,7 +220,7 @@ def main():
         out.append("</div>")
 
     # -- Section 4: what's missing? ------------------------------------
-    out.append("<h2>4. What's missing?</h2>")
+    out.append("<h2>5. What's missing?</h2>")
     out.append("<p class='meta'>Color groups no lane occupies are the "
                "open, uncontested lanes.</p>")
     lane_colors = [(gi, set(colors_of(cards)) - {"C"})
