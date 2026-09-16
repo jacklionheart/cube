@@ -71,11 +71,29 @@ summary h2 { display: inline; }
 .crow { display: grid; grid-template-columns: 72px 1fr 40px;
         align-items: center; margin: 3px 0; }
 .clabel { text-align: left; color: #444; }
+.cbar2 { background: #40566b; height: 9px;
+         border-radius: 0 3px 3px 0; display: block; margin-top: 2px; }
+.cbar1 { background: #a8b8c6; height: 9px;
+         border-radius: 0 3px 3px 0; display: block; }
 .cbar { background: #7d93a8; height: 15px;
         border-radius: 0 4px 4px 0; display: inline-block;
         vertical-align: middle; }
 .cval { color: #444; margin-left: 6px; }
 """
+
+
+GUILDS = {
+    "W": "White", "U": "Blue", "B": "Black", "R": "Red", "G": "Green",
+    "WU": "Azorius", "UB": "Dimir", "BR": "Rakdos", "RG": "Gruul",
+    "WG": "Selesnya", "WB": "Orzhov", "UR": "Izzet", "BG": "Golgari",
+    "WR": "Boros", "UG": "Simic", "WUB": "Esper", "UBR": "Grixis",
+    "BRG": "Jund", "WBG": "Abzan", "WUG": "Bant", "UBG": "Sultai",
+    "WBR": "Mardu", "WUR": "Jeskai", "URG": "Temur", "WRG": "Naya",
+}
+
+
+def guild(letters):
+    return GUILDS.get(letters, letters)
 
 
 def mana(letters):
@@ -149,6 +167,20 @@ def main():
         h.append(f"</div>")
         return "".join(h)
 
+    def barchart_pair(title, rows, mx):
+        h = [f"<h4>{title}</h4><p class='meta' style='margin:0'>"
+             "light: maindecked in any pod · dark: in all three</p>"
+             "<div class='chart'>"]
+        for label, v1, v2 in rows:
+            w1, w2 = round(v1 / mx * 100), round(v2 / mx * 100)
+            h.append(
+                f"<div class='crow'><span class='clabel'>{label}</span>"
+                f"<span><span class='cbar1' style='width:{w1}%'></span>"
+                f"<span class='cbar2' style='width:{w2}%'></span></span>"
+                f"<span class='cval'>{v1}·{v2}</span></div>")
+        h.append("</div>")
+        return "".join(h)
+
     lane_sets = [set(colors_of(cards)) - {"C"}
                  for _, cards in groups]
     pairs10 = ["WU", "UB", "BR", "RG", "WG", "WB", "UR", "BG", "WR", "UG"]
@@ -177,55 +209,74 @@ def main():
         cs = colors.get(c, set())
         return ("Multi" if len(cs) > 1
                 else next(iter(cs)) if cs else "C")
-    lc = Counter(cgroup(c) for c in laneless)
+    laneless3 = [c for c in laneless if None not in owners[c]]
     all_md = [c for c, sig in owners.items() if any(sig)]
-    ac = Counter(cgroup(c) for c in all_md)
+    all_md3 = [c for c, sig in owners.items() if None not in sig]
     ggs = list("WUBRG") + ["Multi", "C"]
-    rows2 = [("Multi" if g == "Multi" else mana(g), lc.get(g, 0))
+
+    def cdist(cards):
+        d = Counter(cgroup(c) for c in cards)
+        return {g: d.get(g, 0) for g in ggs}
+
+    d_ll1, d_ll3 = cdist(laneless), cdist(laneless3)
+    d_a1, d_a3 = cdist(all_md), cdist(all_md3)
+    rows2 = [("Multi" if g == "Multi" else mana(g), d_ll1[g], d_ll3[g])
              for g in ggs]
-    rows2a = [("Multi" if g == "Multi" else mana(g), ac.get(g, 0))
+    rows2a = [("Multi" if g == "Multi" else mana(g), d_a1[g], d_a3[g])
               for g in ggs]
-    shared_mx = max(v for _, v in rows2a)
+    shared_mx = max(v for _, v, _ in rows2a)
 
     out.append(barchart("Lanes touching each color pair", rows0, "lanes"))
     out.append(barchart("Decks by number of lanes represented in their "
                         "maindeck (core or flex)", rows1, "decks"))
-    out.append(barchart("All maindecked cards, by color", rows2a,
-                        "cards", mx=shared_mx))
-    out.append(barchart("Maindecked cards outside every lane, by color "
-                        "(same scale)", rows2, "cards", mx=shared_mx))
+    out.append(barchart_pair("All maindecked cards, by color", rows2a,
+                             shared_mx))
+    out.append(barchart_pair("Maindecked cards outside every lane, "
+                             "by color (same scale)", rows2, shared_mx))
 
-    # -- Section 1: the lanes ------------------------------------------
+    # -- Section 1: the lanes, grouped by theme ------------------------
     out.append("<h2>The lanes</h2>")
+    theme_order = []
     for gi, (sig, cards) in enumerate(groups):
-        e = flex[gi]
-        out.append(f"<div class='lane'><h3><span class='num'>P{gi + 1}"
-                   f"</span>{mana(colors_of(cards))} {lane_theme(gi)} "
-                   f"<span class='kept'>core {len(cards)}</span></h3>")
-        own = []
-        for k, p in enumerate(sig):
-            own.append(f"{drafts[k].name}: "
-                       f"{mana(colors_of(by_deck[(k, p)]))} "
-                       f"{deck_link(k, p)}")
-        out.append(f"<p class='meta'>{' · '.join(own)}</p>")
-        out.append("<div class='cards'>")
-        for c in sorted(cards):
-            img = scry[c].get("image")
-            out.append(f"<img src='{img}' alt='{html.escape(c)}' "
-                       f"title='{html.escape(c)}' loading='lazy'>")
-        out.append("</div>")
-        flex_items = []
-        for k, bucket in enumerate(e["flex"]):
-            for c in bucket:
-                kept = [deck_link(k2, sig[k2], f"{drafts[k2].name} {sig[k2]}")
-                        for k2 in range(len(drafts)) if k2 != k]
-                flex_items.append(
-                    f"<li>{chip(c, colors)} <span class='kept'>kept by "
-                    f"{' and '.join(kept)}</span></li>")
-        if flex_items:
-            out.append(f"<h4>Flex ({len(flex_items)})</h4>"
-                       f"<ul class='flex-list'>{''.join(flex_items)}</ul>")
-        out.append("</div>")
+        th = lane_theme(gi)
+        if th not in theme_order:
+            theme_order.append(th)
+    by_theme = {th: [gi for gi in range(len(groups))
+                     if lane_theme(gi) == th] for th in theme_order}
+    for th in theme_order:
+        out.append(f"<h3 style='margin-top:44px'>{th}</h3>")
+        for gi in by_theme[th]:
+            sig, cards = groups[gi]
+            e = flex[gi]
+            cl = colors_of(cards)
+            out.append(f"<div class='lane'><h3><span class='num'>"
+                       f"P{gi + 1}</span>{mana(cl)} {guild(cl)} Lane "
+                       f"<span class='kept'>core {len(cards)}</span></h3>")
+            own = []
+            for k, p in enumerate(sig):
+                own.append(f"{drafts[k].name}: "
+                           f"{mana(colors_of(by_deck[(k, p)]))} "
+                           f"{deck_link(k, p)}")
+            out.append(f"<p class='meta'>{' · '.join(own)}</p>")
+            out.append("<div class='cards'>")
+            for c in sorted(cards):
+                img = scry[c].get("image")
+                out.append(f"<img src='{img}' alt='{html.escape(c)}' "
+                           f"title='{html.escape(c)}' loading='lazy'>")
+            out.append("</div>")
+            flex_items = []
+            for k, bucket in enumerate(e["flex"]):
+                for c in bucket:
+                    kept = [deck_link(k2, sig[k2],
+                                      f"{drafts[k2].name} {sig[k2]}")
+                            for k2 in range(len(drafts)) if k2 != k]
+                    flex_items.append(
+                        f"<li>{chip(c, colors)} <span class='kept'>kept by "
+                        f"{' and '.join(kept)}</span></li>")
+            if flex_items:
+                out.append(f"<h4>Flex ({len(flex_items)})</h4>"
+                           f"<ul class='flex-list'>{''.join(flex_items)}</ul>")
+            out.append("</div>")
 
     # -- Section 2: two lanes per player -------------------------------
     two_lane = {d: gis for d, gis in lanes_of.items() if len(gis) == 2}
