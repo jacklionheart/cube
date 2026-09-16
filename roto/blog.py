@@ -59,6 +59,8 @@ a:hover { text-decoration-color: #1a1a1a; }
     font: 15px -apple-system, 'Segoe UI', Helvetica, sans-serif;
     color: #6b6b6b; border-left: 2px solid transparent; }
 .sidebar button.on { color: #1a1a1a; border-left-color: #1a1a1a; }
+.vpanes { height: 560px; overflow-y: auto; }
+.vpanes .cards img { width: 122px; }
 .sbh { font: 600 11px -apple-system, 'Segoe UI', Helvetica, sans-serif;
        text-transform: uppercase; letter-spacing: .06em; color: #999;
        margin: 12px 0 2px; }
@@ -230,7 +232,7 @@ def main():
             panes.append(f"<div data-pane='cores' id='core-{idx}'{hid}>"
                          f"{gallery(lcards)}</div>")
             idx += 1
-    out.append("</div><div>")
+    out.append("</div><div class='vpanes'>")
     out += panes
     out.append("</div></div>")
     out.append("""<script>
