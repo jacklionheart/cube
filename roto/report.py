@@ -67,6 +67,7 @@ a:hover { text-decoration-color: #1a1a1a; }
 .flex-list { font-size: 16px; margin: 6px 0 14px; padding-left: 22px; }
 .flex-list li { margin: 3px 0; }
 .kept { color: #6b6b6b; font-size: .88em; }
+[hidden] { display: none !important; }
 summary { cursor: pointer; list-style-position: outside; }
 summary h2 { display: inline; }
 .tabs { margin: 10px 0 4px; }

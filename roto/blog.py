@@ -51,6 +51,14 @@ a:hover { text-decoration-color: #1a1a1a; }
 .pairs { margin: 8px 0 16px; }
 .pair { display: inline-flex; gap: 2px; margin: 3px 10px 3px 0; }
 .pair img { width: 128px; border-radius: 5px; }
+[hidden] { display: none !important; }
+.explorer { display: grid; grid-template-columns: 110px 1fr; gap: 20px;
+            margin: 24px 0 8px; }
+.sidebar button { display: block; width: 100%; text-align: left;
+    background: none; border: none; cursor: pointer; padding: 6px 8px;
+    font: 15px -apple-system, 'Segoe UI', Helvetica, sans-serif;
+    color: #6b6b6b; border-left: 2px solid transparent; }
+.sidebar button.on { color: #1a1a1a; border-left-color: #1a1a1a; }
 #hovercard { position: fixed; display: none; z-index: 10;
              pointer-events: none; }
 #hovercard img { width: 250px; border-radius: 12px;
@@ -136,6 +144,90 @@ def main():
         "together — in the same deck — in all three pods. Three "
         "different drafters, three different decks, same two cards "
         "ending up shoulder to shoulder every time.</p>")
+
+    # --- explorer module: Pairs / Bangers / Lanes ---------------------
+    from collections import Counter as _Ct
+    pair_units_x = [sorted(cards) for _, cards in groups
+                    if len(cards) == 2]
+    team_cards_x = {c for _, cards in groups for c in cards}
+    bangers_x = sorted(c for c, sig in owners.items()
+                       if None not in sig and c not in team_cards_x)
+
+    def tabbed(gid, items, label_fn, pane_fn):
+        h = ["<div class='tabs'>"]
+        for i, it in enumerate(items):
+            on = " class='on'" if i == 0 else ""
+            h.append(f"<button{on} data-group='{gid}' "
+                     f"data-show='{gid}-p{i}'>{label_fn(it)}</button>")
+        h.append("</div>")
+        for i, it in enumerate(items):
+            hid = "" if i == 0 else " hidden"
+            h.append(f"<div data-pane='{gid}' id='{gid}-p{i}'{hid}>"
+                     f"{pane_fn(it)}</div>")
+        return "".join(h)
+
+    def pair_pane(prs):
+        s = ["<div class='pairs'>"]
+        for pr in prs:
+            imgs = "".join(
+                f"<img src='{scry[c].get('image')}' "
+                f"alt='{html.escape(c)}' title='{html.escape(c)}' "
+                f"loading='lazy'>" for c in pr)
+            s.append(f"<span class='pair'>{imgs}</span>")
+        s.append("</div>")
+        return "".join(s)
+
+    pair_by_cl = {}
+    for pr in pair_units_x:
+        pair_by_cl.setdefault(colors_of(pr), []).append(pr)
+    pair_tabs = sorted(pair_by_cl, key=lambda k: -len(pair_by_cl[k]))
+
+    bang_by_cl = {}
+    for c in bangers_x:
+        bang_by_cl.setdefault(colors_of([c]), []).append(c)
+    bang_tabs = sorted(bang_by_cl, key=lambda k: -len(bang_by_cl[k]))
+
+    lanes_sorted = sorted(lanes, key=lambda x: -len(x[1]))
+
+    sets = [
+        ("pairs", f"Pairs ({len(pair_units_x)})",
+         tabbed("tp", pair_tabs,
+                lambda cl: f"{mana(cl)} {len(pair_by_cl[cl])}",
+                lambda cl: pair_pane(pair_by_cl[cl]))),
+        ("bangers", f"Bangers ({len(bangers_x)})",
+         tabbed("tb", bang_tabs,
+                lambda cl: f"{mana(cl)} {len(bang_by_cl[cl])}",
+                lambda cl: gallery(bang_by_cl[cl]))),
+        ("lanes", f"Lanes ({len(lanes)})",
+         tabbed("tl", lanes_sorted,
+                lambda ln: f"{mana(colors_of(ln[1]))} {len(ln[1])}",
+                lambda ln: gallery(ln[1]))),
+    ]
+    out.append("<div class='explorer'><div class='sidebar'>")
+    for i, (sid, label, _) in enumerate(sets):
+        on = " class='on'" if i == 0 else ""
+        out.append(f"<button{on} data-group='sets' "
+                   f"data-show='set-{sid}'>{label}</button>")
+    out.append("</div><div>")
+    for i, (sid, _, body) in enumerate(sets):
+        hid = "" if i == 0 else " hidden"
+        out.append(f"<div data-pane='sets' id='set-{sid}'{hid}>"
+                   f"{body}</div>")
+    out.append("</div></div>")
+    out.append("<p class='meta'>Pairs: exactly-two-card teams. Bangers: "
+               "nonland cards maindecked in all three pods that belong "
+               "to no team. Lanes: the teams of three or more.</p>")
+    out.append("""<script>
+document.addEventListener('click', e => {
+  const b = e.target.closest('button[data-show]');
+  if (!b) return;
+  const g = b.dataset.group;
+  document.querySelectorAll(`[data-pane='${g}']`).forEach(
+    el => el.hidden = (el.id !== b.dataset.show));
+  document.querySelectorAll(`button[data-group='${g}']`).forEach(
+    x => x.classList.toggle('on', x === b));
+});
+</script>""")
 
     out.append(
         "<p>If you ask for teams of three or more cards, the data hands "
