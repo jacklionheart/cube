@@ -47,8 +47,7 @@ def slugify(name):
 TARGET_SHEET_ID = None  # create once via upload_sheet.py, then paste id here
 TITLE = "Samp Cube Roto s4 — Pick Summary"
 COMPUTED_TABS = ["Pick Summary", "Win Rates", "Color Analysis",
-                 "Maindecked Together", f"Packages 2 of {len(SOURCES)}",
-                 "Packages ±1 Card"]
+                 "Lanes (shared drafts)", f"Teams (2 of {len(SOURCES)})"]
 FUZZY_HEADERS = ("Avg", "Win Rate", "Score")  # float columns: rounding wiggle
 
 
