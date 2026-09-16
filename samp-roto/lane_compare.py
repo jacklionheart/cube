@@ -1,13 +1,14 @@
 """Compare lane definitions for the samp s4 pods as an essay-style HTML
 report (styled after roto/report.py's lane-report).
 
-Definitions compared:
+Definitions compared (over REAL maindecks, known for 11 of 13 pods):
   A. Maximal groups: card sets maindecked together (whole set, one deck)
-     in >= S of 13 drafts, size >= Z — Jack's definition, at three
-     settings (9/4 lead, 8/4, 7/3). Overlapping maximal groups roll up
-     into families (union shown as card images, variants listed).
+     in >= S of the 11 decked drafts, size >= Z — Jack's definition, at
+     7/3, 6/3 (the >50% bar), and 5/3. Overlapping maximal groups roll
+     up into families (union shown as card images, variants listed).
   B. Component lanes: connected components of the pairwise co-maindeck
-     graph at >= 9 shared drafts (what the published sheet currently uses).
+     graph at >= 6 shared drafts (what the published sheet's Lanes tab
+     uses).
 
 Usage: python3 lane_compare.py [out.html]
 """
@@ -85,14 +86,29 @@ def mana(colors):
 
 
 def load_data():
-    drafts = []
+    from roto_summary import MAIN_ZONES, load_decks
+
+    drafts, cube, seen = [], [], set()
     for n in refresh.SOURCES:
-        d, _ = parse_draft(HERE / "sources" / f"{refresh.slugify(n)}.xlsx", n)
+        d, c = parse_draft(HERE / "sources" / f"{refresh.slugify(n)}.xlsx", n)
         drafts.append(d)
+        for e in c:
+            if e[0] not in seen:
+                seen.add(e[0])
+                cube.append(e)
+    real_decks, _, _ = load_decks(HERE / "decks.tsv", cube)
+    name2idx = {d.name: k for k, d in enumerate(drafts)}
     decks, card_decks = {}, {}
     for k, d in enumerate(drafts):
         for card, p in d.picks.items():
-            decks.setdefault((k, p.player), set()).add(card)
+            deck = real_decks.get((d.name, p.player))
+            if deck is None:
+                continue  # no decklist known: contributes nothing
+            zone = deck.get(card)
+            if zone is None and card.endswith(" 2"):
+                zone = deck.get(card[:-2].strip())
+            if zone in MAIN_ZONES:
+                decks.setdefault((k, p.player), set()).add(card)
     for dk, cards in decks.items():
         for c in cards:
             card_decks.setdefault(c, set()).add(dk)
@@ -186,11 +202,11 @@ def host_line(group_decks, drafts):
 def render_setting(out, tag, min_sup, min_size, card_decks, drafts, scry, images):
     maximal = mine(card_decks, min_sup, min_size)
     fams = families(maximal)
-    out.append(f"<h2>{tag}: together in ≥{min_sup} of 13 drafts, "
-               f"size ≥{min_size}</h2>")
+    out.append(f"<h2>{tag}: together in ≥{min_sup} of the 11 decked "
+               f"drafts, size ≥{min_size}</h2>")
     out.append(f"<p class='meta'>{len(maximal)} maximal groups → "
                f"{len(fams)} families. A group only counts when every card "
-               f"in it sat in one deck in ≥{min_sup} drafts; overlapping "
+               f"in it sat in one maindeck in ≥{min_sup} drafts; overlapping "
                f"groups (≥2 shared cards) roll up into a family.</p>")
     for fi, f in enumerate(fams):
         groups = sorted((maximal[i] for i in f),
@@ -205,13 +221,13 @@ def render_setting(out, tag, min_sup, min_size, card_decks, drafts, scry, images
         out.append(f"<h3><span class='num'>F{fi + 1}</span>"
                    f"{mana(cl)} {guild(cl)} family "
                    f"<span class='kept'>{len(union)} cards · {len(f)} "
-                   f"groups · best {support(best_ds)}/13</span></h3>")
+                   f"groups · best {support(best_ds)}/11</span></h3>")
         out.append(f"<p class='meta'>Best group's decks — "
                    f"{host_line(best_ds, drafts)}</p>")
         out.append(card_grid(union, images, order))
         items = []
         for S, ds in groups[:8]:
-            items.append(f"<li>[{support(ds)}/13, {len(S)}c] "
+            items.append(f"<li>[{support(ds)}/11, {len(S)}c] "
                          + ", ".join(card_link(c) for c in S) + "</li>")
         if len(groups) > 8:
             items.append(f"<li>… +{len(groups) - 8} more variants</li>")
@@ -219,7 +235,7 @@ def render_setting(out, tag, min_sup, min_size, card_decks, drafts, scry, images
         out.append("</div>")
 
 
-def render_component_lanes(out, card_decks, drafts, scry, images, K=9):
+def render_component_lanes(out, card_decks, drafts, scry, images, K=6):
     from collections import defaultdict
     co = defaultdict(set)
     for dk, _ in {dk: None for ds in card_decks.values() for dk in ds}.items():
@@ -254,10 +270,10 @@ def render_component_lanes(out, card_decks, drafts, scry, images, K=9):
     out.append(f"<h2>For comparison: component lanes "
                f"(pairwise ≥{K} shared drafts)</h2>")
     out.append(f"<p class='meta'>{len(lanes)} lanes. Cards are chained: "
-               "an edge is a PAIR co-maindecked in ≥9 drafts, a lane is a "
+               f"an edge is a PAIR co-maindecked in ≥{K} drafts, a lane is a "
                "connected component — so a lane never certifies that the "
                "whole set appeared together. This is what the published "
-               "sheet's Lanes tab currently shows.</p>")
+               "sheet's Lanes tab shows.</p>")
     for i, cards in enumerate(lanes):
         out.append("<div class='lane'>")
         out.append(f"<h3><span class='num'>L{i + 1}</span>"
@@ -289,18 +305,20 @@ def main():
         "fetchlands. Below: the definition at the chosen setting "
         "(≥9 of 13, size ≥4), two looser settings, then the pairwise "
         "component lanes the published sheet currently uses.</p>"
-        "<p class='meta'>Caveats: maindeck currently means <i>all 45 "
-        "picks</i> (real 40-card decklists are scraped but not wired in "
-        "yet), so these are drafted-together lanes, not built-together "
-        "lanes — supports will only tighten once real maindecks land. "
-        "Duplicated lands aside, the cube drifted ~30 cards across the "
-        "season, so a card absent from early pods can support at most "
-        "the drafts it was available in. Source: the 13 s4 pod "
-        "spreadsheets + read-the-bones.</p>")
-    render_setting(out, "Chosen", 9, 4, card_decks, drafts, scry, images)
-    render_setting(out, "Looser", 8, 4, card_decks, drafts, scry, images)
-    render_setting(out, "Loosest", 7, 3, card_decks, drafts, scry, images)
-    render_component_lanes(out, card_decks, drafts, scry, images)
+        "<p class='meta'>Caveats: maindeck status comes from the real "
+        "submitted sealeddeck lists (companion-aware), so these are "
+        "built-together lanes. Decklists are known for 104 of 129 decks — "
+        "Sinkhole Surveyor and Eagles of the North haven't been scraped "
+        "yet, and 5 players posted images or nothing — so a group's "
+        "support tops out at 11, not 13. The cube also drifted ~30 cards "
+        "across the season, so late-add cards can support at most the "
+        "drafts they were available in. Source: the 13 s4 pod "
+        "spreadsheets + read-the-bones + Rough Drafts #decks channels.</p>")
+    render_setting(out, "Strict", 7, 3, card_decks, drafts, scry, images)
+    render_setting(out, "Chosen — the >50% rule", 6, 3,
+                   card_decks, drafts, scry, images)
+    render_setting(out, "Looser", 5, 3, card_decks, drafts, scry, images)
+    render_component_lanes(out, card_decks, drafts, scry, images, K=6)
     out_path.parent.mkdir(exist_ok=True)
     out_path.write_text("\n".join(out))
     print(out_path)

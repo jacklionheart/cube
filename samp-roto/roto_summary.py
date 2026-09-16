@@ -216,6 +216,12 @@ def norm(name):
     )
 
 
+# pool exports sometimes use a card's alternate (in-universe) name
+DECK_CARD_ALIASES = {
+    "the scouring stormsoul": "Sandman, Shifting Scoundrel",
+}
+
+
 def load_decks(tsv_path, cube):
     """Read decks.tsv (draft/player/kind/url), fetch+cache each sealeddeck
     pool, and return {(draft, player): {canonical card: 'main'|'side'|'hidden'}}.
@@ -225,6 +231,7 @@ def load_decks(tsv_path, cube):
     cache.mkdir(exist_ok=True)
     canonical = {norm(c): c for c, _, _ in cube}
     canonical.update({norm(c.split(" // ")[0]): c for c, _, _ in cube if " // " in c})
+    canonical.update({norm(a): c for a, c in DECK_CARD_ALIASES.items()})
 
     entries, links = {}, []
     for line in tsv_path.read_text().splitlines()[1:]:
@@ -468,7 +475,8 @@ def build_pick_value(wb, drafts, cube, decks, formulas):
     )
 
 
-LANE_MIN_CO = 9  # lane edges: pairs co-maindecked in >= this many drafts
+LANE_MIN_CO = 6  # lane edges: pairs co-maindecked in >= this many drafts
+# (decklists cover 11 of 13 pods, so 6 = the >50% bar of the known decks)
 
 
 def build_md_together(wb, drafts, cube, decks):
@@ -1025,13 +1033,23 @@ def main():
     decks_path = pathlib.Path(__file__).parent / "decks.tsv"
     decks, links = {}, []
     if md_picks:
-        # v1 semantics: every drafted card counts as maindecked (real
-        # decklists — sealeddeck pools and deck pics — come later)
+        # fallback semantics: every drafted card counts as maindecked
         for d in drafts:
             for card, p in d.picks.items():
                 decks.setdefault((d.name, p.player), {})[card] = "main"
     elif decks_path.exists():
         decks, main_sizes, links = load_decks(decks_path, cube)
+        # duplicated lands: the grid may hold 'Hallowed Fountain 2' while
+        # the sealeddeck pool just says 'Hallowed Fountain' — give the
+        # suffixed pick its base card's zone in that player's deck
+        for d in drafts:
+            for card, p in d.picks.items():
+                if not card.endswith(" 2"):
+                    continue
+                deck = decks.get((d.name, p.player))
+                base = card[:-2].strip()
+                if deck and base in deck:
+                    deck.setdefault(card, deck[base])
         check_deck_coverage(decks, main_sizes, drafts)
     build_workbook(
         drafts, cube, availability, formulas=formulas, decks=decks, links=links

@@ -273,9 +273,9 @@ def deck_sets(owners):
     return by_deck
 
 
-# 13 pods of 45-card pick-"decks" intersect far more than 3 pods of real
-# 40-card decks: 5 admits ~2,350 pairs; 18 keeps the ~200 strongest.
-MIN_PAIR_CORE = 18
+# real 40-card decks across 11 known-deck pods: 5 admits ~950 pairs,
+# 12 keeps the ~130 strongest.
+MIN_PAIR_CORE = 12
 
 
 def pair_packages(owners, min_core=None):

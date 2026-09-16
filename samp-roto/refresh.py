@@ -150,7 +150,7 @@ def main():
     out_dir = HERE / "out"
     out_dir.mkdir(exist_ok=True)
     inputs = [f"{n}={src_dir / (slugify(n) + '.xlsx')}" for n in SOURCES]
-    build_cmd = [sys.executable, str(HERE / "roto_summary.py"), "--md-picks"]
+    build_cmd = [sys.executable, str(HERE / "roto_summary.py")]
 
     formulas_x = out_dir / "samp-roto-summary.xlsx"
     subprocess.run(build_cmd + [str(formulas_x)] + inputs, check=True)
