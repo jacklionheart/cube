@@ -9,6 +9,7 @@ Usage: python3 blog.py
 
 import html
 import pathlib
+from collections import Counter
 from urllib.parse import quote
 
 from packages import (card_colors, deck_sets, load, load_scryfall,
@@ -493,12 +494,14 @@ document.addEventListener('click', e => {
     out.append("<h2>Categorizing the pairs</h2>")
     out.append(
         "<p>Every pair, with the identity of its three owners. Where "
-        "a deck owns a core, that core is its label; the decks the "
-        "core system never claimed appear as their drafters. Read "
-        "down the table and the law shows itself: when a pair sits "
-        "with a core twice, the third owner is a sibling from the "
-        "same family or an unassociated deck — never a core from "
-        "another family.</p>")
+        "a deck owns a core, that core is its label. The decks the "
+        "core system never claimed are labeled by what their own "
+        "pairs say — hold a free pair and you're a Rectangles deck; "
+        "Arason's equipment pile bonds only with Sac. A deck with no "
+        "pairs at all keeps its drafter's name. Read down the table "
+        "and the law shows itself: when a pair sits with a core "
+        "twice, the third owner is a sibling from the same family, "
+        "or Rectangles — never a core from another family.</p>")
     deck_core_lab = {}
     for lsig, lcards in lanes:
         nm = core_name(lcards)
@@ -518,10 +521,35 @@ document.addEventListener('click', e => {
         return (f"<a href='{url}' data-img='{html.escape(img)}'>"
                 f"{html.escape(c)}</a>")
 
+    def coreless_label(k, pl):
+        """Affiliation of a no-core deck, read off its own pairs:
+        Rectangles if it holds a free pair, else its satellite or
+        bridge core, else nothing."""
+        labs = Counter()
+        for psig, _ in pair_teams:
+            if psig[k] != pl:
+                continue
+            for lsig, lcards in lanes:
+                if sum(a == b for a, b in zip(psig, lsig)) >= 2:
+                    labs[core_name(lcards)] += 1
+                    break
+            else:
+                if classify(psig) == "free":
+                    labs["Rectangles"] += 1
+                else:
+                    for kk, ppl in enumerate(psig):
+                        for nm in lane_of_deck.get((kk, ppl), []):
+                            labs[nm] += 1
+        if "Rectangles" in labs:
+            return "Rectangles"
+        return labs.most_common(1)[0][0] if labs else None
+
     def owner_cell(k, pl):
         labs = deck_core_lab.get((k, pl))
-        return (" / ".join(labs) if labs
-                else f"<i>{short_link(k, pl)}</i>")
+        if labs:
+            return " / ".join(labs)
+        nm = coreless_label(k, pl)
+        return f"<i>{nm}</i>" if nm else f"<i>{short_link(k, pl)}</i>"
 
     def sat_core(psig):
         for lsig, lcards in lanes:
@@ -594,7 +622,6 @@ document.addEventListener('click', e => {
     out.append("</table>")
 
     # --- bar graph: cards in teams by color identity + pair gallery ---
-    from collections import Counter
     ident = Counter()
     for _, cards in groups:
         cl = colors_of(cards)
