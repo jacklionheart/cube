@@ -130,8 +130,8 @@ def main():
                     ("Fires of Invention", "Fires Ramp"),
                     ("Everything Pizza", "Pizza Ramp"),
                     ("Spider Spawning", "Graveyard"),
-                    ("Expressive Iteration", "Control"),
-                    ("Shoreline Looter", "Tempo")]
+                    ("Expressive Iteration", "Spells"),
+                    ("Shoreline Looter", "Discard")]
 
     def core_name(cards):
         for marker, nm in CORE_MARKERS:
@@ -140,7 +140,7 @@ def main():
         return "?"
     FAMILY = {"Tokens": "Aggro", "Sac": "Aggro", "Fires Ramp": "Green",
               "Pizza Ramp": "Green", "Graveyard": "Green",
-              "Control": "Blue", "Tempo": "Blue"}
+              "Spells": "Blue", "Discard": "Blue"}
 
     def colors_of(cards):
         u = set()
@@ -198,8 +198,8 @@ def main():
     temur_ramp = by_name["Fires Ramp"]
     golgari_ramp = by_name["Pizza Ramp"]
     graveyard = by_name["Graveyard"]
-    blue_spells = by_name["Control"]
-    blue_tempo = by_name["Tempo"]
+    blue_spells = by_name["Spells"]
+    blue_tempo = by_name["Discard"]
 
     out = [f"<meta charset='utf-8'><title>Three Rotos, One Cube</title>"
            f"<style>{CSS}</style>"]
@@ -312,10 +312,10 @@ document.addEventListener('click', e => {
     out.append("<h2>Two Mardu aggro decks</h2>")
     out.append(
         "<p>The aggro seats resolved into two cores that live one pip "
-        "apart. Boros Tokens is the largest and most stable structure "
+        "apart. Tokens is the largest and most stable structure "
         "in the data — nine cards that three different drafters "
         "assembled almost identically, a deck the cube practically "
-        "deals to whoever sits down in it. Rakdos Sac is its darker "
+        "deals to whoever sits down in it. Sac is its darker "
         "sibling: Deadly Dispute, Marionette Apprentice, and Mayhem "
         "Devil forming the sacrifice engine every pod rebuilt. The "
         "two bridges below are why these read as one Mardu family — "
@@ -338,7 +338,7 @@ document.addEventListener('click', e => {
         "which is to say: the people who ramp, ramp both ways. "
         "Graveyard is the third leg — a Spider Spawning value core, "
         "Golgari once you count the flashback cost — sharing a drafter "
-        "with Temur Ramp. Where "
+        "with Fires Ramp. Where "
         "Aggro splits into two clean decks, Green is one ecosystem "
         "with three stable expressions.</p>")
     out.append(f"<h3>{mana('URG')} Fires Ramp</h3>")
@@ -352,15 +352,15 @@ document.addEventListener('click', e => {
     out.append("<h2>Two blue decks</h2>")
     out.append(
         "<p>Blue split along the oldest line there is: do you want to "
-        "answer things or untap and win. The Control core is pure "
+        "answer things or untap and win. The Spells core is pure "
         "spell velocity — Consider, Think Twice, Expressive Iteration, "
-        "Demon Bolt. The Tempo core is the Censor-Quench-Shoreline "
+        "Demon Bolt. The Discard core is the Censor-Quench-Shoreline "
         "Looter package that taxes and chips. Hieroglyphic "
         "Illumination and Lórien Revealed ride with both, the "
         "card-flow glue of the family.</p>")
-    out.append(f"<h3>{mana('UR')} Control</h3>")
+    out.append(f"<h3>{mana('UR')} Spells</h3>")
     out.append(lane_block(blue_spells))
-    out.append(f"<h3>{mana('U')} Tempo</h3>")
+    out.append(f"<h3>{mana('U')} Discard</h3>")
     out.append(lane_block(blue_tempo))
     out.append(family_bridges("Blue"))
 
