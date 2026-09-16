@@ -104,7 +104,9 @@ def mana(letters):
 
 
 def chip(card, colors):
-    return html.escape(card)
+    from urllib.parse import quote
+    return (f'<a href="https://scryfall.com/search?q=!%22{quote(card)}%22">'
+            f'{html.escape(card)}</a>')
 
 
 def main():
@@ -147,10 +149,12 @@ def main():
     out = [f"<meta charset='utf-8'><title>LoL Roto — Lane Report</title>"
            f"<style>{CSS}</style>",
            "<h1>Three Rotos, One Cube: the Lanes</h1>",
-           "<p class='meta'>A <b>Lane</b> is a core of 3+ cards maindecked "
-           "together in all three drafts — by three different people — plus "
-           "its flex orbit (cards that rode with the full core in two of "
-           "the three decks). Deck links go to sealeddeck.tech.</p>"]
+           "<p class='meta'><b>Lane</b>: a core of 3+ cards maindecked "
+           "together in all three drafts, by three different people. "
+           "<b>Flex</b>: a lane's orbit — cards that rode with the full "
+           "core in two of its three decks. <b>Banger</b>: maindecked in "
+           "every pod, in no lane core. Deck links go to sealeddeck.tech; "
+           "method and caveats at the end.</p>"]
 
     # -- Opening charts ------------------------------------------------
     def barchart(title, rows, unit, mx=None):
@@ -184,9 +188,10 @@ def main():
     lane_sets = [set(colors_of(cards)) - {"C"}
                  for _, cards in groups]
     pairs10 = ["WU", "UB", "BR", "RG", "WG", "WB", "UR", "BG", "WR", "UG"]
-    rows0 = [(mana(pr), sum(1 for cs in lane_sets if set(pr) <= cs))
-             for pr in pairs10]
-    rows0.sort(key=lambda r: -r[1])
+    counts0 = [(pr, sum(1 for cs in lane_sets if set(pr) <= cs))
+               for pr in pairs10]
+    counts0.sort(key=lambda r: -r[1])
+    rows0 = [(mana(pr), n) for pr, n in counts0]
 
     lane_cards = []
     for gi, (_, cards) in enumerate(groups):
@@ -226,13 +231,27 @@ def main():
               for g in ggs]
     shared_mx = max(v for _, v, _ in rows2a)
 
-    out.append(barchart("Lanes touching each color pair", rows0, "lanes"))
-    out.append(barchart("Decks by number of lanes represented in their "
-                        "maindeck (core or flex)", rows1, "decks"))
+    zeros = [pr for pr in pairs10
+             if not any(set(pr) <= cs for cs in lane_sets)]
+    zstr = " and ".join(guild(z) for z in zeros)
+    out.append(barchart(
+        f"{guild(counts0[0][0])} is the most-laned color pair; "
+        f"{zstr} never made a lane", rows0, "lanes"))
+    import statistics
+    med = int(statistics.median(touch.values()))
+    out.append(barchart(
+        f"Every deck borrows from the lanes — the median deck plays cards "
+        f"from {med} of them", rows1, "decks"))
+    pct = round(100 * len(laneless) / len(all_md))
     out.append(barchart_pair("All maindecked cards, by color", rows2a,
                              shared_mx))
-    out.append(barchart_pair("Maindecked cards outside every lane, "
-                             "by color (same scale)", rows2, shared_mx))
+    out.append(barchart_pair(
+        f"{pct}% of maindecked cards sit outside every lane "
+        f"(same scale as above)", rows2, shared_mx))
+    out.append("<p class='meta'>Source: three LoL cube rotisserie drafts, "
+               "Sept 2026 — 28 players, all 28 maindecks "
+               "(sealeddeck.tech; one deck transcribed from a screenshot)."
+               "</p>")
 
     # -- Section 1: the lanes, grouped by theme ------------------------
     out.append("<h2>The lanes</h2>")
@@ -460,6 +479,30 @@ showGrp('{present[0]}');
             out.append(f"<p class='meta' style='margin:6px 0 0'>{glabel}</p>"
                        + "<p>" + ", ".join(chip(c, colors) for c in cs)
                        + "</p>")
+
+    out.append("<h2>How this works</h2>")
+    out.append(
+        "<p class='meta'>Data: three rotisserie drafts of the Lords of "
+        "Limited cube (Sept 2026), 45 picks x 28 players, no player in "
+        "more than one pod — every recurring structure here is a "
+        "cross-person replication, not one person's habit. All 28 "
+        "maindecks were recovered from sealeddeck.tech links (one from a "
+        "posted screenshot).</p>"
+        "<p class='meta'>Maindeck rules: pool cards not listed in a deck "
+        "count as sideboard (safe: every deck is either a full 40 or "
+        "lists all 45 picks). A companion in the sideboard slot counts "
+        "as maindecked only if the deck passes its deckbuilding "
+        "requirement — e.g. one of the three Lurrus decks fails the "
+        "mana-value test and is treated as a true sideboard card.</p>"
+        "<p class='meta'>Are lanes real? A permutation test keeps every "
+        "player's picks and re-deals each maindeck as a random same-size "
+        "subset, 2,000 times: random deckbuilding averages 5.6 lanes / "
+        "20 lane-cards / largest 5 — it never once produced this data's "
+        "11 lanes, 53 lane-cards, or a 10-card core. The lane structure "
+        "is deliberate deckbuilding, not a pick-pool artifact.</p>"
+        "<p class='meta'>Caveats: n = 3 drafts in one community; themes "
+        "are hand-labeled; win rates are deliberately absent. Everything "
+        "regenerates from the draft sheets via packages.py.</p>")
 
     dest = HERE / "out" / "lane-report.html"
     dest.parent.mkdir(exist_ok=True)
