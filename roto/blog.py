@@ -127,8 +127,8 @@ def main():
              if len(cards) >= 3]
     CORE_MARKERS = [("Rally at the Hornburg", "Tokens"),
                     ("Mayhem Devil", "Sac"),
-                    ("Fires of Invention", "Fires Ramp"),
-                    ("Everything Pizza", "Pizza Ramp"),
+                    ("Fires of Invention", "Ramp"),
+                    ("Everything Pizza", "Ramp"),
                     ("Spider Spawning", "Graveyard"),
                     ("Expressive Iteration", "Spells"),
                     ("Shoreline Looter", "Discard")]
@@ -138,8 +138,7 @@ def main():
             if marker in cards:
                 return nm
         return "?"
-    FAMILY = {"Tokens": "Aggro", "Sac": "Aggro", "Fires Ramp": "Green",
-              "Pizza Ramp": "Green", "Graveyard": "Green",
+    FAMILY = {"Tokens": "Aggro", "Sac": "Aggro", "Ramp": "Green", "Graveyard": "Green",
               "Spells": "Blue", "Discard": "Blue"}
 
     def colors_of(cards):
@@ -192,14 +191,16 @@ def main():
 
     # Jack's taxonomy of the size-3+ teams (labels are his; mapping of
     # the two blue teams is a guess — swap if backwards)
-    by_name = {core_name(cards): (sig, cards) for sig, cards in lanes}
-    tokens = by_name["Tokens"]
-    sac = by_name["Sac"]
-    temur_ramp = by_name["Fires Ramp"]
-    golgari_ramp = by_name["Pizza Ramp"]
-    graveyard = by_name["Graveyard"]
-    blue_spells = by_name["Spells"]
-    blue_tempo = by_name["Discard"]
+    def core_by_marker(m):
+        return next((sig, cards) for sig, cards in lanes if m in cards)
+
+    tokens = core_by_marker("Rally at the Hornburg")
+    sac = core_by_marker("Mayhem Devil")
+    temur_ramp = core_by_marker("Fires of Invention")
+    golgari_ramp = core_by_marker("Everything Pizza")
+    graveyard = core_by_marker("Spider Spawning")
+    blue_spells = core_by_marker("Expressive Iteration")
+    blue_tempo = core_by_marker("Shoreline Looter")
 
     out = [f"<meta charset='utf-8'><title>Three Rotos, One Cube</title>"
            f"<style>{CSS}</style>"]
@@ -341,9 +342,9 @@ document.addEventListener('click', e => {
         "with Fires Ramp. Where "
         "Aggro splits into two clean decks, Green is one ecosystem "
         "with three stable expressions.</p>")
-    out.append(f"<h3>{mana('URG')} Fires Ramp</h3>")
+    out.append(f"<h3>{mana('URG')} Ramp</h3>")
     out.append(lane_block(temur_ramp))
-    out.append(f"<h3>{mana('BG')} Pizza Ramp</h3>")
+    out.append(f"<h3>{mana('BG')} Ramp</h3>")
     out.append(lane_block(golgari_ramp))
     out.append(f"<h3>{mana('G')} Graveyard</h3>")
     out.append(lane_block(graveyard))
