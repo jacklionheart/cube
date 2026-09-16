@@ -44,7 +44,9 @@ SOURCES = {
 
 def slugify(name):
     return name.lower().replace(" ", "-")
-TARGET_SHEET_ID = None  # create once via upload_sheet.py, then paste id here
+# The live sheet — always update in place (same URL, same sharing):
+# https://docs.google.com/spreadsheets/d/1VcZrPKd_UypiJUpbs3CJ6-ysmBhkGapnq8VJ3duJ3cc/edit
+TARGET_SHEET_ID = "1VcZrPKd_UypiJUpbs3CJ6-ysmBhkGapnq8VJ3duJ3cc"
 TITLE = "Samp Cube Roto s4 — Pick Summary"
 COMPUTED_TABS = ["Pick Summary", "Win Rates", "Color Analysis",
                  "Lanes (shared drafts)", f"Teams (2 of {len(SOURCES)})"]

@@ -15,6 +15,7 @@ Usage: python3 roto_summary.py out.xlsx draft1.xlsx draft2.xlsx [...]
 """
 
 import json
+import math
 import pathlib
 import sys
 import unicodedata
@@ -39,6 +40,12 @@ FIRST_PLAYER_COL = 3  # column C
 # pick-for-pick against read-the-bones pickN for kishla and raven-eagle).
 # Must be odd (the first double traversal runs right-to-left).
 DOUBLE_PICK_AFTER = 25
+
+
+def round1(x):
+    """One-decimal rounding with Sheets' ROUND semantics (half away from
+    zero) — Python's round() is half-even and disagrees on .X5 averages."""
+    return math.floor(x * 10 + 0.5) / 10
 
 
 def overall_pick(rnd, seat, n):
@@ -514,7 +521,9 @@ def build_md_together(wb, drafts, cube, decks):
                 p = d.picks.get(card)
                 if p:
                     counts[p.player] = counts.get(p.player, 0) + 1
-            best = max(counts.items(), key=lambda kv: kv[1], default=(None, 0))
+            # ties break by seat order so the pick is deterministic
+            best = max(sorted(counts.items(), key=lambda kv: d.players.index(kv[0])),
+                       key=lambda kv: kv[1], default=(None, 0))
             if best[1] >= 2:
                 hosts.append(f"{best[0]} ({best[1]})")
                 hosted += 1
@@ -677,8 +686,8 @@ def build_workbook(drafts, cube, availability, formulas=True, decks=None, links=
         return row + [
             min(overalls) if overalls else None,
             max(overalls) if overalls else None,
-            round(sum(overalls) / len(overalls), 1) if overalls else None,
-            round(sum(rounds) / len(rounds), 1) if rounds else None,
+            round1(sum(overalls) / len(overalls)) if overalls else None,
+            round1(sum(rounds) / len(rounds)) if rounds else None,
             len(overalls),
             sum(m == "Y" for m in mds),
             availability.get(card, 0),
@@ -1005,6 +1014,11 @@ def main():
                     print(f"note: {d.name}: pick {card!r} -> {fixed!r}", file=sys.stderr)
             if fixed:
                 d.picks[fixed] = d.picks.pop(card)
+                # rewrite the grid copy too: the sheet formulas look the
+                # canonical name up in the draft tab (Sheets' = is already
+                # case-insensitive, but shorthand needs the real text)
+                d.rounds = [[fixed if c == card else c for c in row]
+                            for row in d.rounds]
             else:
                 print(f"warning: {d.name}: pick {card!r} not in any cube list", file=sys.stderr)
 
