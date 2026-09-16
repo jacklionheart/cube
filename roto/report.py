@@ -444,6 +444,43 @@ showGrp('{present[0]}');
         out.append("</div>")
     out.append("</details>")
 
+    # -- Satellites: the third deck ------------------------------------
+    lanes_x = [(sig, cards) for sig, cards in all_classes
+               if len(cards) >= 3]
+    pairs_x = [(sig, sorted(cards)) for sig, cards in all_classes
+               if len(cards) == 2]
+    out.append("<h2>Satellites and their third deck</h2>")
+    out.append("<p class='meta'>A satellite agrees with a lane's decks "
+               "in two pods; the third pod is where it went its own way "
+               "— kept by someone else while the lane's own deck "
+               "passed on it.</p>")
+    out.append("<table><tr><th>Pair</th><th>Satellite of</th>"
+               "<th>Rides with</th><th>Third deck (kept it)</th>"
+               "<th>Lane's deck there (didn't)</th></tr>")
+    for psig, pcards in pairs_x:
+        best = None
+        for li, (lsig, lcards) in enumerate(lanes_x):
+            agree = [k for k in range(len(psig)) if psig[k] == lsig[k]]
+            if len(agree) >= 2:
+                best = (li, lsig, lcards, agree)
+                break
+        if not best:
+            continue
+        li, lsig, lcards, agree = best
+        k3 = next(k for k in range(len(psig)) if k not in agree)
+        pname = " + ".join(chip(c, colors) for c in pcards)
+        lane_lab = (f"P{li + 1} {theme_str(lcards, themes) or ''} "
+                    f"{mana(colors_of(lcards))}")
+        rides = ", ".join(f"{drafts[k].name} {html.escape(psig[k])}"
+                          for k in agree)
+        out.append(f"<tr><td>{pname}</td><td>{lane_lab}</td>"
+                   f"<td>{rides}</td>"
+                   f"<td>{drafts[k3].name} "
+                   f"{mana(colors_of(by_deck[(k3, psig[k3])]))} "
+                   f"{deck_link(k3, psig[k3])}</td>"
+                   f"<td>{html.escape(lsig[k3])}</td></tr>")
+    out.append("</table>")
+
     # -- Section 4: decks that carved their own lanes ------------------
     claimed = set()
     for gi, (sig, cards) in enumerate(groups):
