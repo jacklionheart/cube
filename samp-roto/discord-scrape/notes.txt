@@ -8,3 +8,5 @@ goose-mother: COMPLETE via /0 - all 10 players
 yorion: COMPLETE via /0 - all 10 players
 skycoach: COMPLETE - all 10 players posted links
 Dom (slickshot): transcribed -> deckcache/manual-dom-slickshot.json (validated vs picks); Baleful Rocketman/Rob/aidybaby + sinkhole/eagles channels still blocked on Chrome extension
+eagles: murmurtwin posted an image-only deck update 9/11 (swap description); linked deck used as current
+sinkhole+eagles scraped (all 20 decks, links); aidybaby transcribed from v2 image; rocketman/rob images + tenderdrafter search still pending (Discord logged out mid-capture, Chrome multi-download block ate 3 images)

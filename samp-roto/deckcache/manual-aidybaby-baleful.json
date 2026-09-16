@@ -1,0 +1,193 @@
+{
+ "poolId": "manual-aidybaby-baleful",
+ "note": "Transcribed from aidybaby's 'Updated list' image posted 2026-08-01 14:07 (discord-scrape/baleful-aidybaby-2026-08-011407-1.png). A 'Version 3' image followed 27 minutes later but its download was blocked by Chrome's multiple-download protection before Discord logged out \u2014 the 15-card sideboard here is fully named, so v3 can only differ by main/side swaps. Validated: 15 side + 23 main spells + 7 land picks = his 45 picks exactly.",
+ "deck": [
+  {
+   "name": "Esper Sentinel",
+   "count": 1
+  },
+  {
+   "name": "Bloodchief's Thirst",
+   "count": 1
+  },
+  {
+   "name": "Thoughtseize",
+   "count": 1
+  },
+  {
+   "name": "Intrepid Adversary",
+   "count": 1
+  },
+  {
+   "name": "Sheltered by Ghosts",
+   "count": 1
+  },
+  {
+   "name": "Voice of Victory",
+   "count": 1
+  },
+  {
+   "name": "Deep-Cavern Bat",
+   "count": 1
+  },
+  {
+   "name": "Sheoldred's Edict",
+   "count": 1
+  },
+  {
+   "name": "Shoot the Sheriff",
+   "count": 1
+  },
+  {
+   "name": "Dauthi Voidwalker",
+   "count": 1
+  },
+  {
+   "name": "The Meathook Massacre",
+   "count": 1
+  },
+  {
+   "name": "Elite Spellbinder",
+   "count": 1
+  },
+  {
+   "name": "Sanguine Evangelist",
+   "count": 1
+  },
+  {
+   "name": "Adeline, Resplendent Cathar",
+   "count": 1
+  },
+  {
+   "name": "Enduring Innocence",
+   "count": 1
+  },
+  {
+   "name": "Preacher of the Schism",
+   "count": 1
+  },
+  {
+   "name": "Cloak and Dagger, Entwined",
+   "count": 1
+  },
+  {
+   "name": "The Wandering Emperor",
+   "count": 1
+  },
+  {
+   "name": "Elegy Acolyte",
+   "count": 1
+  },
+  {
+   "name": "Sheoldred, the Apocalypse",
+   "count": 1
+  },
+  {
+   "name": "Gix's Command",
+   "count": 1
+  },
+  {
+   "name": "Eagles of the North",
+   "count": 1
+  },
+  {
+   "name": "Crabomination",
+   "count": 1
+  },
+  {
+   "name": "Abandoned Air Temple",
+   "count": 1
+  },
+  {
+   "name": "Cave of the Frost Dragon",
+   "count": 1
+  },
+  {
+   "name": "Concealed Courtyard",
+   "count": 1
+  },
+  {
+   "name": "Godless Shrine",
+   "count": 2
+  },
+  {
+   "name": "Multiversal Passage",
+   "count": 1
+  },
+  {
+   "name": "Shadowy Backstreet",
+   "count": 1
+  },
+  {
+   "name": "Plains",
+   "count": 5
+  },
+  {
+   "name": "Swamp",
+   "count": 5
+  }
+ ],
+ "sideboard": [
+  {
+   "name": "Descendant of Storms",
+   "count": 1
+  },
+  {
+   "name": "Mana Tithe",
+   "count": 1
+  },
+  {
+   "name": "Usher of the Fallen",
+   "count": 1
+  },
+  {
+   "name": "Moonshadow",
+   "count": 1
+  },
+  {
+   "name": "Currency Converter",
+   "count": 1
+  },
+  {
+   "name": "Thalia, Guardian of Thraben",
+   "count": 1
+  },
+  {
+   "name": "Infernal Grasp",
+   "count": 1
+  },
+  {
+   "name": "Sinkhole Surveyor",
+   "count": 1
+  },
+  {
+   "name": "Super Shredder",
+   "count": 1
+  },
+  {
+   "name": "Tourach, Dread Cantor",
+   "count": 1
+  },
+  {
+   "name": "Aang's Iceberg",
+   "count": 1
+  },
+  {
+   "name": "Liliana of the Veil",
+   "count": 1
+  },
+  {
+   "name": "Appa, Steadfast Guardian",
+   "count": 1
+  },
+  {
+   "name": "Archfiend of the Dross",
+   "count": 1
+  },
+  {
+   "name": "Skysovereign, Consul Flagship",
+   "count": 1
+  }
+ ],
+ "hidden": []
+}

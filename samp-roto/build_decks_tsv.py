@@ -22,7 +22,8 @@ SCRAPE2DRAFT = {
     "hard-academic": "Hardened Academic", "baleful-strix": "Baleful Strix",
     "goose-mother": "Goose Mother", "yorion": "Yorion",
     "mockingbird": "Mockingbird", "aven": "Aven Interrupter",
-    "skycoach": "Skycoach Conductor",
+    "skycoach": "Skycoach Conductor", "sinkhole": "Sinkhole Surveyor",
+    "eagles": "Eagles of the North",
 }
 
 # (draft, author) -> roster name, for cases normalization can't derive
@@ -50,6 +51,8 @@ ALIASES = {
 MANUAL_DECKS = [
     ("Slickshot", "Dom", "ocr",
      "https://sealeddeck.tech/manual-dom-slickshot"),
+    ("Baleful Strix", "aidybaby", "ocr",
+     "https://sealeddeck.tech/manual-aidybaby-baleful"),
 ]
 
 

@@ -3,7 +3,7 @@ report (styled after roto/report.py's lane-report).
 
 Definitions compared (over REAL maindecks, known for 11 of 13 pods):
   A. Maximal groups: card sets maindecked together (whole set, one deck)
-     in >= S of the 11 decked drafts, size >= Z — Jack's definition, at
+     in >= S of the 13 decked drafts, size >= Z — Jack's definition, at
      7/3, 6/3 (the >50% bar), and 5/3. Overlapping maximal groups roll
      up into families (union shown as card images, variants listed).
   B. Component lanes: connected components of the pairwise co-maindeck
@@ -202,7 +202,7 @@ def host_line(group_decks, drafts):
 def render_setting(out, tag, min_sup, min_size, card_decks, drafts, scry, images):
     maximal = mine(card_decks, min_sup, min_size)
     fams = families(maximal)
-    out.append(f"<h2>{tag}: together in ≥{min_sup} of the 11 decked "
+    out.append(f"<h2>{tag}: together in ≥{min_sup} of the 13 decked "
                f"drafts, size ≥{min_size}</h2>")
     out.append(f"<p class='meta'>{len(maximal)} maximal groups → "
                f"{len(fams)} families. A group only counts when every card "
@@ -221,13 +221,13 @@ def render_setting(out, tag, min_sup, min_size, card_decks, drafts, scry, images
         out.append(f"<h3><span class='num'>F{fi + 1}</span>"
                    f"{mana(cl)} {guild(cl)} family "
                    f"<span class='kept'>{len(union)} cards · {len(f)} "
-                   f"groups · best {support(best_ds)}/11</span></h3>")
+                   f"groups · best {support(best_ds)}/13</span></h3>")
         out.append(f"<p class='meta'>Best group's decks — "
                    f"{host_line(best_ds, drafts)}</p>")
         out.append(card_grid(union, images, order))
         items = []
         for S, ds in groups[:8]:
-            items.append(f"<li>[{support(ds)}/11, {len(S)}c] "
+            items.append(f"<li>[{support(ds)}/13, {len(S)}c] "
                          + ", ".join(card_link(c) for c in S) + "</li>")
         if len(groups) > 8:
             items.append(f"<li>… +{len(groups) - 8} more variants</li>")
@@ -235,7 +235,7 @@ def render_setting(out, tag, min_sup, min_size, card_decks, drafts, scry, images
         out.append("</div>")
 
 
-def render_component_lanes(out, card_decks, drafts, scry, images, K=6):
+def render_component_lanes(out, card_decks, drafts, scry, images, K=7):
     from collections import defaultdict
     co = defaultdict(set)
     for dk, _ in {dk: None for ds in card_decks.values() for dk in ds}.items():
@@ -303,24 +303,24 @@ def main():
         "<b>family</b>, shown as one card grid ordered core-first. "
         "<b>Lands are excluded</b> — otherwise every family is half "
         "fetchlands. Below: the definition at the chosen setting "
-        "(≥6 of the 11 decked drafts — the >50% rule), one stricter and "
+        "(≥7 of the 13 decked drafts — the >50% rule), one stricter and "
         "one looser setting, then the pairwise component lanes the "
         "published sheet currently uses.</p>"
         "<p class='meta'>Caveats: maindeck status comes from the real "
         "submitted sealeddeck lists (companion-aware), so these are "
-        "built-together lanes. Decklists are known for 105 of 129 decks — "
-        "Sinkhole Surveyor and Eagles of the North haven't been scraped "
-        "yet, Dom's deck is transcribed from his posted image, and 4 "
-        "players posted images or nothing — so a group's "
-        "support tops out at 11, not 13. The cube also drifted ~30 cards "
+        "built-together lanes. Decklists are known for 126 of 129 decks "
+        "(all 13 pods) — Dom's and aidybaby's decks are transcribed from "
+        "their posted images; Rocketman's and Rob's Baleful Strix decks "
+        "and Kishla's tenderdrafter remain unknown. "
+        "The cube also drifted ~30 cards "
         "across the season, so late-add cards can support at most the "
         "drafts they were available in. Source: the 13 s4 pod "
         "spreadsheets + read-the-bones + Rough Drafts #decks channels.</p>")
-    render_setting(out, "Strict", 7, 3, card_decks, drafts, scry, images)
-    render_setting(out, "Chosen — the >50% rule", 6, 3,
+    render_setting(out, "Strict", 8, 3, card_decks, drafts, scry, images)
+    render_setting(out, "Chosen — the >50% rule", 7, 3,
                    card_decks, drafts, scry, images)
-    render_setting(out, "Looser", 5, 3, card_decks, drafts, scry, images)
-    render_component_lanes(out, card_decks, drafts, scry, images, K=6)
+    render_setting(out, "Looser", 6, 3, card_decks, drafts, scry, images)
+    render_component_lanes(out, card_decks, drafts, scry, images, K=7)
     out_path.parent.mkdir(exist_ok=True)
     out_path.write_text("\n".join(out))
     print(out_path)
