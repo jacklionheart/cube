@@ -167,7 +167,8 @@ def main():
            "together in all three drafts, by three different people. "
            "<b>Flex</b>: a lane's orbit — cards that rode with the full "
            "core in two of its three decks. <b>Banger</b>: maindecked in "
-           "every pod, in no lane core. Lands are ignored throughout. Deck "
+           "every pod, in no lane core. A <b>Team</b> is a lane or a standalone "
+           "always-together pair. Lands are ignored throughout. Deck "
            "links go to sealeddeck.tech; "
            "method and caveats at the end.</p>"]
 
@@ -252,6 +253,16 @@ def main():
     out.append(barchart(
         f"{guild(counts0[0][0])} is the most-laned color pair; "
         f"{zstr} never made a lane", rows0, "lanes"))
+    team_classes = signature_groups(owners, min_size=2)
+    team_cards = [c for _, cards in team_classes for c in cards]
+    ident = Counter(colors_of([c]) for c in team_cards)
+    rows_t = [(mana(cl), n) for cl, n in
+              sorted(ident.items(), key=lambda x: -x[1])]
+    top_cl = max(ident, key=ident.get)
+    out.append(barchart(
+        f"The {len(team_cards)} cards on teams (lanes + pairs), by color "
+        f"identity — {guild(top_cl)} leads", rows_t, "cards"))
+
     import statistics
     med = int(statistics.median(touch.values()))
     out.append(barchart(
