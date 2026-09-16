@@ -29,12 +29,11 @@ body { font-family: Charter, Georgia, 'Times New Roman', serif;
        font-size: 19px; line-height: 1.65; color: #1a1a1a;
        max-width: 680px; margin: 56px auto 120px; padding: 0 20px;
        background: #fff; }
-h1 { font-size: 34px; line-height: 1.2; margin: 0 0 8px; }
-h2 { font-size: 25px; margin: 64px 0 10px; }
-h3 { font-size: 20px; margin: 40px 0 6px; }
-h4 { margin-top: 30px; font-family: -apple-system, 'Segoe UI', Helvetica, sans-serif;
-     font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
-     color: #6b6b6b; margin: 26px 0 6px; font-weight: 600; }
+h1 { font-size: 26px; line-height: 1.25; margin: 0 0 6px; }
+h2 { font-size: 21px; margin: 48px 0 8px; }
+h3 { font-size: 17px; margin: 30px 0 4px; }
+h4 { font-family: -apple-system, 'Segoe UI', Helvetica, sans-serif;
+     font-size: 13px; color: #777; margin: 20px 0 4px; font-weight: 600; }
 table { border-collapse: collapse; margin: 12px 0 20px; width: 100%;
         font-family: -apple-system, 'Segoe UI', Helvetica, sans-serif;
         font-size: 14px; }
@@ -47,20 +46,26 @@ a { color: inherit; text-decoration: underline;
 a:hover { text-decoration-color: #1a1a1a; }
 .meta { font-family: -apple-system, 'Segoe UI', Helvetica, sans-serif;
         font-size: 14px; color: #6b6b6b; margin: 2px 0 14px; }
-.lane { border-top: 1px solid #e6e6e6; margin-top: 60px; padding-top: 26px; }
+.lane { border-top: 1px solid #e6e6e6; margin-top: 40px; padding-top: 16px; }
 .num { font-family: -apple-system, 'Segoe UI', Helvetica, sans-serif;
        font-size: 13px; color: #9a9a9a; font-weight: 400;
        margin-right: 6px; }
-.cards { display: flex; flex-wrap: wrap; gap: 10px; margin: 22px 0 26px;
-         justify-content: center;
-         width: min(960px, calc(100vw - 40px));
-         margin-left: 50%; transform: translateX(-50%); }
-.cards img { width: 176px; border-radius: 8px; }
-.bangers img { width: 148px; }
+.cards { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 18px; }
+.cards img { width: 160px; border-radius: 6px; }
+.bangers img { width: 128px; }
+.mana { width: 13px; height: 13px; vertical-align: -1px;
+        margin-right: 1px; }
 .flex-list { font-size: 16px; margin: 6px 0 14px; padding-left: 22px; }
 .flex-list li { margin: 3px 0; }
 .kept { color: #6b6b6b; font-size: .88em; }
 """
+
+
+def mana(letters):
+    syms = [s for s in letters if s in "WUBRGC"] or ["C"]
+    return "".join(
+        f"<img class='mana' src='https://svgs.scryfall.io/card-symbols/"
+        f"{s}.svg' alt='{s}'>" for s in syms)
 
 
 def chip(card, colors):
@@ -116,12 +121,14 @@ def main():
     out.append("<h2>The lanes</h2>")
     for gi, (sig, cards) in enumerate(groups):
         e = flex[gi]
-        out.append(f"<div class='lane'><h3><span class='num'>P{gi + 1}</span>{lane_theme(gi)} "
-                   f"<span class='kept'>{colors_of(cards)} · "
-                   f"core {len(cards)}</span></h3>")
+        out.append(f"<div class='lane'><h3><span class='num'>P{gi + 1}"
+                   f"</span>{mana(colors_of(cards))} {lane_theme(gi)} "
+                   f"<span class='kept'>core {len(cards)}</span></h3>")
         own = []
         for k, p in enumerate(sig):
-            own.append(f"{drafts[k].name}: {deck_link(k, p)}")
+            own.append(f"{drafts[k].name}: "
+                       f"{mana(colors_of(by_deck[(k, p)]))} "
+                       f"{deck_link(k, p)}")
         out.append(f"<p class='meta'>{' · '.join(own)}</p>")
         out.append("<div class='cards'>")
         for c in sorted(cards):
@@ -191,7 +198,8 @@ def main():
     for g in group_order:
         if not by_grp[g]:
             continue
-        out.append(f"<h4>{g} ({len(by_grp[g])})</h4>"
+        glabel = "Multi" if g == "Multi" else mana(g)
+        out.append(f"<h4>{glabel} ({len(by_grp[g])})</h4>"
                    f"<div class='cards bangers'>")
         for c in by_grp[g]:
             img = scry[c].get("image")
@@ -216,8 +224,7 @@ def main():
         cards = by_deck[(k, p)]
         distinct = sorted(cards - claimed)
         out.append(f"<div class='lane'><h3>{drafts[k].name}: "
-                   f"{deck_link(k, p)} <span class='kept'>"
-                   f"{colors_of(cards)}</span></h3>")
+                   f"{mana(colors_of(cards))} {deck_link(k, p)}</h3>")
         out.append(f"<p class='meta'>{len(distinct)} of {len(cards)} "
                    f"nonbasic cards sit outside every lane (in no core or "
                    f"flex — though other decks may also run them):</p>")
@@ -245,10 +252,10 @@ def main():
             status, cls = "absent", " class='absent'"
             lanes = []
         lanestr = ", ".join(f"P{gi + 1} {lane_theme(gi)}" for gi in lanes)
-        return (f"<tr{cls}><td>{label}</td><td>{status}</td>"
+        return (f"<tr{cls}><td>{mana(label)}</td><td>{status}</td>"
                 f"<td>{lanestr}</td></tr>")
 
-    out.append("<style>.absent td { background: #fbdcdc; }</style>")
+    out.append("<style>.absent td { font-weight: 600; }</style>")
     out.append("<h3>Color coverage of the lanes</h3>"
                "<table><tr><th>Colors</th><th>Status</th><th>Lanes</th></tr>")
     for c in "WUBRG":
@@ -297,14 +304,16 @@ def main():
                    f"height:8px;width:{int(share * 140)}px'></span>")
             mark = " <b>↑</b>" if hot else ""
             cells.append(f"<td>{d[g]} ({share:.0%}){mark}<br>{bar}</td>")
-        out.append(f"<tr><td>{g}</td>{''.join(cells)}</tr>")
+        glabel = "Multi" if g == "Multi" else mana(g)
+        out.append(f"<tr><td>{glabel}</td>{''.join(cells)}</tr>")
     out.append("</table>")
 
     out.append("<h4>The never-drafted cards, by color</h4>")
     for g in groups_order:
         cs = [c for c in nd if group_of(c) == g]
         if cs:
-            out.append(f"<p class='meta' style='margin:6px 0 0'>{g}:</p>"
+            glabel = "Multi" if g == "Multi" else mana(g)
+            out.append(f"<p class='meta' style='margin:6px 0 0'>{glabel}</p>"
                        + "".join(chip(c, colors) for c in cs))
 
     dest = HERE / "out" / "lane-report.html"
