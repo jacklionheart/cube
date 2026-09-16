@@ -292,6 +292,56 @@ document.addEventListener('click', e => {
     out.append(f"<h3>{mana('U')} Tempo</h3>")
     out.append(lane_block(blue_tempo))
 
+    # --- bridges and free pairs ---------------------------------------
+    LANE_NAME = {"WR": "Tokens", "BR": "Sac", "URG": "Temur Ramp",
+                 "BG": "Golgari Ramp", "G": "Graveyard",
+                 "UR": "Control", "U": "Tempo"}
+    lane_of_deck = {}
+    for lsig, lcards in lanes:
+        nm = LANE_NAME[colors_of(lcards)]
+        for k, pl in enumerate(lsig):
+            lane_of_deck.setdefault((k, pl), []).append(nm)
+
+    def classify(psig):
+        for lsig, lcards in lanes:
+            if sum(a == b for a, b in zip(psig, lsig)) >= 2:
+                return "satellite"
+        touched = set()
+        for k, pl in enumerate(psig):
+            touched.update(lane_of_deck.get((k, pl), []))
+        return "bridge" if len(touched) >= 2 else "free"
+
+    def pair_span(pcards):
+        imgs = "".join(
+            f"<img src='{scry[c].get('image')}' alt='{html.escape(c)}' "
+            f"title='{html.escape(c)}' loading='lazy'>" for c in pcards)
+        return f"<span class='pair'>{imgs}</span>"
+
+    bridges = [(psig, pc) for psig, pc in pair_teams
+               if classify(psig) == "bridge"]
+    free = [(psig, pc) for psig, pc in pair_teams
+            if classify(psig) == "free"]
+
+    out.append("<h2>The bridges</h2>")
+    out.append("<p class='meta'><span class='todo'>TODO: framing — "
+               "pairs whose decks belong to two different lanes; every "
+               "bridge stays inside one family.</span></p>")
+    for psig, pcards in bridges:
+        touched = set()
+        for k, pl in enumerate(psig):
+            touched.update(lane_of_deck.get((k, pl), []))
+        out.append(f"<div class='pairs'>{pair_span(pcards)}"
+                   f"<span class='meta' style='margin-left:10px'>"
+                   f"{' ↔ '.join(sorted(touched))}</span></div>")
+
+    out.append("<h2>The free pairs</h2>")
+    out.append("<p class='meta'><span class='todo'>TODO: framing — "
+               "pairs living outside the lane system; the proto-lanes."
+               "</span></p><div class='pairs'>")
+    for psig, pcards in free:
+        out.append(pair_span(pcards))
+    out.append("</div>")
+
     # --- bar graph: cards in teams by color identity + pair gallery ---
     from collections import Counter
     ident = Counter()
