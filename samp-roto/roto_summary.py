@@ -472,13 +472,13 @@ def build_pick_value(wb, drafts, cube, decks, formulas):
 
 
 def build_packages(wb, drafts, cube, decks):
-    """One Packages tab: every nonland card set (pairs and bigger) whose
-    WHOLE set sat in one maindeck in more than half of the drafts with
-    known decklists. Subsets are included — the Maximal column marks
-    sets not extendable without dropping below the bar, so the sheet
-    filters to non-subsets. Hosts are the certifying decks (unique per
-    draft: roto ownership); W/L totals the host decks' match records.
-    Computed here, not by sheet formulas."""
+    """Teams: every nonland card set (pairs and bigger) whose WHOLE set
+    sat in one maindeck in more than half of the drafts with known
+    decklists. The Teams tab shows only maximal (non-subset) sets — the
+    default view; Teams (Full) keeps every qualifying subset with a
+    Maximal flag for filtering. Hosts are the certifying decks (unique
+    per draft: roto ownership); W/L totals the host decks' match
+    records. Computed here, not by sheet formulas."""
     import packages as pk
 
     scry = pk.load_scryfall()
@@ -519,45 +519,54 @@ def build_packages(wb, drafts, cube, decks):
     groups = sorted(frequent.items(),
                     key=lambda kv: (-len(kv[0]), -support(kv[1]), kv[0]))
 
-    ws = wb.create_sheet("Packages")
-    header = ["#", "Maximal", "Size", "Colors",
-              f"Drafts (of {n_known} with decks)",
-              f"Cards — whole set in one maindeck in ≥{min_sup} drafts"]
-    header += [f"{d.name} Host" for d in drafts]
-    header += ["Wins", "Losses", "Win Rate"]
-    ws.append(header)
-    style_header(ws)
-    for i, (S, ds) in enumerate(groups):
-        by_draft = dict(sorted(ds))  # k -> player (unique per draft)
-        hosts = [by_draft.get(k, "") for k in range(len(drafts))]
-        w = l = 0
-        for k, p in sorted(by_draft.items()):
-            dw, dl = drafts[k].records.get(p, (0, 0))
-            w, l = w + dw, l + dl
-        wr = w / (w + l) if w + l else None
-        ws.append([i + 1, "Y" if is_maximal(S, ds) else "", len(S),
-                   pk.colors_str(S, scry), support(ds),
-                   "\n".join(sorted(S)), *hosts, w, l, wr])
-        r = ws.max_row
-        ws.cell(r, 6).alignment = Alignment(wrap_text=True)
-        for c in (1, 2, 3, 4, 5, *range(7, len(header) + 1)):
-            ws.cell(r, c).alignment = CENTER
-        ws.cell(r, len(header)).number_format = "0.0%"
-    ws.freeze_panes = "A2"
-    ws.column_dimensions["F"].width = 40
-    for i in range(len(drafts)):
-        ws.column_dimensions[get_column_letter(7 + i)].width = 14
-    ws.auto_filter.ref = ws.dimensions
-    wr_col = get_column_letter(len(header))
-    if ws.max_row >= 2:
-        ws.conditional_formatting.add(
-            f"{wr_col}2:{wr_col}{ws.max_row}",
-            ColorScaleRule(
-                start_type="num", start_value=0, start_color="E67C73",
-                mid_type="num", mid_value=0.5, mid_color="FFD666",
-                end_type="num", end_value=1, end_color="57BB8A",
-            ),
-        )
+    def write_tab(title, rows, with_flag):
+        ws = wb.create_sheet(title)
+        header = ["#"] + (["Maximal"] if with_flag else []) + [
+            "Size", "Colors", f"Drafts (of {n_known} with decks)",
+            f"Cards — whole set in one maindeck in ≥{min_sup} drafts"]
+        header += [f"{d.name} Host" for d in drafts]
+        header += ["Wins", "Losses", "Win Rate"]
+        ws.append(header)
+        style_header(ws)
+        cards_col = 6 if with_flag else 5
+        for i, (S, ds, maximal) in enumerate(rows):
+            by_draft = dict(sorted(ds))  # k -> player (unique per draft)
+            hosts = [by_draft.get(k, "") for k in range(len(drafts))]
+            w = l = 0
+            for k, p in sorted(by_draft.items()):
+                dw, dl = drafts[k].records.get(p, (0, 0))
+                w, l = w + dw, l + dl
+            wr = w / (w + l) if w + l else None
+            row = [i + 1] + (["Y" if maximal else ""] if with_flag else [])
+            row += [len(S), pk.colors_str(S, scry), support(ds),
+                    "\n".join(sorted(S)), *hosts, w, l, wr]
+            ws.append(row)
+            r = ws.max_row
+            ws.cell(r, cards_col).alignment = Alignment(wrap_text=True)
+            for c in (*range(1, cards_col), *range(cards_col + 1, len(header) + 1)):
+                ws.cell(r, c).alignment = CENTER
+            ws.cell(r, len(header)).number_format = "0.0%"
+        ws.freeze_panes = "A2"
+        ws.column_dimensions[get_column_letter(cards_col)].width = 40
+        for i in range(len(drafts)):
+            ws.column_dimensions[get_column_letter(cards_col + 1 + i)].width = 14
+        ws.auto_filter.ref = ws.dimensions
+        wr_col = get_column_letter(len(header))
+        if ws.max_row >= 2:
+            ws.conditional_formatting.add(
+                f"{wr_col}2:{wr_col}{ws.max_row}",
+                ColorScaleRule(
+                    start_type="num", start_value=0, start_color="E67C73",
+                    mid_type="num", mid_value=0.5, mid_color="FFD666",
+                    end_type="num", end_value=1, end_color="57BB8A",
+                ),
+            )
+
+    flagged = [(S, ds, is_maximal(S, ds)) for S, ds in groups]
+    # Teams = the maximal (non-subset) sets only; Teams (Full) keeps every
+    # qualifying subset with the Maximal flag for filtering
+    write_tab("Teams", [g for g in flagged if g[2]], with_flag=False)
+    write_tab("Teams (Full)", flagged, with_flag=True)
 
 
 
@@ -763,7 +772,8 @@ def build_workbook(drafts, cube, availability, formulas=True, decks=None, links=
     for col, w in zip("ABCDE", (10, 18, 10, 36, 6)):
         ws.column_dimensions[col].width = w
 
-    order = ["Pick Summary", "Color Analysis", "Packages", "Card List"]
+    order = ["Pick Summary", "Color Analysis", "Teams", "Teams (Full)",
+             "Card List"]
     order += [d.name for d in drafts]
     order += ["Records", "Decks", "Deck Links", "Win Rates"]
     wb._sheets = [wb[name] for name in order]
