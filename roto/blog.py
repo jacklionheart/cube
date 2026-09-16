@@ -59,6 +59,9 @@ a:hover { text-decoration-color: #1a1a1a; }
     font: 15px -apple-system, 'Segoe UI', Helvetica, sans-serif;
     color: #6b6b6b; border-left: 2px solid transparent; }
 .sidebar button.on { color: #1a1a1a; border-left-color: #1a1a1a; }
+.sbh { font: 600 11px -apple-system, 'Segoe UI', Helvetica, sans-serif;
+       text-transform: uppercase; letter-spacing: .06em; color: #999;
+       margin: 12px 0 2px; }
 #hovercard { position: fixed; display: none; z-index: 10;
              pointer-events: none; }
 #hovercard img { width: 250px; border-radius: 12px;
@@ -110,8 +113,22 @@ def main():
     owners = nonland_owners(maindeck_owners(drafts, cube, decks), scry)
     colors = {c: card_colors(c, scry) for c in owners}
     groups = signature_groups(owners, min_size=2)
+    _, _, links = load_decks(HERE / "decks.tsv", cube)
+    url_map = {(dr, pl): u for dr, pl, kind, u, used in links
+               if used == "Y" and "manual-" not in u}
+
+    def deck_link(k, pl):
+        url = url_map.get((drafts[k].name, pl))
+        lab = html.escape(f"{drafts[k].name} {pl}")
+        return f'<a href="{url}">{lab}</a>' if url else lab
     lanes = [(sig, sorted(cards)) for sig, cards in groups
              if len(cards) >= 3]
+    LANE_NAME = {"WR": "Tokens", "BR": "Sac", "URG": "Temur Ramp",
+                 "BG": "Golgari Ramp", "G": "Graveyard",
+                 "UR": "Control", "U": "Tempo"}
+    FAMILY = {"Tokens": "Aggro", "Sac": "Aggro", "Temur Ramp": "Green",
+              "Golgari Ramp": "Green", "Graveyard": "Green",
+              "Control": "Blue", "Tempo": "Blue"}
 
     def colors_of(cards):
         u = set()
@@ -188,78 +205,29 @@ def main():
         "<p>Teams come in two sizes: <b>Pairs</b> — exactly two cards — "
         "and <b>Cores</b> — three or more.</p>")
 
-    # --- explorer module: Pairs / Bangers / Lanes ---------------------
-    from collections import Counter as _Ct
-    pair_units_x = [sorted(cards) for _, cards in groups
-                    if len(cards) == 2]
-    team_cards_x = {c for _, cards in groups for c in cards}
-    bangers_x = sorted(c for c, sig in owners.items()
-                       if None not in sig and c not in team_cards_x)
-
-    def tabbed(gid, items, label_fn, pane_fn):
-        h = ["<div class='tabs'>"]
-        for i, it in enumerate(items):
-            on = " class='on'" if i == 0 else ""
-            h.append(f"<button{on} data-group='{gid}' "
-                     f"data-show='{gid}-p{i}'>{label_fn(it)}</button>")
-        h.append("</div>")
-        for i, it in enumerate(items):
-            hid = "" if i == 0 else " hidden"
-            h.append(f"<div data-pane='{gid}' id='{gid}-p{i}'{hid}>"
-                     f"{pane_fn(it)}</div>")
-        return "".join(h)
-
-    def pair_pane(prs):
-        s = ["<div class='pairs'>"]
-        for pr in prs:
-            imgs = "".join(
-                f"<img src='{scry[c].get('image')}' "
-                f"alt='{html.escape(c)}' title='{html.escape(c)}' "
-                f"loading='lazy'>" for c in pr)
-            s.append(f"<span class='pair'>{imgs}</span>")
-        s.append("</div>")
-        return "".join(s)
-
-    pair_by_cl = {}
-    for pr in pair_units_x:
-        pair_by_cl.setdefault(colors_of(pr), []).append(pr)
-    pair_tabs = sorted(pair_by_cl, key=canon_key)
-
-    bang_by_cl = {}
-    for c in bangers_x:
-        bang_by_cl.setdefault(colors_of([c]), []).append(c)
-    bang_tabs = sorted(bang_by_cl, key=canon_key)
-
-    lanes_sorted = sorted(lanes, key=lambda x: (canon_key(colors_of(x[1])), -len(x[1])))
-
-    sets = [
-        ("pairs", f"Pairs ({len(pair_units_x)})",
-         tabbed("tp", pair_tabs,
-                lambda cl: f"{mana(cl)} {len(pair_by_cl[cl])}",
-                lambda cl: pair_pane(pair_by_cl[cl]))),
-        ("bangers", f"Bangers ({len(bangers_x)})",
-         tabbed("tb", bang_tabs,
-                lambda cl: f"{mana(cl)} {len(bang_by_cl[cl])}",
-                lambda cl: gallery(bang_by_cl[cl]))),
-        ("lanes", f"Cores ({len(lanes)})",
-         tabbed("tl", lanes_sorted,
-                lambda ln: f"{mana(colors_of(ln[1]))} {len(ln[1])}",
-                lambda ln: gallery(ln[1]))),
-    ]
+    # --- the Lanes viewer: Macro -> Core sidebar + card viewer --------
+    fam_order = ["Aggro", "Green", "Blue"]
+    cores_by_fam = {f: [] for f in fam_order}
+    for lsig, lcards in lanes:
+        nm = LANE_NAME[colors_of(lcards)]
+        cores_by_fam[FAMILY[nm]].append((nm, lsig, lcards))
     out.append("<div class='explorer'><div class='sidebar'>")
-    for i, (sid, label, _) in enumerate(sets):
-        on = " class='on'" if i == 0 else ""
-        out.append(f"<button{on} data-group='sets' "
-                   f"data-show='set-{sid}'>{label}</button>")
+    idx = 0
+    panes = []
+    for f in fam_order:
+        out.append(f"<div class='sbh'>{f}</div>")
+        for nm, lsig, lcards in cores_by_fam[f]:
+            on = " class='on'" if idx == 0 else ""
+            out.append(f"<button{on} data-group='cores' "
+                       f"data-show='core-{idx}'>{mana(colors_of(lcards))} "
+                       f"{nm}</button>")
+            hid = "" if idx == 0 else " hidden"
+            panes.append(f"<div data-pane='cores' id='core-{idx}'{hid}>"
+                         f"{gallery(lcards)}</div>")
+            idx += 1
     out.append("</div><div>")
-    for i, (sid, _, body) in enumerate(sets):
-        hid = "" if i == 0 else " hidden"
-        out.append(f"<div data-pane='sets' id='set-{sid}'{hid}>"
-                   f"{body}</div>")
+    out += panes
     out.append("</div></div>")
-    out.append("<p class='meta'>Pairs: exactly-two-card teams. Bangers: "
-               "nonland cards maindecked in all three pods that belong "
-               "to no team. Cores: the teams of three or more.</p>")
     out.append("""<script>
 document.addEventListener('click', e => {
   const b = e.target.closest('button[data-show]');
@@ -272,17 +240,12 @@ document.addEventListener('click', e => {
 });
 </script>""")
 
+
     out.append(
         "<p>Ask for the Cores and the data hands "
         f"back just {len(lanes)} — and they sort themselves into "
         "three families:</p>")
 
-    LANE_NAME = {"WR": "Tokens", "BR": "Sac", "URG": "Temur Ramp",
-                 "BG": "Golgari Ramp", "G": "Graveyard",
-                 "UR": "Control", "U": "Tempo"}
-    FAMILY = {"Tokens": "Aggro", "Sac": "Aggro", "Temur Ramp": "Green",
-              "Golgari Ramp": "Green", "Graveyard": "Green",
-              "Control": "Blue", "Tempo": "Blue"}
     lane_of_deck = {}
     for lsig, lcards in lanes:
         nm = LANE_NAME[colors_of(lcards)]
@@ -350,6 +313,57 @@ document.addEventListener('click', e => {
     out.append(f"<h3>{mana('U')} Tempo</h3>")
     out.append(lane_block(blue_tempo))
     out.append(family_bridges("Blue"))
+
+    # --- how the cores group ------------------------------------------
+    shared = []
+    for i in range(len(lanes)):
+        for j in range(i + 1, len(lanes)):
+            si, ci = lanes[i]
+            sj, cj = lanes[j]
+            common = [(k, si[k]) for k in range(len(si)) if si[k] == sj[k]]
+            if common:
+                shared.append((LANE_NAME[colors_of(ci)],
+                               LANE_NAME[colors_of(cj)], common))
+    out.append("<h2>How the cores group</h2>")
+    out.append("<p class='meta'><span class='todo'>TODO: prose — the "
+               "seven cores collapse into three families (Aggro, Green, "
+               "Blue). The mechanical evidence: cores sharing decks."
+               "</span></p>")
+    for n1, n2, common in shared:
+        cc = ", ".join(deck_link(k, pl) for k, pl in common)
+        out.append(f"<p class='meta'>{n1} and {n2} share {cc}</p>")
+
+    # --- categorizing the pairs ---------------------------------------
+    out.append("<h2>Categorizing the pairs</h2>")
+    out.append("<h3>Contested part of a core</h3>")
+    out.append("<p class='meta'><span class='todo'>TODO: prose — the "
+               "pair sat in two of a core's three decks; in the third "
+               "pod it was contested away, landing either with a macro "
+               "sibling or an unassociated deck.</span></p>")
+    for psig, pcards in pair_teams:
+        best = None
+        for lsig, lcards in lanes:
+            agree = [k for k in range(len(psig)) if psig[k] == lsig[k]]
+            if len(agree) >= 2:
+                best = (lsig, lcards, agree)
+                break
+        if not best:
+            continue
+        lsig, lcards, agree = best
+        core_nm = LANE_NAME[colors_of(lcards)]
+        k3 = next(k for k in range(len(psig)) if k not in agree)
+        owns = lane_of_deck.get((k3, psig[k3]), [])
+        if owns:
+            fams = {FAMILY[n] for n in owns}
+            kind = (f"macro sibling — {'/'.join(sorted(owns))}"
+                    if fams == {FAMILY[core_nm]}
+                    else f"other family — {'/'.join(sorted(owns))}")
+        else:
+            kind = "unassociated deck"
+        out.append(f"<div class='pairs'>{pair_span(pcards)}"
+                   f"<span class='meta' style='margin-left:10px'>"
+                   f"{core_nm} core · third deck: "
+                   f"{deck_link(k3, psig[k3])} ({kind})</span></div>")
 
     out.append("<h2>The Rectangles</h2>")
     out.append("<p class='meta'><span class='todo'>TODO: framing — the "
@@ -453,9 +467,6 @@ showPairs('{order[0]}');
         for pl in d.players:
             if not any(sig[k] == pl for sig, _ in groups):
                 zero_team.append((k, pl))
-    _, _, links = load_decks(HERE / "decks.tsv", cube)
-    url_map = {(dr, pl): u for dr, pl, kind, u, used in links
-               if used == "Y" and "manual-" not in u}
     for k, pl in zero_team:
         dcards = by_deck[(k, pl)]
         url = url_map.get((drafts[k].name, pl))
