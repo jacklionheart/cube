@@ -58,6 +58,23 @@ a:hover { text-decoration-color: #1a1a1a; }
 .flex-list { font-size: 16px; margin: 6px 0 14px; padding-left: 22px; }
 .flex-list li { margin: 3px 0; }
 .kept { color: #6b6b6b; font-size: .88em; }
+summary { cursor: pointer; list-style-position: outside; }
+summary h2 { display: inline; }
+.tabs { margin: 10px 0 4px; }
+.tabs button { background: none; border: none; cursor: pointer;
+               font: 14px -apple-system, 'Segoe UI', Helvetica, sans-serif;
+               color: #6b6b6b; padding: 4px 10px 5px 6px;
+               border-bottom: 2px solid transparent; }
+.tabs button.on { color: #1a1a1a; border-bottom-color: #1a1a1a; }
+.chart { margin: 6px 0 26px; font-family: -apple-system, 'Segoe UI',
+         Helvetica, sans-serif; font-size: 13px; }
+.crow { display: grid; grid-template-columns: 72px 1fr 40px;
+        align-items: center; margin: 3px 0; }
+.clabel { text-align: left; color: #444; }
+.cbar { background: #7d93a8; height: 15px;
+        border-radius: 0 4px 4px 0; display: inline-block;
+        vertical-align: middle; }
+.cval { color: #444; margin-left: 6px; }
 """
 
 
@@ -116,6 +133,67 @@ def main():
            "together in all three drafts — by three different people — plus "
            "its flex orbit (cards that rode with the full core in two of "
            "the three decks). Deck links go to sealeddeck.tech.</p>"]
+
+    # -- Opening charts ------------------------------------------------
+    def barchart(title, rows, unit, mx=None):
+        if mx is None:
+            mx = max(v for _, v in rows) or 1
+        h = [f"<h4>{title}</h4><div class='chart'>"]
+        for label, v in rows:
+            w = round(v / mx * 100)
+            bar = (f"<span class='cbar' style='width:{w}%'></span>"
+                   if v else "")
+            h.append(f"<div class='crow'><span class='clabel'>{label}"
+                     f"</span><span>{bar}</span>"
+                     f"<span class='cval'>{v}</span></div>")
+        h.append(f"</div>")
+        return "".join(h)
+
+    lane_sets = [set(colors_of(cards)) - {"C"}
+                 for _, cards in groups]
+    pairs10 = ["WU", "UB", "BR", "RG", "WG", "WB", "UR", "BG", "WR", "UG"]
+    rows0 = [(mana(pr), sum(1 for cs in lane_sets if set(pr) <= cs))
+             for pr in pairs10]
+    rows0.sort(key=lambda r: -r[1])
+
+    lane_cards = []
+    for gi, (_, cards) in enumerate(groups):
+        s = set(cards)
+        for bucket in flex[gi]["flex"]:
+            s |= set(bucket)
+        lane_cards.append(s)
+    touch = {}
+    for dk, cards in by_deck.items():
+        touch[dk] = sum(1 for s in lane_cards if s & cards)
+    from collections import Counter
+    tc = Counter(touch.values())
+    rows1 = [(f"{n} lane{'s' if n != 1 else ''}", tc.get(n, 0))
+             for n in range(0, max(tc) + 1)]
+
+    all_lane = set().union(*lane_cards)
+    laneless = [c for c, sig in owners.items()
+                if any(sig) and c not in all_lane]
+    def cgroup(c):
+        cs = colors.get(c, set())
+        return ("Multi" if len(cs) > 1
+                else next(iter(cs)) if cs else "C")
+    lc = Counter(cgroup(c) for c in laneless)
+    all_md = [c for c, sig in owners.items() if any(sig)]
+    ac = Counter(cgroup(c) for c in all_md)
+    ggs = list("WUBRG") + ["Multi", "C"]
+    rows2 = [("Multi" if g == "Multi" else mana(g), lc.get(g, 0))
+             for g in ggs]
+    rows2a = [("Multi" if g == "Multi" else mana(g), ac.get(g, 0))
+              for g in ggs]
+    shared_mx = max(v for _, v in rows2a)
+
+    out.append(barchart("Lanes touching each color pair", rows0, "lanes"))
+    out.append(barchart("Decks by number of lanes represented in their "
+                        "maindeck (core or flex)", rows1, "decks"))
+    out.append(barchart("All maindecked cards, by color", rows2a,
+                        "cards", mx=shared_mx))
+    out.append(barchart("Maindecked cards outside every lane, by color "
+                        "(same scale)", rows2, "cards", mx=shared_mx))
 
     # -- Section 1: the lanes ------------------------------------------
     out.append("<h2>The lanes</h2>")
@@ -183,24 +261,28 @@ def main():
         c for c, sig in owners.items()
         if None not in sig and c not in core_cards
         and "Land" not in scry[c]["type_line"].split(" // ")[0])
-    out.append("<h2>Bangers</h2>")
-    out.append(f"<p class='meta'>{len(ubiq)} nonland cards were maindecked "
-               "in every pod yet belong to no lane core — good enough to "
-               "play everywhere, tied to nothing. A P# tag means the card "
-               "is in that lane's "
-               "flex orbit; untagged cards float free.</p>")
     group_order = ["W", "U", "B", "R", "G", "Multi", "C"]
     by_grp = {g: [] for g in group_order}
     for c in ubiq:
         cc = colors[c]
         g = ("Multi" if len(cc) > 1 else next(iter(cc)) if cc else "C")
         by_grp[g].append(c)
-    for g in group_order:
-        if not by_grp[g]:
-            continue
+    present = [g for g in group_order if by_grp[g]]
+    out.append("<details open><summary><h2>Bangers "
+               f"<span class='kept'>{len(ubiq)} cards</span></h2></summary>")
+    out.append(f"<p class='meta'>Nonland cards maindecked in every pod "
+               "yet in no lane core — good enough to play everywhere, "
+               "tied to nothing. A P# tag means the card is in that "
+               "lane's flex orbit; untagged cards float free.</p>")
+    tabs = []
+    for g in present:
         glabel = "Multi" if g == "Multi" else mana(g)
-        out.append(f"<h4>{glabel} ({len(by_grp[g])})</h4>"
-                   f"<div class='cards bangers'>")
+        tabs.append(f"<button id='bt-{g}' onclick=\"showGrp('{g}')\">"
+                    f"{glabel} {len(by_grp[g])}</button>")
+    out.append(f"<div class='tabs'>{''.join(tabs)}</div>")
+    for g in present:
+        vis = "" if g == present[0] else " hidden"
+        out.append(f"<div class='cards bangers' id='bg-{g}'{vis}>")
         for c in by_grp[g]:
             img = scry[c].get("image")
             tag = (f"<div class='kept' style='text-align:center'>"
@@ -208,6 +290,17 @@ def main():
             out.append(f"<div><img src='{img}' alt='{html.escape(c)}' "
                        f"title='{html.escape(c)}' loading='lazy'>{tag}</div>")
         out.append("</div>")
+    grps = ",".join(f"'{g}'" for g in present)
+    out.append(f"""<script>
+const bangerGroups = [{grps}];
+function showGrp(g) {{
+  for (const x of bangerGroups) {{
+    document.getElementById('bg-' + x).hidden = (x !== g);
+    document.getElementById('bt-' + x).classList.toggle('on', x === g);
+  }}
+}}
+showGrp('{present[0]}');
+</script></details>""")
 
     # -- Section 4: decks that carved their own lanes ------------------
     claimed = set()
@@ -314,7 +407,8 @@ def main():
         if cs:
             glabel = "Multi" if g == "Multi" else mana(g)
             out.append(f"<p class='meta' style='margin:6px 0 0'>{glabel}</p>"
-                       + "".join(chip(c, colors) for c in cs))
+                       + "<p>" + ", ".join(chip(c, colors) for c in cs)
+                       + "</p>")
 
     dest = HERE / "out" / "lane-report.html"
     dest.parent.mkdir(exist_ok=True)
