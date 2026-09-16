@@ -125,9 +125,19 @@ def main():
         return f'<a href="{url}">{lab}</a>' if url else lab
     lanes = [(sig, sorted(cards)) for sig, cards in groups
              if len(cards) >= 3]
-    LANE_NAME = {"WR": "Tokens", "BR": "Sac", "URG": "Temur Ramp",
-                 "BG": "Golgari Ramp", "G": "Graveyard",
-                 "UR": "Control", "U": "Tempo"}
+    CORE_MARKERS = [("Rally at the Hornburg", "Tokens"),
+                    ("Mayhem Devil", "Sac"),
+                    ("Fires of Invention", "Temur Ramp"),
+                    ("Everything Pizza", "Golgari Ramp"),
+                    ("Spider Spawning", "Graveyard"),
+                    ("Expressive Iteration", "Control"),
+                    ("Shoreline Looter", "Tempo")]
+
+    def core_name(cards):
+        for marker, nm in CORE_MARKERS:
+            if marker in cards:
+                return nm
+        return "?"
     FAMILY = {"Tokens": "Aggro", "Sac": "Aggro", "Temur Ramp": "Green",
               "Golgari Ramp": "Green", "Graveyard": "Green",
               "Control": "Blue", "Tempo": "Blue"}
@@ -182,13 +192,14 @@ def main():
 
     # Jack's taxonomy of the size-3+ teams (labels are his; mapping of
     # the two blue teams is a guess — swap if backwards)
-    tokens = lane_by_colors("WR")
-    sac = lane_by_colors("BR")
-    temur_ramp = lane_by_colors("URG")
-    golgari_ramp = lane_by_colors("BG")
-    graveyard = lane_by_colors("G")
-    blue_spells = lane_by_colors("UR")
-    blue_tempo = lane_by_colors("U")
+    by_name = {core_name(cards): (sig, cards) for sig, cards in lanes}
+    tokens = by_name["Tokens"]
+    sac = by_name["Sac"]
+    temur_ramp = by_name["Temur Ramp"]
+    golgari_ramp = by_name["Golgari Ramp"]
+    graveyard = by_name["Graveyard"]
+    blue_spells = by_name["Control"]
+    blue_tempo = by_name["Tempo"]
 
     out = [f"<meta charset='utf-8'><title>Three Rotos, One Cube</title>"
            f"<style>{CSS}</style>"]
@@ -216,7 +227,7 @@ def main():
     fam_order = ["Aggro", "Green", "Blue"]
     cores_by_fam = {f: [] for f in fam_order}
     for lsig, lcards in lanes:
-        nm = LANE_NAME[colors_of(lcards)]
+        nm = core_name(lcards)
         cores_by_fam[FAMILY[nm]].append((nm, lsig, lcards))
     out.append("<div class='explorer'><div class='sidebar'>")
     idx = 0
@@ -255,7 +266,7 @@ document.addEventListener('click', e => {
 
     lane_of_deck = {}
     for lsig, lcards in lanes:
-        nm = LANE_NAME[colors_of(lcards)]
+        nm = core_name(lcards)
         for k, pl in enumerate(lsig):
             lane_of_deck.setdefault((k, pl), []).append(nm)
 
@@ -325,8 +336,9 @@ document.addEventListener('click', e => {
         "The two ramp cores — the five-color Fires-of-Invention pile "
         "and the Pizza build — share two of their three drafters, "
         "which is to say: the people who ramp, ramp both ways. "
-        "Graveyard is the third leg, a mono-green Spider Spawning "
-        "value core that shares a drafter with Temur Ramp. Where "
+        "Graveyard is the third leg — a Spider Spawning value core, "
+        "Golgari once you count the flashback cost — sharing a drafter "
+        "with Temur Ramp. Where "
         "Aggro splits into two clean decks, Green is one ecosystem "
         "with three stable expressions.</p>")
     out.append(f"<h3>{mana('URG')} Five-color Temur Ramp</h3>")
@@ -360,8 +372,8 @@ document.addEventListener('click', e => {
             sj, cj = lanes[j]
             common = [(k, si[k]) for k in range(len(si)) if si[k] == sj[k]]
             if common:
-                shared.append((LANE_NAME[colors_of(ci)],
-                               LANE_NAME[colors_of(cj)], common))
+                shared.append((core_name(ci),
+                               core_name(cj), common))
     out.append("<h2>How the cores group</h2>")
     out.append(
         "<p>The seven cores are not seven islands. Sort them by which "
@@ -392,7 +404,7 @@ document.addEventListener('click', e => {
         if not best:
             continue
         lsig, lcards, agree = best
-        core_nm = LANE_NAME[colors_of(lcards)]
+        core_nm = core_name(lcards)
         k3 = next(k for k in range(len(psig)) if k not in agree)
         owns = lane_of_deck.get((k3, psig[k3]), [])
         if owns:
@@ -425,7 +437,7 @@ document.addEventListener('click', e => {
     def pair_label(psig):
         for lsig, lcards in lanes:
             if sum(a == b for a, b in zip(psig, lsig)) >= 2:
-                return LANE_NAME[colors_of(lcards)]
+                return core_name(lcards)
         if classify(psig) == "bridge":
             per = set()
             for k, pl in enumerate(psig):

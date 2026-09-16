@@ -222,6 +222,11 @@ def card_colors(name, scry):
         produced = set(info.get("produced_mana", [])) & set(WUBRG)
         if len(produced) < 5:
             colors |= produced
+    import re as _re
+    for line in _re.findall(r"Flashback[^\n]*",
+                            info.get("oracle_text", "")):
+        for grp in _re.findall(r"\{([^}]*)\}", line):
+            colors |= set(grp) & set(WUBRG)
     return colors
 
 
