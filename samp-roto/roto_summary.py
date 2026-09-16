@@ -295,12 +295,8 @@ def build_color_analysis(wb, drafts, formulas):
     """Per-color aggregates over the Win Rates tab, with bar charts."""
     wr = wb["Win Rates"]
     n = wr.max_row
-    n_d = len(drafts)
-    base = 4 + 4 * n_d
-    col = {  # Win Rates column letters
-        "wrd": get_column_letter(base + 2), "wrm": get_column_letter(base + 5),
-        "md": get_column_letter(base + 6), "grp": get_column_letter(base + 8),
-    }
+    # Win Rates summary columns are fixed up front: D..L
+    col = {"wrd": "F", "wrm": "I", "md": "J", "grp": "L"}
     ws = wb.create_sheet("Color Analysis")
     ws.append(["Color", "Cards Drafted", "Cards Maindecked",
                "Avg Win Rate (Drafted)", "Avg Win Rate (Maindeck)"])
@@ -320,15 +316,15 @@ def build_color_analysis(wb, drafts, formulas):
             drafted = md = 0
             wrd, wrm = [], []
             for row in wr.iter_rows(min_row=2, values_only=True):
-                if row[base + 7] != g:
+                if row[11] != g:  # Color Group (L)
                     continue
                 drafted += 1
-                if row[base + 5] > 0:
+                if row[9] > 0:  # Maindecked (J)
                     md += 1
-                if isinstance(row[base + 1], (int, float)):
-                    wrd.append(row[base + 1])
-                if isinstance(row[base + 4], (int, float)):
-                    wrm.append(row[base + 4])
+                if isinstance(row[5], (int, float)):  # WR Drafted (F)
+                    wrd.append(row[5])
+                if isinstance(row[8], (int, float)):  # WR Maindeck (I)
+                    wrm.append(row[8])
             ws.append([g, drafted, md,
                        sum(wrd) / len(wrd) if wrd else None,
                        sum(wrm) / len(wrm) if wrm else None])
@@ -667,9 +663,9 @@ def build_workbook(drafts, cube, availability, formulas=True, decks=None, links=
                "Drafts Taken", "Maindecked", "Drafts Available"]
     ws.append(header)
     n_d = len(drafts)
-    wr_end = get_column_letter(4 + 4 * n_d + 8)  # Win Rates last column
-    wr_md_col = lambda i: 7 + 4 * i  # per-draft MD column in Win Rates
-    wr_mdcount_col = 4 + 4 * n_d + 6  # Maindecked column in Win Rates
+    wr_end = get_column_letter(12 + 4 * n_d)  # Win Rates last column
+    wr_md_col = lambda i: 16 + 4 * i  # per-draft MD column in Win Rates
+    wr_mdcount_col = 10  # Maindecked column in Win Rates
 
     def sort_key(entry):
         card, _, _ = entry
@@ -856,19 +852,22 @@ def build_win_rates(wb, drafts, cube, formulas, decks):
         rate = w / (w + l) if w + l else -1
         return (-w, -rate, card)
 
+    # layout: Card/Type/Color, then the 9 summary columns (D..L), then a
+    # 4-column block per draft — summary up front so it's readable without
+    # scrolling past 13 pods
     ws = wb.create_sheet("Win Rates")
     header = ["Card", "Type", "Color"]
-    for d in drafts:
-        header += [f"{d.name} Picked By", f"{d.name} W", f"{d.name} L", f"{d.name} MD"]
     header += [
         "Wins (Drafted)", "Losses (Drafted)", "Win Rate (Drafted)",
         "Wins (Maindeck)", "Losses (Maindeck)", "Win Rate (Maindeck)",
         "Maindecked", "Decks Known", "Color Group",
     ]
+    for d in drafts:
+        header += [f"{d.name} Picked By", f"{d.name} W", f"{d.name} L", f"{d.name} MD"]
     ws.append(header)
 
     n_d = len(drafts)
-    base = 4 + 4 * n_d  # first totals column (Wins (Drafted))
+    FIRST_DRAFT_COL = 13  # per-draft blocks start here (after summary D..L)
     drafted_cards = [
         entry for entry in cube if any(d.picks.get(entry[0]) for d in drafts)
     ]
@@ -876,13 +875,13 @@ def build_win_rates(wb, drafts, cube, formulas, decks):
         r = ws.max_row + 1
         if formulas:
             lookup = f"=VLOOKUP($A{r},'Card List'!$A:$D,{{}},FALSE)"
-            row = [card, lookup.format(2), lookup.format(3)]
+            per_draft = []
             for i, d in enumerate(drafts):
                 n = len(d.players)
                 last = 1 + len(d.rounds)
                 rng = f"'{d.name}'!$B$2:${get_column_letter(1 + n)}${last}"
                 hdr = f"'{d.name}'!$B$1:${get_column_letter(1 + n)}$1"
-                pc = f"${get_column_letter(4 + 4 * i)}{r}"
+                pc = f"${get_column_letter(FIRST_DRAFT_COL + 4 * i)}{r}"
                 rec_a = get_column_letter(1 + 4 * i)
                 rec_c = get_column_letter(3 + 4 * i)
                 rec = f"Records!${rec_a}$2:${rec_c}${1 + n}"
@@ -892,30 +891,34 @@ def build_win_rates(wb, drafts, cube, formulas, decks):
                     f'Decks!$C:$C,$A{r},Decks!$D:$D,"{z}")'
                     for z in MAIN_ZONES
                 )
-                row.append(
+                per_draft.append(
                     f"=IFERROR(INDEX({hdr},"
                     f"SUMPRODUCT(({rng}=$A{r})*COLUMN({rng}))-1),\"\")"
                 )
-                row.append(f'=IF({pc}="","",VLOOKUP({pc},{rec},2,FALSE))')
-                row.append(f'=IF({pc}="","",VLOOKUP({pc},{rec},3,FALSE))')
-                row.append(
+                per_draft.append(f'=IF({pc}="","",VLOOKUP({pc},{rec},2,FALSE))')
+                per_draft.append(f'=IF({pc}="","",VLOOKUP({pc},{rec},3,FALSE))')
+                per_draft.append(
                     f'=IF({pc}="","",IF({has_deck}=0,"",'
                     f'IF(({in_main})>0,"Y","N")))'
                 )
-            wcells = ",".join(f"${get_column_letter(5 + 4 * i)}{r}" for i in range(n_d))
-            lcells = ",".join(f"${get_column_letter(6 + 4 * i)}{r}" for i in range(n_d))
-            mds = [f"${get_column_letter(7 + 4 * i)}{r}" for i in range(n_d)]
+            wcells = ",".join(f"${get_column_letter(FIRST_DRAFT_COL + 1 + 4 * i)}{r}"
+                              for i in range(n_d))
+            lcells = ",".join(f"${get_column_letter(FIRST_DRAFT_COL + 2 + 4 * i)}{r}"
+                              for i in range(n_d))
+            mds = [f"${get_column_letter(FIRST_DRAFT_COL + 3 + 4 * i)}{r}"
+                   for i in range(n_d)]
             known = "+".join(f'({m}<>"")' for m in mds)
             ycount = "+".join(f'({m}="Y")' for m in mds)
             wmd_sum = "+".join(
-                f'IF({m}="Y",${get_column_letter(5 + 4 * i)}{r},0)' for i, m in enumerate(mds)
+                f'IF({m}="Y",${get_column_letter(FIRST_DRAFT_COL + 1 + 4 * i)}{r},0)'
+                for i, m in enumerate(mds)
             )
             lmd_sum = "+".join(
-                f'IF({m}="Y",${get_column_letter(6 + 4 * i)}{r},0)' for i, m in enumerate(mds)
+                f'IF({m}="Y",${get_column_letter(FIRST_DRAFT_COL + 2 + 4 * i)}{r},0)'
+                for i, m in enumerate(mds)
             )
-            wt, lt = f"${get_column_letter(base)}{r}", f"${get_column_letter(base + 1)}{r}"
-            wm, lm = f"${get_column_letter(base + 3)}{r}", f"${get_column_letter(base + 4)}{r}"
-            row += [
+            wt, lt, wm, lm = f"$D{r}", f"$E{r}", f"$G{r}", f"$H{r}"
+            row = [card, lookup.format(2), lookup.format(3)] + [
                 f'=IF(COUNT({wcells})=0,"",SUM({wcells}))',
                 f'=IF(COUNT({lcells})=0,"",SUM({lcells}))',
                 f'=IF(OR({wt}="",({wt}+{lt})=0),"",{wt}/({wt}+{lt}))',
@@ -925,9 +928,9 @@ def build_win_rates(wb, drafts, cube, formulas, decks):
                 f"={ycount}",
                 f"={known}",
                 f'=IF(LEN($C{r})>1,"Multi",IF($C{r}="","C",$C{r}))',
-            ]
+            ] + per_draft
         else:
-            row = [card, ctype, color]
+            per_draft = []
             w = l = w_md = l_md = md_y = md_known = 0
             for d in drafts:
                 p = d.picks.get(card)
@@ -942,11 +945,11 @@ def build_win_rates(wb, drafts, cube, formulas, decks):
                         if md == "Y":
                             md_y += 1
                             w_md, l_md = w_md + dw, l_md + dl
-                    row += [p.player, dw, dl, md]
+                    per_draft += [p.player, dw, dl, md]
                     w, l = w + dw, l + dl
                 else:
-                    row += [None, None, None, None]
-            row += [
+                    per_draft += [None, None, None, None]
+            row = [card, ctype, color] + [
                 w,
                 l,
                 w / (w + l) if w + l else None,
@@ -956,24 +959,24 @@ def build_win_rates(wb, drafts, cube, formulas, decks):
                 md_y,
                 md_known,
                 "Multi" if len(color or "") > 1 else (color or "C"),
-            ]
+            ] + per_draft
         ws.append(row)
         style_card_cell(ws.cell(r, 1), color)
         for c in range(3, len(header) + 1):
             ws.cell(r, c).alignment = CENTER
-        ws.cell(r, base + 2).number_format = "0.0%"
-        ws.cell(r, base + 5).number_format = "0.0%"
+        ws.cell(r, 6).number_format = "0.0%"
+        ws.cell(r, 9).number_format = "0.0%"
 
     style_header(ws)
     ws.freeze_panes = "B2"
     ws.column_dimensions["A"].width = 32
     ws.column_dimensions["B"].width = 32
     for i in range(n_d):
-        ws.column_dimensions[get_column_letter(4 + 4 * i)].width = 16
+        ws.column_dimensions[get_column_letter(FIRST_DRAFT_COL + 4 * i)].width = 16
     ws.auto_filter.ref = ws.dimensions
 
     # win rates: red (low) -> green (high), fixed 0..1 scale
-    for col in (base + 2, base + 5):
+    for col in (6, 9):
         letter = get_column_letter(col)
         ws.conditional_formatting.add(
             f"{letter}2:{letter}{ws.max_row}",
