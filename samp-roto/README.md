@@ -32,10 +32,11 @@ Google Sheet, at feature parity with the LoL roto sheet (`../roto/`).
 - **Real maindecks**: `build_decks_tsv.py` maps Discord authors to
   grid players (hand aliases for by-elimination cases) and writes
   `decks.tsv`; `load_decks` then applies the LoL companion-aware
-  pipeline. Coverage: 104 of 129 decks — Sinkhole Surveyor and Eagles
-  of the North are unscraped, Dom (Slickshot) is image-only
-  (`discord-scrape/dom-slickshot-deck.png`, pending OCR), and
-  tenderdrafter/Rocketman/Rob/aidybaby posted nothing usable. Unknown
+  pipeline. Coverage: 105 of 129 decks — Sinkhole Surveyor and Eagles
+  of the North are unscraped; Dom (Slickshot) is transcribed from his
+  posted image (`deckcache/manual-dom-slickshot.json`, validated
+  against his 45 picks); tenderdrafter/Rocketman/Rob/aidybaby posted
+  nothing usable (Baleful trio posted images — pending capture). Unknown
   decks show blank MD, like LoL. `--md-picks` remains as a fallback
   mode (drafted = maindecked). Alternate-name pools are aliased
   (DECK_CARD_ALIASES: 'the scouring stormsoul' = Sandman).

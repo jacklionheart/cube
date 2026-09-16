@@ -7,3 +7,4 @@ hard-academic: COMPLETE via /0 - all 10 players
 goose-mother: COMPLETE via /0 - all 10 players
 yorion: COMPLETE via /0 - all 10 players
 skycoach: COMPLETE - all 10 players posted links
+Dom (slickshot): transcribed -> deckcache/manual-dom-slickshot.json (validated vs picks); Baleful Rocketman/Rob/aidybaby + sinkhole/eagles channels still blocked on Chrome extension

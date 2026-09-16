@@ -45,6 +45,14 @@ ALIASES = {
 }
 
 
+# decks with no sealeddeck link, transcribed by hand from posted images
+# into deckcache/manual-*.json (the fake URL's last segment is the pool id)
+MANUAL_DECKS = [
+    ("Slickshot", "Dom", "ocr",
+     "https://sealeddeck.tech/manual-dom-slickshot"),
+]
+
+
 def norm(s):
     s = re.sub(r"#\d+", "", s)
     s = re.sub(r"[^\w]", "", s, flags=re.UNICODE)
@@ -97,6 +105,10 @@ def main():
                 rows.append((draft, player,
                              kind, f"https://sealeddeck.tech/{pool_id}"))
             seen_players.add(player)
+        for d2, p2, kind, url in MANUAL_DECKS:
+            if d2 == draft and p2 not in seen_players:
+                rows.append((d2, p2, kind, url))
+                seen_players.add(p2)
         for p in rosters[draft]:
             if p not in seen_players:
                 missing.append((draft, p))
