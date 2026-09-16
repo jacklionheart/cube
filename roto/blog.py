@@ -429,33 +429,58 @@ document.addEventListener('click', e => {
                      f"</title></image>")
         return "".join(s), h
 
-    svg = ["<svg viewBox='0 0 680 620' style='max-width:680px;"
-           "width:100%;margin:16px 0'>"]
-    svg.append(region(6, 6, 216, 608, "#f7ebe8", "MARDU"))
-    svg.append(region(232, 6, 216, 608, "#ebf3e8", "GREEN"))
-    svg.append(region(458, 6, 216, 608, "#e8eff6", "BLUE"))
-    n_tok, h_tok = node_cards(30, 34, "WR", "Tokens", tokens[1])
-    n_sac, h_sac = node_cards(30, 500, "BR", "Sac", sac[1])
-    # bridge edge with pair card images
-    ey0 = 34 + h_tok
-    svg.append(f"<line x1='106' y1='{ey0}' x2='106' y2='500' "
-               f"stroke='#b08b85' stroke-width='2'/>")
-    y0 = ey0 + 10
-    for psig, pcards in bridges:
-        for xi, c in enumerate(sorted(pcards)):
+    # family-loyal extras: maindecked 3x, always inside the family's
+    # core decks, but in no core themselves — the family glue
+    fam_decks = {"Aggro": set(), "Green": set(), "Blue": set()}
+    core_cards_all = set()
+    for lsig, lcards in lanes:
+        fm = FAMILY[core_name(lcards)]
+        core_cards_all |= set(lcards)
+        for k, pl in enumerate(lsig):
+            fam_decks[fm].add((k, pl))
+
+    def fam_glue(fm):
+        return sorted(
+            c for c, sig in owners.items()
+            if None not in sig and c not in core_cards_all
+            and all((k, pl) in fam_decks[fm]
+                    for k, pl in enumerate(sig)))
+
+    def glue_strip(x, y, w, cards):
+        s = [f"<rect x='{x}' y='{y}' width='{w}' height='96' rx='9' "
+             f"fill='none' stroke='#aaa' stroke-dasharray='4 3'/>",
+             f"<text x='{x + 10}' y='{y + 16}' font-size='11' "
+             f"font-family='-apple-system,sans-serif' fill='#8a8a8a'>"
+             f"FAMILY-WIDE</text>"]
+        for i, c in enumerate(cards):
             img = scry[c].get("image")
-            svg.append(f"<image href='{img}' x='{118 + xi * 48}' "
-                       f"y='{y0}' width='44' height='62'/>")
-        y0 += 70
-    svg.append(n_tok); svg.append(n_sac)
+            s.append(f"<image href='{img}' x='{x + 8 + i * 48}' "
+                     f"y='{y + 24}' width='44' height='62'>"
+                     f"<title>{html.escape(c)}</title></image>")
+        return "".join(s)
+
+    svg = ["<svg viewBox='0 0 680 700' style='max-width:680px;"
+           "width:100%;margin:16px 0'>"]
+    svg.append(region(6, 6, 216, 688, "#f7ebe8", "MARDU"))
+    svg.append(region(232, 6, 216, 688, "#ebf3e8", "GREEN"))
+    svg.append(region(458, 6, 216, 688, "#e8eff6", "BLUE"))
+    n_tok, h_tok = node_cards(30, 34, "WR", "Tokens", tokens[1])
+    n_sac, h_sac = node_cards(30, 34 + h_tok + 24, "BR", "Sac", sac[1])
+    svg += [n_tok, n_sac]
+    svg.append(glue_strip(30, 34 + h_tok + 24 + h_sac + 24, 168,
+                          fam_glue("Aggro")))
     n1, h1 = node_cards(256, 34, "URG", "Ramp", temur_ramp[1])
     n2, h2 = node_cards(256, 34 + h1 + 24, "BG", "Ramp", golgari_ramp[1])
     n3, h3 = node_cards(256, 34 + h1 + 24 + h2 + 24, "BG", "Graveyard",
                         graveyard[1])
     svg += [n1, n2, n3]
-    n4, h4 = node_cards(482, 80, "UR", "Spells", blue_spells[1])
-    n5, h5 = node_cards(482, 80 + h4 + 40, "U", "Discard", blue_tempo[1])
+    svg.append(glue_strip(256, 34 + h1 + h2 + h3 + 72, 168,
+                          fam_glue("Green")))
+    n4, h4 = node_cards(482, 34, "UR", "Spells", blue_spells[1])
+    n5, h5 = node_cards(482, 34 + h4 + 24, "U", "Discard", blue_tempo[1])
     svg += [n4, n5]
+    svg.append(glue_strip(482, 34 + h4 + 24 + h5 + 24, 168,
+                          fam_glue("Blue")))
     svg.append("</svg>")
     out.append("".join(svg))
 
@@ -602,13 +627,15 @@ showPairs('{order[0]}');
 
     # --- the most original decks --------------------------------------
     ue = unique_ensembles(owners)
+    by_deck_all = deck_sets(owners)
     lane_own_u = {(k, pl) for lsig, _ in lanes
                   for k, pl in enumerate(lsig)}
     sizes = {dk: len(s) for dk, s in ue.items()}
-    avg_lane = (sum(v for dk, v in sizes.items() if dk in lane_own_u)
-                / sum(1 for dk in sizes if dk in lane_own_u))
-    avg_free = (sum(v for dk, v in sizes.items() if dk not in lane_own_u)
-                / sum(1 for dk in sizes if dk not in lane_own_u))
+    share = {dk: sizes[dk] / len(by_deck_all[dk]) for dk in sizes}
+    avg_lane = (sum(share[dk] for dk in share if dk in lane_own_u)
+                / sum(1 for dk in share if dk in lane_own_u))
+    avg_free = (sum(share[dk] for dk in share if dk not in lane_own_u)
+                / sum(1 for dk in share if dk not in lane_own_u))
     out.append("<h2>The most original decks</h2>")
     out.append(
         "<p>Flip the question over. Instead of asking what recurred, "
@@ -616,8 +643,9 @@ showPairs('{order[0]}');
         "cards no other deck ever ran any two of — its unique ensemble, "
         "the part of the deck that was genuinely invented at that "
         "table. Core ownership turns out to be the opposite of "
-        f"originality: core decks average {avg_lane:.1f} unique cards, "
-        f"decks outside the core system {avg_free:.1f}.</p>")
+        "originality: core decks average "
+        f"{avg_lane:.0%} of their maindeck unique, "
+        f"decks outside the core system {avg_free:.0%}.</p>")
     from collections import Counter as _Ch
     hist = _Ch(sizes.values())
     out.append("<div class='vchart'>")
@@ -632,14 +660,29 @@ showPairs('{order[0]}');
     out.append("</div>")
     out.append("<p class='meta'>Decks by size of their largest unique "
                "ensemble (nonland cards, no pair shared with any other "
-               "deck).</p>")
-    top_dk = max(sizes, key=sizes.get)
-    tk, tpl = top_dk
+               "deck). Raw counts flatter big decks — the three "
+               "Yorion-sized builds ran 35&ndash;37 nonland cards and "
+               "sit to the right.</p>")
+    top_raw = max(sizes, key=sizes.get)
+    rk, rpl = top_raw
+    max_share = max(share.values())
+    leaders = sorted(dk for dk in share if share[dk] == max_share)
     out.append(
-        f"<p>The largest belongs to {deck_link(tk, tpl)} — "
-        f"{sizes[top_dk]} cards that exist as a group nowhere else in "
-        "ninety decks' worth of building:</p>")
-    out.append(gallery(ue[top_dk]))
+        f"<p>The raw record belongs to {deck_link(rk, rpl)} at "
+        f"{sizes[top_raw]} — but that's a "
+        f"{len(by_deck_all[top_raw])}-card Yorion maindeck, and bulk "
+        "is a kind of cheating: more cards, more room for pairs "
+        "nobody else could have duplicated. Score it as a share of "
+        "the maindeck instead and the crown changes hands"
+        + ("." if len(leaders) == 1 else
+           " — and splits.") + "</p>")
+    for lk, lpl in leaders:
+        out.append(
+            f"<p>{deck_link(lk, lpl)}: {sizes[(lk, lpl)]} unique "
+            f"cards out of {len(by_deck_all[(lk, lpl)])} nonland — "
+            f"{share[(lk, lpl)]:.0%} of the deck invented on the "
+            "spot.</p>")
+        out.append(gallery(ue[(lk, lpl)]))
 
     # --- the FOOMP section --------------------------------------------
     by_deck = deck_sets(owners)
