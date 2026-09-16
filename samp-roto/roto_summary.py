@@ -484,12 +484,14 @@ def build_md_together(wb, drafts, cube, decks):
     shared owner signature across all drafts) yields nothing at 13 pods,
     so a samp lane is a connected component of the co-maindeck graph:
     cards are linked when they sat in the same deck in >= LANE_MIN_CO
-    drafts. Each draft's Host is the deck holding the most lane cards
+    drafts. Lands are excluded (every manabase chains everything).
+    Each draft's Host is the deck holding the most lane cards
     (needs >= 2 to count); W/L totals over host decks. Computed here,
     not by sheet formulas."""
     import packages as pk
 
     owners_map = pk.maindeck_owners(drafts, cube, decks)
+    owners_map = pk.nonland_owners(owners_map, pk.load_scryfall())
     co = pk.co_maindeck_counts(owners_map)
     scry = pk.load_scryfall()
     themes = pk.load_themes()
