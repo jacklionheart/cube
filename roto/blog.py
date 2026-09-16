@@ -465,7 +465,7 @@ document.addEventListener('click', e => {
                      f"<title>{html.escape(c)}</title></image>")
         return "".join(s)
 
-    svg = ["<svg viewBox='0 0 680 700' style='max-width:680px;"
+    svg = ["<svg viewBox='0 0 680 830' style='max-width:680px;"
            "width:100%;margin:16px 0'>"]
     svg.append(region(6, 6, 216, 688, "#f7ebe8", "MARDU"))
     svg.append(region(232, 6, 216, 688, "#ebf3e8", "GREEN"))
@@ -487,6 +487,22 @@ document.addEventListener('click', e => {
     svg += [n4, n5]
     svg.append(glue_strip(482, 34 + h4 + 24 + h5 + 24, 168,
                           fam_glue("Blue")))
+    # the ghost region: the family of free pairs that never found a core
+    ry = 706
+    svg.append(f"<rect x='6' y='{ry}' width='668' height='118' rx='14' "
+               f"fill='none' stroke='#b5b0a8' stroke-dasharray='6 4'/>")
+    svg.append(f"<text x='18' y='{ry + 20}' font-size='11' "
+               f"font-family='-apple-system,sans-serif' "
+               f"letter-spacing='.08em' fill='#8a8a8a'>RECTANGLES — "
+               f"THE CORE THAT NEVER ASSEMBLED</text>")
+    px = 16
+    for psig, pcards in free:
+        for j, c in enumerate(sorted(pcards)):
+            img = scry[c].get("image")
+            svg.append(f"<image href='{img}' x='{px + j * 44}' "
+                       f"y='{ry + 30}' width='42' height='59'>"
+                       f"<title>{html.escape(c)}</title></image>")
+        px += 94
     svg.append("</svg>")
     out.append("".join(svg))
 
