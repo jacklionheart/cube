@@ -12,7 +12,8 @@ import pathlib
 from urllib.parse import quote
 
 from packages import (card_colors, deck_sets, load, load_scryfall,
-                      maindeck_owners, nonland_owners, signature_groups)
+                      maindeck_owners, nonland_owners, signature_groups,
+                      unique_ensembles)
 from roto_summary import load_decks
 
 HERE = pathlib.Path(__file__).parent
