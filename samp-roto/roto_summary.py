@@ -461,60 +461,84 @@ def build_pick_value(wb, drafts, cube, decks, formulas):
     )
 
 
+LANE_MIN_CO = 9  # lane edges: pairs co-maindecked in >= this many drafts
+
+
 def build_md_together(wb, drafts, cube, decks):
-    """Maximal groups of cards maindecked together (same deck) in every
-    draft. Cards group iff they share the same deck-owner signature across
-    all drafts, so pairs/triplets/bigger clusters all fall out at once.
-    Pure co-occurrence analysis — computed here, not by sheet formulas."""
-    sigs = {}
-    for card, _, _ in cube:
-        owners = []
-        for d in drafts:
-            p = d.picks.get(card)
-            deck = decks.get((d.name, p.player)) if p else None
-            if not deck or deck.get(card) not in MAIN_ZONES:
-                owners = None
-                break
-            owners.append(p.player)
-        if owners:
-            sigs.setdefault(tuple(owners), []).append(card)
-
-    groups = []
-    for owners, cards in sigs.items():
-        if len(cards) < 2:
-            continue
-        w = l = 0
-        for d, p in zip(drafts, owners):
-            dw, dl = d.records.get(p, (0, 0))
-            w, l = w + dw, l + dl
-        wr = w / (w + l) if w + l else None
-        groups.append((cards, owners, w, l, wr))
-    groups.sort(key=lambda g: (-(g[4] if g[4] is not None else -1), -len(g[0]), g[0]))
-
+    """Recurring card clusters across the pods. The LoL definition (one
+    shared owner signature across all drafts) yields nothing at 13 pods,
+    so a samp lane is a connected component of the co-maindeck graph:
+    cards are linked when they sat in the same deck in >= LANE_MIN_CO
+    drafts. Each draft's Host is the deck holding the most lane cards
+    (needs >= 2 to count); W/L totals over host decks. Computed here,
+    not by sheet formulas."""
     import packages as pk
-    scry = pk.load_scryfall()
 
-    ws = wb.create_sheet("Maindecked Together")
-    header = ["Group", "Cards", "Size", "Colors"]
-    header += [f"{d.name} Player" for d in drafts]
+    owners_map = pk.maindeck_owners(drafts, cube, decks)
+    co = pk.co_maindeck_counts(owners_map)
+    scry = pk.load_scryfall()
+    themes = pk.load_themes()
+
+    parent = {}
+
+    def find(x):
+        parent.setdefault(x, x)
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+
+    for (a, b), cnt in co.items():
+        if cnt >= LANE_MIN_CO:
+            parent[find(a)] = find(b)
+    comps = {}
+    for card in list(parent):
+        comps.setdefault(find(card), set()).add(card)
+    lanes = sorted((s for s in comps.values() if len(s) >= 3),
+                   key=lambda s: (-len(s), min(s)))
+
+    ws = wb.create_sheet("Lanes (shared drafts)")
+    header = ["Group", "Theme", "Colors", "Size",
+              f"Cards — linked when co-maindecked in ≥{LANE_MIN_CO} drafts",
+              "Drafts Hosted"]
+    header += [f"{d.name} Host" for d in drafts]
     header += ["Wins", "Losses", "Win Rate"]
     ws.append(header)
     style_header(ws)
-    for i, (cards, owners, w, l, wr) in enumerate(groups):
-        ws.append([i + 1, "\n".join(sorted(cards)), len(cards),
-                   pk.colors_str(cards, scry), *owners, w, l, wr])
+    for i, cards in enumerate(lanes):
+        hosts, w, l = [], 0, 0
+        hosted = 0
+        for d in drafts:
+            counts = {}
+            for card in cards:
+                p = d.picks.get(card)
+                if p:
+                    counts[p.player] = counts.get(p.player, 0) + 1
+            best = max(counts.items(), key=lambda kv: kv[1], default=(None, 0))
+            if best[1] >= 2:
+                hosts.append(f"{best[0]} ({best[1]})")
+                hosted += 1
+                dw, dl = d.records.get(best[0], (0, 0))
+                w, l = w + dw, l + dl
+            else:
+                hosts.append("")
+        wr = w / (w + l) if w + l else None
+        ws.append([i + 1, pk.theme_str(cards, themes),
+                   pk.colors_str(cards, scry), len(cards),
+                   "\n".join(sorted(cards)), hosted, *hosts, w, l, wr])
         r = ws.max_row
-        ws.cell(r, 2).alignment = Alignment(wrap_text=True)
-        for c in (1, 3, *range(4, len(header) + 1)):
+        ws.cell(r, 5).alignment = Alignment(wrap_text=True)
+        for c in (1, 2, 3, 4, 6, *range(7, len(header) + 1)):
             ws.cell(r, c).alignment = CENTER
         ws.cell(r, len(header)).number_format = "0.0%"
     ws.freeze_panes = "A2"
-    ws.column_dimensions["B"].width = 60
+    ws.column_dimensions["B"].width = 14
+    ws.column_dimensions["E"].width = 40
     for i in range(len(drafts)):
-        ws.column_dimensions[get_column_letter(5 + i)].width = 16
+        ws.column_dimensions[get_column_letter(7 + i)].width = 16
     ws.auto_filter.ref = ws.dimensions
     wr_col = get_column_letter(len(header))
-    if ws.max_row >= 2:  # no decks yet -> no groups to format
+    if ws.max_row >= 2:
         ws.conditional_formatting.add(
             f"{wr_col}2:{wr_col}{ws.max_row}",
             ColorScaleRule(
@@ -526,68 +550,35 @@ def build_md_together(wb, drafts, cube, decks):
 
 
 def build_package_tabs(wb, drafts, cube, decks):
-    """Two relaxed-package views alongside Maindecked Together (the strict
-    all-cards/all-drafts definition). 'Packages 2 of 3': maximal sets fully
-    maindecked together in 2 of 3 drafts (cross-draft deck-pair
-    intersections; +2 slack cards fit if one miss per deck is allowed).
-    'Packages ±1 Card': each strict package plus per-draft flex buckets —
-    cards in the other two decks of the same triple, absent from this
-    draft's deck. Computed here, not by sheet formulas."""
+    """Teams: the strongest cross-draft deck-pair intersections — maximal
+    card sets that two decks in different pods drafted in common
+    (>= packages.MIN_PAIR_CORE cards, subset-dominated pairs removed).
+    Computed here, not by sheet formulas."""
     import packages as pk
 
     owners = pk.maindeck_owners(drafts, cube, decks)
-    groups = pk.signature_groups(owners)
     scry = pk.load_scryfall()
+    themes = pk.load_themes()
 
-    ws = wb.create_sheet(f"Packages 2 of {len(drafts)}")
-    header = ["#", "Size", "Colors", "Cards", "Deck A", "Deck B", "Contains Strict"]
+    ws = wb.create_sheet(f"Teams (2 of {len(drafts)})")
+    header = ["#", "Size", "Theme", "Colors", "Cards", "Deck A", "Deck B"]
     ws.append(header)
     style_header(ws)
-    strict = [(i + 1, set(cards)) for i, (_, cards) in enumerate(groups)]
     for n, e in enumerate(pk.pair_packages(owners)):
         (ka, pa), (kb, pb) = e["decks"]
-        contains = ", ".join(f"P{i}" for i, s in strict if s <= e["core"])
-        ws.append([n + 1, len(e["core"]), pk.colors_str(e["core"], scry),
+        ws.append([n + 1, len(e["core"]), pk.theme_str(e["core"], themes),
+                   pk.colors_str(e["core"], scry),
                    "\n".join(sorted(e["core"])),
-                   f"{drafts[ka].name}: {pa}", f"{drafts[kb].name}: {pb}",
-                   contains])
+                   f"{drafts[ka].name}: {pa}", f"{drafts[kb].name}: {pb}"])
         r = ws.max_row
-        ws.cell(r, 4).alignment = Alignment(wrap_text=True)
-        for c in (1, 2, 3):
+        ws.cell(r, 5).alignment = Alignment(wrap_text=True)
+        for c in (1, 2, 3, 4):
             ws.cell(r, c).alignment = CENTER
     ws.freeze_panes = "A2"
-    for col, w in zip("ABCDEFG", (5, 6, 9, 42, 20, 20, 16)):
+    for col, w in zip("ABCDEFG", (5, 6, 14, 9, 42, 22, 22)):
         ws.column_dimensions[col].width = w
     ws.auto_filter.ref = ws.dimensions
 
-    ws = wb.create_sheet("Packages ±1 Card")
-    ws.append(["P#", "Colors", "Core — in all 3 decks",
-               "Flex — in 2 of 3 (marked: the deck that skipped it)",
-               "Combined", "Core #", "Flex #", "Total #"])
-    style_header(ws)
-    entries = []
-    for gi, e in enumerate(pk.flex_packages(groups, owners)):
-        core = sorted(e["cards"])
-        flex = []
-        for k, bucket in enumerate(e["flex"]):
-            flex += [f"{card}  — not in {drafts[k].name}" for card in bucket]
-        n_flex = sum(len(b) for b in e["flex"])
-        all_cards = list(e["cards"]) + [c for b in e["flex"] for c in b]
-        entries.append((gi + 1, pk.colors_str(all_cards, scry),
-                        "\n".join(core), "\n".join(flex),
-                        "\n".join(sorted(all_cards)),
-                        len(core), n_flex, len(all_cards)))
-    for row in sorted(entries, key=lambda x: -x[7]):
-        ws.append(list(row))
-        r = ws.max_row
-        for c in (3, 4, 5):
-            ws.cell(r, c).alignment = Alignment(wrap_text=True)
-        for c in (1, 2, 6, 7, 8):
-            ws.cell(r, c).alignment = CENTER
-    ws.freeze_panes = "A2"
-    for col, w in zip("ABCDEFGH", (5, 9, 34, 40, 34, 10, 10, 9)):
-        ws.column_dimensions[col].width = w
-    ws.auto_filter.ref = ws.dimensions
 
 
 def check_deck_coverage(decks, main_sizes, drafts):
@@ -793,8 +784,8 @@ def build_workbook(drafts, cube, availability, formulas=True, decks=None, links=
     for col, w in zip("ABCDE", (10, 18, 10, 36, 6)):
         ws.column_dimensions[col].width = w
 
-    order = ["Pick Summary", "Color Analysis", "Maindecked Together",
-             f"Packages 2 of {len(drafts)}", "Packages ±1 Card", "Card List"]
+    order = ["Pick Summary", "Color Analysis", "Lanes (shared drafts)",
+             f"Teams (2 of {len(drafts)})", "Card List"]
     order += [d.name for d in drafts]
     order += ["Records", "Decks", "Deck Links", "Win Rates"]
     wb._sheets = [wb[name] for name in order]

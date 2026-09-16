@@ -1,7 +1,8 @@
 """Package analysis over the roto drafts' maindecks.
 
-A *package* is a maximal set of cards maindecked in the same deck in every
-draft (identical deck-owner signature). Edges connect packages whose
+A *package* is a maximal set of at least MIN_PACKAGE_SIZE (3) cards
+maindecked in the same deck in every draft (identical deck-owner
+signature). Edges connect packages whose
 signatures agree in 2 of 3 drafts — packages that traveled together but
 split once, i.e. real draft-time choices. Connected components are
 archetype super-clusters. *Halos* loosen the definition: cards that shared
@@ -68,15 +69,31 @@ def maindeck_owners(drafts, cube, decks):
     return owners
 
 
-def signature_groups(owners):
-    """Maximal packages: cards sharing one full (no-None) owner signature.
-    Returns [(signature, cards)] with >= 2 cards, largest first."""
+MIN_PACKAGE_SIZE = 3
+MIN_SHARED_DRAFTS = 2  # partial signatures must span at least this many
+
+
+def signature_groups(owners, min_size=None):
+    if min_size is None:
+        min_size = MIN_PACKAGE_SIZE
+    return _signature_groups(owners, min_size)
+
+
+def _signature_groups(owners, min_size):
+    """Maximal packages: cards sharing one owner signature. With 13 samp
+    pods no card set survives all 13 drafts, so PARTIAL signatures group
+    too — same owner in the same drafts, absent from the same drafts —
+    as long as the cards appear together in at least MIN_SHARED_DRAFTS.
+    Returns [(signature, cards)] with >= min_size cards, largest first,
+    then most-shared-drafts first."""
     sigs = defaultdict(list)
     for card, sig in owners.items():
-        if None not in sig:
+        if sum(p is not None for p in sig) >= MIN_SHARED_DRAFTS:
             sigs[sig].append(card)
-    groups = [(sig, cards) for sig, cards in sigs.items() if len(cards) >= 2]
-    groups.sort(key=lambda g: -len(g[1]))  # stable: ties keep cube order
+    groups = [(sig, cards) for sig, cards in sigs.items()
+              if len(cards) >= min_size]
+    groups.sort(key=lambda g: (-len(g[1]),
+                               -sum(p is not None for p in g[0])))
     return groups
 
 
@@ -222,6 +239,30 @@ def colors_str(cards, scry):
     return "".join(c for c in WUBRG if c in u) or "C"
 
 
+def load_themes():
+    """card -> theme, from hand-labeled themes.tsv (Jack's labels,
+    captured from the sheet's Maindecked Together Theme column)."""
+    path = HERE / "themes.tsv"
+    if not path.exists():
+        return {}
+    out = {}
+    for line in path.read_text().splitlines()[1:]:
+        if line.strip():
+            card, theme = line.split("\t")
+            out[card] = theme
+    return out
+
+
+def theme_str(cards, themes):
+    """Unique themes represented in a card set, alphabetical by card."""
+    seen = []
+    for c in sorted(cards):
+        t = themes.get(c)
+        if t and t not in seen:
+            seen.append(t)
+    return ", ".join(seen)
+
+
 def deck_sets(owners):
     """(draft index, player) -> set of cards maindecked in that deck."""
     by_deck = defaultdict(set)
@@ -232,7 +273,18 @@ def deck_sets(owners):
     return by_deck
 
 
-def pair_packages(owners, min_core=3):
+# 13 pods of 45-card pick-"decks" intersect far more than 3 pods of real
+# 40-card decks: 5 admits ~2,350 pairs; 18 keeps the ~200 strongest.
+MIN_PAIR_CORE = 18
+
+
+def pair_packages(owners, min_core=None):
+    if min_core is None:
+        min_core = MIN_PAIR_CORE
+    return _pair_packages(owners, min_core)
+
+
+def _pair_packages(owners, min_core):
     """Relaxed packages with k2=1: maximal card sets fully maindecked in
     one deck in 2 of the 3 drafts — i.e. cross-draft deck-pair
     intersections, subset-dominated cores removed. Adding k1=1 on top
@@ -268,13 +320,52 @@ def flex_packages(groups, owners):
     by_deck = deck_sets(owners)
     out = []
     for sig, cards in groups:
-        decks = [by_deck[(k, p)] for k, p in enumerate(sig)]
-        flex = []
-        for i in range(len(decks)):
-            others = set.intersection(*(d for j, d in enumerate(decks) if j != i))
-            flex.append(sorted(others - decks[i]))
+        live = [k for k, p in enumerate(sig) if p is not None]
+        decks = {k: by_deck[(k, sig[k])] for k in live}
+        flex = [[] for _ in sig]
+        if len(live) >= 3:  # "all but one" needs at least two others
+            for i in live:
+                others = set.intersection(
+                    *(decks[j] for j in live if j != i))
+                flex[i] = sorted(others - decks[i])
         out.append({"sig": sig, "cards": cards, "flex": flex})
     return out
+
+
+def team_partners(owners):
+    """Every deck's teams, keyed by the other draft:
+    {(k, player): {k2: [(partner, core)]}}, unfiltered."""
+    partners = defaultdict(lambda: defaultdict(list))
+    for e in pair_packages(owners):
+        (ka, pa), (kb, pb) = e["decks"]
+        partners[(ka, pa)][kb].append((pb, e["core"]))
+        partners[(kb, pb)][ka].append((pa, e["core"]))
+    return partners
+
+
+def straddles(owners, drafts):
+    """Decks whose 2-of-3 cores pair them with two or more different
+    decks of the same other draft — one drafter merging what another
+    draft's table split. Returns {(k, player): {k2: [(partner, core)]}}
+    keeping only same-draft partner lists of length >= 2."""
+    return {
+        deck: {k2: plist for k2, plist in by_draft.items() if len(plist) >= 2}
+        for deck, by_draft in team_partners(owners).items()
+        if any(len(plist) >= 2 for plist in by_draft.values())
+    }
+
+
+def report_straddles(owners, drafts):
+    themes = load_themes()
+    for (k, p), by_draft in sorted(straddles(owners, drafts).items()):
+        for k2, plist in sorted(by_draft.items()):
+            print(f"\n{drafts[k].name} {p} straddles {len(plist)} decks "
+                  f"of {drafts[k2].name}:")
+            for pb, core in sorted(plist, key=lambda x: -len(x[1])):
+                t = theme_str(core, themes) or "—"
+                cards = ", ".join(sorted(core)[:7])
+                more = "..." if len(core) > 7 else ""
+                print(f"   with {pb:18s} [{len(core)}] ({t}): {cards}{more}")
 
 
 def null_model(drafts, cube, decks, iters=2000, seed=0):
@@ -357,7 +448,8 @@ def report_mermaid(groups, edges, comps):
 
 def report_null(drafts, cube, decks, iters, seed):
     observed, samples = null_model(drafts, cube, decks, iters=iters, seed=seed)
-    names = ["packages (size>=2)", "cards in packages", "largest package"]
+    names = [f"packages (size>={MIN_PACKAGE_SIZE})", "cards in packages",
+             "largest package"]
     print(f"NULL MODEL: {iters} random re-deckbuilds of the drafted pools "
           f"(seed {seed})")
     print("stat                 observed   null mean    sd   p95  max   p(null>=obs)")
@@ -386,6 +478,10 @@ def main():
         print(f"observed: {len(groups)} packages, {len(edges)} edges, "
               f"{len(comps)} components\n")
         report_null(drafts, cube, decks, iters, seed)
+        return
+
+    if "--straddles" in sys.argv:
+        report_straddles(owners, drafts)
         return
 
     if "--relax" in sys.argv:
