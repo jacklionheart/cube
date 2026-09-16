@@ -49,6 +49,11 @@ a:hover { text-decoration-color: #1a1a1a; }
                color: #6b6b6b; padding: 4px 10px 5px 6px;
                border-bottom: 2px solid transparent; }
 .tabs button.on { color: #1a1a1a; border-bottom-color: #1a1a1a; }
+table { border-collapse: collapse; margin: 14px 0 18px;
+        font: 14px/1.5 -apple-system, 'Segoe UI', Helvetica, sans-serif; }
+th { text-align: left; font-weight: 600; color: #6b6b6b; }
+th, td { padding: 6px 16px 6px 0; border-bottom: 1px solid #e8e8e8;
+         vertical-align: top; }
 .pairs { margin: 8px 0 16px; }
 .pair { display: inline-flex; gap: 2px; margin: 3px 10px 3px 0; }
 .pair img { width: 128px; border-radius: 5px; }
@@ -486,38 +491,56 @@ document.addEventListener('click', e => {
 
     # --- categorizing the pairs ---------------------------------------
     out.append("<h2>Categorizing the pairs</h2>")
-    out.append("<h3>Contested part of a core</h3>")
     out.append(
-        "<p>A contested pair is core material that got away once: it "
-        "sat in two of a core's three decks, and in the third pod "
-        "someone else took it. Every one of the five follows the same "
-        "law — the third deck is either a sibling from the same "
-        "family, or one of the unassociated decks. No pair was ever "
-        "contested <i>across</i> families.</p>")
-    for psig, pcards in pair_teams:
-        best = None
+        "<p>Every pair, with the identity of its three owners. Where "
+        "a deck owns a core, that core is its label; the decks the "
+        "core system never claimed appear as their drafters. Read "
+        "down the table and the law shows itself: when a pair sits "
+        "with a core twice, the third owner is a sibling from the "
+        "same family or an unassociated deck — never a core from "
+        "another family.</p>")
+    deck_core_lab = {}
+    for lsig, lcards in lanes:
+        nm = core_name(lcards)
+        cl = colors_of(lcards)
+        for k, pl in enumerate(lsig):
+            deck_core_lab.setdefault((k, pl), []).append(
+                f"{mana(cl)}&thinsp;{nm}")
+
+    def short_link(k, pl):
+        url = url_map.get((drafts[k].name, pl))
+        lab = html.escape(pl)
+        return f'<a href="{url}">{lab}</a>' if url else lab
+
+    def card_link(c):
+        img = scry[c].get("image") or ""
+        url = "https://scryfall.com/search?q=" + quote(f'!"{c}"')
+        return (f"<a href='{url}' data-img='{html.escape(img)}'>"
+                f"{html.escape(c)}</a>")
+
+    def owner_cell(k, pl):
+        labs = deck_core_lab.get((k, pl))
+        return (" / ".join(labs) if labs
+                else f"<i>{short_link(k, pl)}</i>")
+
+    def sat_core(psig):
         for lsig, lcards in lanes:
-            agree = [k for k in range(len(psig)) if psig[k] == lsig[k]]
-            if len(agree) >= 2:
-                best = (lsig, lcards, agree)
-                break
-        if not best:
-            continue
-        lsig, lcards, agree = best
-        core_nm = core_name(lcards)
-        k3 = next(k for k in range(len(psig)) if k not in agree)
-        owns = lane_of_deck.get((k3, psig[k3]), [])
-        if owns:
-            fams = {FAMILY[n] for n in owns}
-            kind = (f"macro sibling — {'/'.join(sorted(owns))}"
-                    if fams == {FAMILY[core_nm]}
-                    else f"other family — {'/'.join(sorted(owns))}")
-        else:
-            kind = "unassociated deck"
-        out.append(f"<div class='pairs'>{pair_span(pcards)}"
-                   f"<span class='meta' style='margin-left:10px'>"
-                   f"{core_nm} core · third deck: "
-                   f"{deck_link(k3, psig[k3])} ({kind})</span></div>")
+            if sum(a == b for a, b in zip(psig, lsig)) >= 2:
+                return core_name(lcards)
+        return ""
+
+    CAT_RANK = {"satellite": 0, "bridge": 1, "free": 2}
+    prows = sorted(pair_teams,
+                   key=lambda t: (CAT_RANK[classify(t[0])],
+                                  sat_core(t[0]), t[1]))
+    out.append("<table class='pairtab'><tr><th>Pair</th>"
+               "<th>Draft 1</th><th>Draft 2</th><th>Draft 3</th></tr>")
+    for psig, pcards in prows:
+        pair_cell = "<br>".join(card_link(c) for c in pcards)
+        cells = "".join(f"<td>{owner_cell(k, pl)}</td>"
+                        for k, pl in enumerate(psig))
+        out.append(f"<tr><td>{pair_cell}</td>{cells}</tr>")
+    out.append("</table>")
 
     out.append("<h2>The Rectangles</h2>")
     out.append(
