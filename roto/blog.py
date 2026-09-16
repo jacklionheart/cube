@@ -408,29 +408,28 @@ document.addEventListener('click', e => {
                 f"font-size='11' font-family='-apple-system,sans-serif' "
                 f"letter-spacing='.08em' fill='#8a8a8a'>{label}</text>")
 
-    bridge_labels = []
-    for psig, pcards in bridges:
-        short = " + ".join(c.split(",")[0] for c in pcards)
-        bridge_labels.append(short)
-    svg = ["<svg viewBox='0 0 660 300' style='max-width:660px;width:100%;"
+    svg = ["<svg viewBox='0 0 660 330' style='max-width:660px;width:100%;"
            "margin:16px 0'>"]
-    svg.append(region(6, 6, 200, 288, "#f7ebe8", "MARDU"))
-    svg.append(region(216, 6, 214, 288, "#ebf3e8", "GREEN"))
-    svg.append(region(440, 6, 214, 288, "#e8eff6", "BLUE"))
-    # bridge edge: Tokens -- Sac with pair labels
-    svg.append("<line x1='106' y1='90' x2='106' y2='210' "
+    svg.append(region(6, 6, 236, 318, "#f7ebe8", "MARDU"))
+    svg.append(region(252, 6, 190, 318, "#ebf3e8", "GREEN"))
+    svg.append(region(452, 6, 202, 318, "#e8eff6", "BLUE"))
+    # bridge edge: Tokens -- Sac, labeled with the pair card images
+    svg.append("<line x1='86' y1='92' x2='86' y2='258' "
                "stroke='#b08b85' stroke-width='2'/>")
-    for i, lab in enumerate(bridge_labels):
-        svg.append(f"<text x='118' y='{140 + i * 18}' font-size='11' "
-                   f"font-family='-apple-system,sans-serif' "
-                   f"fill='#8a6a64'>{html.escape(lab)}</text>")
-    svg.append(node(106, 70, "WR", "Tokens"))
-    svg.append(node(106, 230, "BR", "Sac"))
-    svg.append(node(322, 70, "URG", "Ramp"))
-    svg.append(node(322, 150, "BG", "Ramp"))
-    svg.append(node(322, 230, "BG", "Graveyard"))
-    svg.append(node(546, 100, "UR", "Spells"))
-    svg.append(node(546, 200, "U", "Discard"))
+    y0 = 106
+    for psig, pcards in bridges:
+        for xi, c in enumerate(sorted(pcards)):
+            img = scry[c].get("image")
+            svg.append(f"<image href='{img}' x='{104 + xi * 50}' "
+                       f"y='{y0}' width='46' height='64'/>")
+        y0 += 72
+    svg.append(node(86, 70, "WR", "Tokens"))
+    svg.append(node(86, 280, "BR", "Sac"))
+    svg.append(node(347, 70, "URG", "Ramp"))
+    svg.append(node(347, 170, "BG", "Ramp"))
+    svg.append(node(347, 270, "BG", "Graveyard"))
+    svg.append(node(553, 110, "UR", "Spells"))
+    svg.append(node(553, 230, "U", "Discard"))
     svg.append("</svg>")
     out.append("".join(svg))
 
