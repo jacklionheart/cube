@@ -1,9 +1,10 @@
-"""One-command refresh of the LoL roto Google Sheet.
+"""One-command refresh of the Samp Cube Roto s4 Google Sheet.
 
-Downloads fresh exports of the three draft spreadsheets (match results live
-in their Matches tabs), fetches any deck pools missing from deckcache/,
-rebuilds the workbook, and updates the Google Sheet in place — same URL,
-same sharing settings.
+Downloads fresh exports of the 11 sheet-based pod spreadsheets, converts
+the 2 read-the-bones pods (rtb_to_xlsx.py), rebuilds the workbook, and
+updates the Google Sheet in place — same URL, same sharing settings.
+v1 treats every drafted card as maindecked (--md-picks); sealeddeck pools
+and deck pics are a later refinement.
 
   new deck link posted -> add a row to decks.tsv, then: python3 refresh.py
   new matches played   -> python3 refresh.py
@@ -20,16 +21,34 @@ import subprocess
 import sys
 
 HERE = pathlib.Path(__file__).parent
-# Samp Cube Roto season 4 pods (summer 2026): draft1 = Mockingbird
-# (started July), draft2 = Slickshot Show-Off (started August).
+# Samp Cube Roto season 4: 13 pods in chronological order. 11 live in the
+# LoL-template Google Sheets; kishla + raven-eagle ran on
+# read-the-bones.vercel.app and are synthesized into the same xlsx shape
+# by rtb_to_xlsx.py from cached API payloads in rtb/.
 SOURCES = {
-    "draft1": "1IJ90RKGsvJsjF3C8vpwoF0u5zbQHHRa6GEnZEss5EWo",
-    "draft2": "1aSjy4BenSzlMkZubCSm6Jq0fV0WjdEao2EH25VaoJbY",
+    "Mockingbird": "1IJ90RKGsvJsjF3C8vpwoF0u5zbQHHRa6GEnZEss5EWo",
+    "Yorion": "1QmNInG_tr27jdePxJoIHX3YRh8O4n7q6QDGb0VtqFSQ",
+    "Goose Mother": "1GvW_9aQT3EgsPBuRXBjZ2N4qaT8Q2UpAEgK7DRUXvfI",
+    "Baleful Strix": "1BZc5bW2iHzl-OMeM6UrUQGQFioZfYCdRGN_frCTrlgQ",
+    "Ledger Shredder": "1eHX8qG-jCvycyzkCwI1fKaQOL3wnQ2Mh_oJoROvW4lU",
+    "Kishla Skimmer": "rtb:kishla-skimmer",
+    "Raven Eagle": "rtb:raven-eagle",
+    "Hardened Academic": "1cyQKgJBBp3HEOA1ECvd3iAZ_uGn0lpOj3N3y_0G359Y",
+    "Slickshot": "1aSjy4BenSzlMkZubCSm6Jq0fV0WjdEao2EH25VaoJbY",
+    "Aven Interrupter": "1VzCUYnjbE4-jP4dK0sjFoLILe46lyu7Bml9cCpyy1vk",
+    "Skycoach Conductor": "12CEsijxs6i2oIfytVl25VZnF0Cvpwn7RNNZc6D7ml1k",
+    "Sinkhole Surveyor": "1jm5xS8MIkx6WhBthiqBshxItFIGwM0sizx_ZuHE3ZFE",
+    "Eagles of the North": "1_PMi90Uj-S3RpFeqHF_g9WmGrsIzW6cHtvY_uELydFg",
 }
+
+
+def slugify(name):
+    return name.lower().replace(" ", "-")
 TARGET_SHEET_ID = None  # create once via upload_sheet.py, then paste id here
 TITLE = "Samp Cube Roto s4 — Pick Summary"
 COMPUTED_TABS = ["Pick Summary", "Win Rates", "Color Analysis",
-                 "Maindecked Together", "Packages 2 of 3", "Packages ±1 Card"]
+                 "Maindecked Together", f"Packages 2 of {len(SOURCES)}",
+                 "Packages ±1 Card"]
 FUZZY_HEADERS = ("Avg", "Win Rate", "Score")  # float columns: rounding wiggle
 
 
@@ -40,9 +59,16 @@ def curl(url, out):
 def download_sources(src_dir):
     src_dir.mkdir(exist_ok=True)
     for name, sid in SOURCES.items():
-        curl(f"https://docs.google.com/spreadsheets/d/{sid}/export?format=xlsx",
-             src_dir / f"{name}.xlsx")
-        print(f"downloaded {name}")
+        out = src_dir / f"{slugify(name)}.xlsx"
+        if sid.startswith("rtb:"):
+            subprocess.run(
+                [sys.executable, str(HERE / "rtb_to_xlsx.py"),
+                 sid.removeprefix("rtb:"), str(out)],
+                check=True)
+        else:
+            curl(f"https://docs.google.com/spreadsheets/d/{sid}/export?format=xlsx",
+                 out)
+            print(f"downloaded {name}")
 
 
 def prefetch_pools():
@@ -122,8 +148,8 @@ def main():
 
     out_dir = HERE / "out"
     out_dir.mkdir(exist_ok=True)
-    inputs = [str(src_dir / f"{n}.xlsx") for n in SOURCES]
-    build_cmd = [sys.executable, str(HERE / "roto_summary.py")]
+    inputs = [f"{n}={src_dir / (slugify(n) + '.xlsx')}" for n in SOURCES]
+    build_cmd = [sys.executable, str(HERE / "roto_summary.py"), "--md-picks"]
 
     formulas_x = out_dir / "samp-roto-summary.xlsx"
     subprocess.run(build_cmd + [str(formulas_x)] + inputs, check=True)

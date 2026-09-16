@@ -203,6 +203,19 @@
   "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Mountain or Plains card, put it onto the battlefield, then shuffle.",
   "type_line": "Land"
  },
+ "Ark of Hunger": {
+  "cmc": 4.0,
+  "color_identity": [
+   "R",
+   "W"
+  ],
+  "colors": [
+   "R",
+   "W"
+  ],
+  "oracle_text": "Whenever one or more cards leave your graveyard, this artifact deals 1 damage to each opponent and you gain 1 life.\n{T}: Mill a card. You may play that card this turn.",
+  "type_line": "Artifact"
+ },
  "Artist's Talent": {
   "cmc": 2.0,
   "color_identity": [
@@ -574,6 +587,17 @@
   ],
   "type_line": "Land"
  },
+ "Bothersome Noisemaker": {
+  "cmc": 2.0,
+  "color_identity": [
+   "R"
+  ],
+  "colors": [
+   "R"
+  ],
+  "oracle_text": "Whenever you cast a noncreature spell, amass Goblins 1. (Put a +1/+1 counter on an Army you control. It's also a Goblin. If you don't control an Army, create a 0/0 black Goblin Army creature token first.)",
+  "type_line": "Creature \u2014 Goblin Bard"
+ },
  "Brainstorm": {
   "cmc": 1.0,
   "color_identity": [
@@ -693,6 +717,19 @@
   "oracle_text": "When this creature enters, discard your hand, then investigate four times. (To investigate, create a Clue token. It's an artifact with \"{2}, Sacrifice this token: Draw a card.\")\nAs long as you have one or fewer cards in hand, this creature gets +2/+2 and has menace.",
   "type_line": "Creature \u2014 Devil Detective"
  },
+ "Carnage, Crimson Chaos": {
+  "cmc": 4.0,
+  "color_identity": [
+   "B",
+   "R"
+  ],
+  "colors": [
+   "B",
+   "R"
+  ],
+  "oracle_text": "Trample\nWhen Carnage enters, return target creature card with mana value 3 or less from your graveyard to the battlefield. It gains \"This creature attacks each combat if able\" and \"When this creature deals combat damage to a player, sacrifice it.\"\nMayhem {B}{R}",
+  "type_line": "Legendary Creature \u2014 Symbiote Villain"
+ },
  "Casey Jones, Vigilante": {
   "cmc": 3.0,
   "color_identity": [
@@ -763,6 +800,17 @@
    "W"
   ],
   "type_line": "Land"
+ },
+ "Cemetery Gatekeeper": {
+  "cmc": 2.0,
+  "color_identity": [
+   "R"
+  ],
+  "colors": [
+   "R"
+  ],
+  "oracle_text": "First strike\nWhen this creature enters, exile a card from a graveyard.\nWhenever a player plays a land or casts a spell, if it shares a card type with the exiled card, this creature deals 2 damage to that player.",
+  "type_line": "Creature \u2014 Vampire"
  },
  "Censor": {
   "cmc": 2.0,
@@ -920,6 +968,17 @@
   ],
   "type_line": "Creature \u2014 Wall // Creature \u2014 Eye Horror"
  },
+ "Condemn": {
+  "cmc": 1.0,
+  "color_identity": [
+   "W"
+  ],
+  "colors": [
+   "W"
+  ],
+  "oracle_text": "Put target attacking creature on the bottom of its owner's library. Its controller gains life equal to its toughness.",
+  "type_line": "Instant"
+ },
  "Consider": {
   "cmc": 1.0,
   "color_identity": [
@@ -929,6 +988,17 @@
    "U"
   ],
   "oracle_text": "Surveil 1. (Look at the top card of your library. You may put it into your graveyard.)\nDraw a card.",
+  "type_line": "Instant"
+ },
+ "Consult the Star Charts": {
+  "cmc": 2.0,
+  "color_identity": [
+   "U"
+  ],
+  "colors": [
+   "U"
+  ],
+  "oracle_text": "Kicker {1}{U} (You may pay an additional {1}{U} as you cast this spell.)\nLook at the top X cards of your library, where X is the number of lands you control. Put one of those cards into your hand. If this spell was kicked, put two of those cards into your hand instead. Put the rest on the bottom of your library in a random order.",
   "type_line": "Instant"
  },
  "Cool but Rude": {
@@ -1744,6 +1814,17 @@
   "oracle_text": "You can cast spells only during your turn and you can cast no more than two spells each turn.\nYou may cast spells with mana value less than or equal to the number of lands you control without paying their mana costs.",
   "type_line": "Enchantment"
  },
+ "Fists of Flame": {
+  "cmc": 2.0,
+  "color_identity": [
+   "R"
+  ],
+  "colors": [
+   "R"
+  ],
+  "oracle_text": "Draw a card. Until end of turn, target creature gains trample and gets +1/+0 for each card you've drawn this turn. (A creature with trample can deal excess combat damage to the player or planeswalker it's attacking.)",
+  "type_line": "Instant"
+ },
  "Flame Slash": {
   "cmc": 1.0,
   "color_identity": [
@@ -2176,6 +2257,19 @@
   "oracle_text": "As long as Grist isn't on the battlefield, it's a 1/1 Insect creature in addition to its other types.\n+1: Create a 1/1 black and green Insect creature token, then mill a card. If an Insect card was milled this way, put a loyalty counter on Grist and repeat this process.\n\u22122: You may sacrifice a creature. When you do, destroy target creature or planeswalker.\n\u22125: Each opponent loses life equal to the number of creature cards in your graveyard.",
   "type_line": "Legendary Planeswalker \u2014 Grist"
  },
+ "Halana and Alena, Partners": {
+  "cmc": 4.0,
+  "color_identity": [
+   "G",
+   "R"
+  ],
+  "colors": [
+   "G",
+   "R"
+  ],
+  "oracle_text": "Reach (This creature can block creatures with flying.)\nFirst strike (This creature deals combat damage before creatures without first strike.)\nAt the beginning of combat on your turn, put X +1/+1 counters on another target creature you control, where X is Halana and Alena's power. That creature gains haste until end of turn.",
+  "type_line": "Legendary Creature \u2014 Human Ranger"
+ },
  "Haliya, Guided by Light": {
   "cmc": 3.0,
   "color_identity": [
@@ -2358,6 +2452,19 @@
    "R"
   ],
   "type_line": "Creature \u2014 Goblin Shaman"
+ },
+ "Ill-Timed Explosion": {
+  "cmc": 4.0,
+  "color_identity": [
+   "R",
+   "U"
+  ],
+  "colors": [
+   "R",
+   "U"
+  ],
+  "oracle_text": "Draw two cards. Then you may discard two cards. When you do, Ill-Timed Explosion deals X damage to each creature, where X is the greatest mana value among cards discarded this way.",
+  "type_line": "Sorcery"
  },
  "Imodane's Recruiter": {
   "cmc": 3.0,
@@ -2716,6 +2823,19 @@
   ],
   "oracle_text": "Haste\nWhenever Laelia attacks, exile the top card of your library. You may play that card this turn.\nWhenever one or more cards are put into exile from your library and/or your graveyard, put a +1/+1 counter on Laelia.",
   "type_line": "Legendary Creature \u2014 Spirit Warrior"
+ },
+ "Lazav, Wearer of Faces": {
+  "cmc": 2.0,
+  "color_identity": [
+   "B",
+   "U"
+  ],
+  "colors": [
+   "B",
+   "U"
+  ],
+  "oracle_text": "Whenever Lazav attacks, exile target card from a graveyard, then investigate. (Create a Clue token. It's an artifact with \"{2}, Sacrifice this token: Draw a card.\")\nWhenever you sacrifice a Clue, you may have Lazav become a copy of a creature card exiled with it until end of turn.",
+  "type_line": "Legendary Creature \u2014 Shapeshifter Detective"
  },
  "Ledger Shredder": {
   "cmc": 2.0,
@@ -3342,6 +3462,17 @@
   "oracle_text": "{T}: Target creature you control gains protection from the color of your choice until end of turn.",
   "type_line": "Creature \u2014 Human Cleric"
  },
+ "Mu Yanling, Wind Rider": {
+  "cmc": 4.0,
+  "color_identity": [
+   "U"
+  ],
+  "colors": [
+   "U"
+  ],
+  "oracle_text": "When Mu Yanling enters, create a 3/2 colorless Vehicle artifact token with crew 1.\nVehicles you control have flying.\nWhenever one or more creatures you control with flying deal combat damage to a player, draw a card.",
+  "type_line": "Legendary Creature \u2014 Human Wizard Pilot"
+ },
  "Multiversal Passage": {
   "cmc": 0.0,
   "color_identity": [],
@@ -3509,6 +3640,17 @@
   ],
   "oracle_text": "When this creature enters, investigate. (Create a Clue token. It's an artifact with \"{2}, Sacrifice this token: Draw a card.\")",
   "type_line": "Creature \u2014 Human Detective"
+ },
+ "Noxious Gearhulk": {
+  "cmc": 6.0,
+  "color_identity": [
+   "B"
+  ],
+  "colors": [
+   "B"
+  ],
+  "oracle_text": "Menace\nWhen this creature enters, you may destroy another target creature. If a creature is destroyed this way, you gain life equal to its toughness.",
+  "type_line": "Artifact Creature \u2014 Construct"
  },
  "Obsessive Pursuit": {
   "cmc": 2.0,
@@ -4895,6 +5037,17 @@
   ],
   "type_line": "Land"
  },
+ "Stadium Headliner": {
+  "cmc": 1.0,
+  "color_identity": [
+   "R"
+  ],
+  "colors": [
+   "R"
+  ],
+  "oracle_text": "Mobilize 1 (Whenever this creature attacks, create a tapped and attacking 1/1 red Warrior creature token. Sacrifice it at the beginning of the next end step.)\n{1}{R}, Sacrifice this creature: It deals damage equal to the number of creatures you control to target creature.",
+  "type_line": "Creature \u2014 Goblin Warrior"
+ },
  "Staff of the Storyteller": {
   "cmc": 2.0,
   "color_identity": [
@@ -4973,6 +5126,17 @@
    "W"
   ],
   "type_line": "Land"
+ },
+ "Stitcher's Supplier": {
+  "cmc": 1.0,
+  "color_identity": [
+   "B"
+  ],
+  "colors": [
+   "B"
+  ],
+  "oracle_text": "When this creature enters or dies, mill three cards. (Put the top three cards of your library into your graveyard.)",
+  "type_line": "Creature \u2014 Zombie"
  },
  "Stock Up": {
   "cmc": 3.0,
@@ -5082,6 +5246,17 @@
   "oracle_text": "Exile all creatures. Incubate X, where X is the number of creatures exiled this way. (Create an Incubator token with X +1/+1 counters on it and \"{2}: Transform this token.\" It transforms into a 0/0 Phyrexian artifact creature.)",
   "type_line": "Sorcery"
  },
+ "Sungold Sentinel": {
+  "cmc": 2.0,
+  "color_identity": [
+   "W"
+  ],
+  "colors": [
+   "W"
+  ],
+  "oracle_text": "Whenever this creature enters or attacks, exile up to one target card from a graveyard.\nCoven \u2014 {1}{W}: Choose a color. This creature gains hexproof from that color until end of turn and can't be blocked by creatures of that color this turn. Activate only if you control three or more creatures with different powers.",
+  "type_line": "Creature \u2014 Human Soldier"
+ },
  "Super Shredder": {
   "cmc": 2.0,
   "color_identity": [
@@ -5105,6 +5280,17 @@
   ],
   "oracle_text": "Mind Swap \u2014 You may have Superior Spider-Man enter as a copy of any creature card in a graveyard, except his name is Superior Spider-Man and he's a 4/4 Spider Human Hero in addition to his other types. When you do, exile that card.",
   "type_line": "Legendary Creature \u2014 Spider Human Hero"
+ },
+ "Suplex": {
+  "cmc": 2.0,
+  "color_identity": [
+   "R"
+  ],
+  "colors": [
+   "R"
+  ],
+  "oracle_text": "Choose one \u2014\n\u2022 Suplex deals 3 damage to target creature. If that creature would die this turn, exile it instead.\n\u2022 Exile target artifact.",
+  "type_line": "Sorcery"
  },
  "Surrak, Elusive Hunter": {
   "cmc": 3.0,

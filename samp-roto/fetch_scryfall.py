@@ -1,4 +1,4 @@
-"""Regenerate scryfall.json for the cube list in sources/draft1.xlsx.
+"""Regenerate scryfall.json for the union of all sources/*.xlsx cube lists.
 
 Keyed by cube card names (as typed in the Cube tab). Batched
 /cards/collection lookups via curl (urllib SSL is broken on this
@@ -23,12 +23,16 @@ FIELDS = ("cmc", "type_line", "colors", "color_identity",
 
 
 def cube_names():
-    ws = openpyxl.load_workbook(HERE / "sources" / "draft1.xlsx",
-                                data_only=True)["Cube"]
-    names, r = [], 2
-    while ws.cell(r, 2).value not in (None, ""):
-        names.append(str(ws.cell(r, 2).value).strip())
-        r += 1
+    names, seen = [], set()
+    for path in sorted((HERE / "sources").glob("*.xlsx")):
+        ws = openpyxl.load_workbook(path, data_only=True)["Cube"]
+        r = 2
+        while ws.cell(r, 2).value not in (None, ""):
+            n = str(ws.cell(r, 2).value).strip()
+            if n not in seen:
+                seen.add(n)
+                names.append(n)
+            r += 1
     return names
 
 

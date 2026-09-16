@@ -34,6 +34,22 @@ FIRST_ROUND_ROW = 4
 PLAYER_HEADER_ROW = 3
 FIRST_PLAYER_COL = 3  # column C
 
+# samp draft rules: plain snake through this round, then each traversal
+# covers two rounds — every player takes two consecutive picks (validated
+# pick-for-pick against read-the-bones pickN for kishla and raven-eagle).
+# Must be odd (the first double traversal runs right-to-left).
+DOUBLE_PICK_AFTER = 25
+
+
+def overall_pick(rnd, seat, n):
+    """True overall pick number for grid position (round, 1-based seat)."""
+    if rnd <= DOUBLE_PICK_AFTER:
+        return (rnd - 1) * n + (seat if rnd % 2 == 1 else n + 1 - seat)
+    k = (rnd - DOUBLE_PICK_AFTER - 1) // 2  # pair of rounds per traversal
+    idx = (n - seat) if k % 2 == 0 else (seat - 1)
+    return (DOUBLE_PICK_AFTER * n + k * 2 * n + 2 * idx + 1
+            + (rnd - DOUBLE_PICK_AFTER - 1 - 2 * k))
+
 
 @dataclass
 class Pick:
@@ -72,15 +88,12 @@ def parse_draft(path, name):
         cards = [ws.cell(row, FIRST_PLAYER_COL + i).value for i in range(n)]
         cards = [str(c).strip() if c is not None else None for c in cards]
         draft.rounds.append(cards)
-        # snake: odd rounds left-to-right, even rounds right-to-left
-        order = range(n) if rnd % 2 == 1 else range(n - 1, -1, -1)
-        for pos, seat in enumerate(order):
-            card = cards[seat]
+        for seat0, card in enumerate(cards):
             if card:
-                overall = (rnd - 1) * n + pos + 1
+                overall = overall_pick(rnd, seat0 + 1, n)
                 if card in draft.picks:
                     print(f"warning: {name}: {card!r} picked twice", file=sys.stderr)
-                draft.picks[card] = Pick(rnd, overall, players[seat])
+                draft.picks[card] = Pick(rnd, overall, players[seat0])
         row += 1
 
     draft.records = {p: [0, 0] for p in players}
@@ -526,7 +539,7 @@ def build_package_tabs(wb, drafts, cube, decks):
     groups = pk.signature_groups(owners)
     scry = pk.load_scryfall()
 
-    ws = wb.create_sheet("Packages 2 of 3")
+    ws = wb.create_sheet(f"Packages 2 of {len(drafts)}")
     header = ["#", "Size", "Colors", "Cards", "Deck A", "Deck B", "Contains Strict"]
     ws.append(header)
     style_header(ws)
@@ -689,14 +702,21 @@ def build_workbook(drafts, cube, availability, formulas=True, decks=None, links=
             rng = f"'{d.name}'!$B$2:${get_column_letter(1 + n)}${last}"
             rcol = f"'{d.name}'!$A$2:$A${last}"
             rc = f"{get_column_letter(4 + 3 * i)}{r}"
-            seat = f"SUMPRODUCT(({rng}=$A{r})*COLUMN({rng}))-1"
+            seat = f"(SUMPRODUCT(({rng}=$A{r})*COLUMN({rng}))-1)"
             row.append(
                 f'=IF(SUMPRODUCT(--({rng}=$A{r}))=0,"",'
                 f"SUMPRODUCT(({rng}=$A{r})*{rcol}))"
             )
+            # true overall pick: plain snake through DOUBLE_PICK_AFTER, then
+            # two consecutive rounds per traversal (see overall_pick)
+            dp = DOUBLE_PICK_AFTER
+            k = f"INT(({rc}-{dp + 1})/2)"
             row.append(
-                f'=IF({rc}="","",({rc}-1)*{n}'
-                f"+IF(ISODD({rc}),{seat},{n}+1-({seat})))"
+                f'=IF({rc}="","",IF({rc}<={dp},'
+                f"({rc}-1)*{n}+IF(ISODD({rc}),{seat},{n}+1-{seat}),"
+                f"{dp * n}+{k}*{2 * n}"
+                f"+2*IF(ISEVEN({k}),{n}-{seat},{seat}-1)"
+                f"+1+MOD({rc}-{dp + 1},2)))"
             )
             row.append(
                 f"=IFERROR(VLOOKUP($A{r},'Win Rates'!$A:${wr_end},"
@@ -774,7 +794,7 @@ def build_workbook(drafts, cube, availability, formulas=True, decks=None, links=
         ws.column_dimensions[col].width = w
 
     order = ["Pick Summary", "Color Analysis", "Maindecked Together",
-             "Packages 2 of 3", "Packages ±1 Card", "Card List"]
+             f"Packages 2 of {len(drafts)}", "Packages ±1 Card", "Card List"]
     order += [d.name for d in drafts]
     order += ["Records", "Decks", "Deck Links", "Win Rates"]
     wb._sheets = [wb[name] for name in order]
@@ -958,14 +978,18 @@ def build_win_rates(wb, drafts, cube, formulas, decks):
 def main():
     args = sys.argv[1:]
     formulas = "--values" not in args
-    args = [a for a in args if a != "--values"]
+    md_picks = "--md-picks" in args
+    args = [a for a in args if a not in ("--values", "--md-picks")]
     if len(args) < 2:
         sys.exit(__doc__)
     out, inputs = args[0], args[1:]
 
     drafts, cube, seen, availability = [], [], set(), {}
-    for i, path in enumerate(inputs):
-        draft, cube_list = parse_draft(path, f"Draft {i + 1}")
+    for i, spec in enumerate(inputs):
+        name, _, path = spec.rpartition("=")
+        if not name:
+            name, path = f"Draft {i + 1}", spec
+        draft, cube_list = parse_draft(path, name)
         drafts.append(draft)
         for entry in cube_list:
             availability[entry[0]] = availability.get(entry[0], 0) + 1
@@ -983,6 +1007,11 @@ def main():
             if card in seen:
                 continue
             fixed = canonical.get(card.casefold())
+            if not fixed:  # hand-typed shorthand, e.g. 'air temple'
+                subs = [c for k, c in canonical.items() if card.casefold() in k]
+                if len(subs) == 1:
+                    fixed = subs[0]
+                    print(f"note: {d.name}: pick {card!r} -> {fixed!r}", file=sys.stderr)
             if fixed:
                 d.picks[fixed] = d.picks.pop(card)
             else:
@@ -990,7 +1019,13 @@ def main():
 
     decks_path = pathlib.Path(__file__).parent / "decks.tsv"
     decks, links = {}, []
-    if decks_path.exists():
+    if md_picks:
+        # v1 semantics: every drafted card counts as maindecked (real
+        # decklists — sealeddeck pools and deck pics — come later)
+        for d in drafts:
+            for card, p in d.picks.items():
+                decks.setdefault((d.name, p.player), {})[card] = "main"
+    elif decks_path.exists():
         decks, main_sizes, links = load_decks(decks_path, cube)
         check_deck_coverage(decks, main_sizes, drafts)
     build_workbook(
