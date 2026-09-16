@@ -272,30 +272,12 @@ document.addEventListener('click', e => {
         f"back {len(lanes)} of them — and they sort themselves into "
         "three families:</p>")
 
-    out.append("<h2>Two Mardu aggro decks</h2>")
-    out.append(f"<h3>{mana('WR')} Boros Tokens</h3>")
-    out.append(lane_block(tokens))
-    out.append(f"<h3>{mana('BR')} Rakdos Sac</h3>")
-    out.append(lane_block(sac))
-
-    out.append("<h2>Three green decks</h2>")
-    out.append(f"<h3>{mana('URG')} Five-color Temur Ramp</h3>")
-    out.append(lane_block(temur_ramp))
-    out.append(f"<h3>{mana('BG')} Five-color Golgari Ramp</h3>")
-    out.append(lane_block(golgari_ramp))
-    out.append(f"<h3>{mana('G')} Golgari Graveyard</h3>")
-    out.append(lane_block(graveyard))
-
-    out.append("<h2>Two blue decks</h2>")
-    out.append(f"<h3>{mana('UR')} Control</h3>")
-    out.append(lane_block(blue_spells))
-    out.append(f"<h3>{mana('U')} Tempo</h3>")
-    out.append(lane_block(blue_tempo))
-
-    # --- bridges and free pairs ---------------------------------------
     LANE_NAME = {"WR": "Tokens", "BR": "Sac", "URG": "Temur Ramp",
                  "BG": "Golgari Ramp", "G": "Graveyard",
                  "UR": "Control", "U": "Tempo"}
+    FAMILY = {"Tokens": "Aggro", "Sac": "Aggro", "Temur Ramp": "Green",
+              "Golgari Ramp": "Green", "Graveyard": "Green",
+              "Control": "Blue", "Tempo": "Blue"}
     lane_of_deck = {}
     for lsig, lcards in lanes:
         nm = LANE_NAME[colors_of(lcards)]
@@ -303,7 +285,7 @@ document.addEventListener('click', e => {
             lane_of_deck.setdefault((k, pl), []).append(nm)
 
     def classify(psig):
-        for lsig, lcards in lanes:
+        for lsig, _ in lanes:
             if sum(a == b for a, b in zip(psig, lsig)) >= 2:
                 return "satellite"
         touched = set()
@@ -322,17 +304,43 @@ document.addEventListener('click', e => {
     free = [(psig, pc) for psig, pc in pair_teams
             if classify(psig) == "free"]
 
-    out.append("<h2>The bridges</h2>")
-    out.append("<p class='meta'><span class='todo'>TODO: framing — "
-               "pairs whose decks belong to two different lanes; every "
-               "bridge stays inside one family.</span></p>")
-    for psig, pcards in bridges:
-        touched = set()
-        for k, pl in enumerate(psig):
-            touched.update(lane_of_deck.get((k, pl), []))
-        out.append(f"<div class='pairs'>{pair_span(pcards)}"
-                   f"<span class='meta' style='margin-left:10px'>"
-                   f"{' ↔ '.join(sorted(touched))}</span></div>")
+    def family_bridges(fam):
+        h = []
+        for psig, pcards in bridges:
+            touched = set()
+            for k, pl in enumerate(psig):
+                touched.update(lane_of_deck.get((k, pl), []))
+            if {FAMILY[nm] for nm in touched} == {fam}:
+                h.append(f"<div class='pairs'>{pair_span(pcards)}"
+                         f"<span class='meta' style='margin-left:10px'>"
+                         f"{' ↔ '.join(sorted(touched))}</span></div>")
+        if h:
+            return ("<p class='meta'>Bridges — pairs whose decks span "
+                    "two of this family's lanes:</p>" + "".join(h))
+        return ""
+
+    out.append("<h2>Two Mardu aggro decks</h2>")
+    out.append(f"<h3>{mana('WR')} Boros Tokens</h3>")
+    out.append(lane_block(tokens))
+    out.append(f"<h3>{mana('BR')} Rakdos Sac</h3>")
+    out.append(lane_block(sac))
+    out.append(family_bridges("Aggro"))
+
+    out.append("<h2>Three green decks</h2>")
+    out.append(f"<h3>{mana('URG')} Five-color Temur Ramp</h3>")
+    out.append(lane_block(temur_ramp))
+    out.append(f"<h3>{mana('BG')} Five-color Golgari Ramp</h3>")
+    out.append(lane_block(golgari_ramp))
+    out.append(f"<h3>{mana('G')} Golgari Graveyard</h3>")
+    out.append(lane_block(graveyard))
+    out.append(family_bridges("Green"))
+
+    out.append("<h2>Two blue decks</h2>")
+    out.append(f"<h3>{mana('UR')} Control</h3>")
+    out.append(lane_block(blue_spells))
+    out.append(f"<h3>{mana('U')} Tempo</h3>")
+    out.append(lane_block(blue_tempo))
+    out.append(family_bridges("Blue"))
 
     out.append("<h2>The free pairs</h2>")
     out.append("<p class='meta'><span class='todo'>TODO: framing — "
