@@ -373,8 +373,9 @@ document.addEventListener('click', e => {
             sj, cj = lanes[j]
             common = [(k, si[k]) for k in range(len(si)) if si[k] == sj[k]]
             if common:
-                shared.append((core_name(ci),
-                               core_name(cj), common))
+                shared.append((f"{mana(colors_of(ci))} {core_name(ci)}",
+                               f"{mana(colors_of(cj))} {core_name(cj)}",
+                               common))
     out.append("<h2>How the cores group</h2>")
     out.append(
         "<p>The seven cores are not seven islands. Sort them by which "
