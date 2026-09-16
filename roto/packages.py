@@ -257,6 +257,17 @@ def theme_str(cards, themes):
     return ", ".join(seen)
 
 
+def is_land(name, scry):
+    """Front-face land check (MDFC spell//land faces count as nonland)."""
+    return "Land" in scry[name]["type_line"].split(" // ")[0]
+
+
+def nonland_owners(owners, scry):
+    """Restrict the maindeck-owners map to nonland cards — the whole
+    analysis then ignores lands (lane cores become 3+ nonland cards)."""
+    return {c: sig for c, sig in owners.items() if not is_land(c, scry)}
+
+
 def deck_sets(owners):
     """(draft index, player) -> set of cards maindecked in that deck."""
     by_deck = defaultdict(set)
@@ -456,6 +467,8 @@ def report_null(drafts, cube, decks, iters, seed):
 def main():
     drafts, cube, decks = load()
     owners = maindeck_owners(drafts, cube, decks)
+    if "--nonland" in sys.argv:
+        owners = nonland_owners(owners, load_scryfall())
     groups = signature_groups(owners)
     edges = package_edges(groups)
     comps = components(groups, edges)

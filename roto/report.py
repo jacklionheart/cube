@@ -17,6 +17,7 @@ import html
 import pathlib
 
 from packages import (card_colors, deck_sets, flex_packages, load,
+                      nonland_owners,
                       load_scryfall, load_themes, maindeck_owners,
                       never_drafted, never_maindecked, signature_groups,
                       theme_str)
@@ -111,12 +112,12 @@ def chip(card, colors):
 
 def main():
     drafts, cube, decks = load()
-    owners = maindeck_owners(drafts, cube, decks)
+    scry = load_scryfall()
+    owners = nonland_owners(maindeck_owners(drafts, cube, decks), scry)
     groups = signature_groups(owners)
     flex = flex_packages(groups, owners)
     by_deck = deck_sets(owners)
     themes = load_themes()
-    scry = load_scryfall()
     colors = {c: card_colors(c, scry) for c, _, _ in cube}
 
     _, _, links = load_decks(HERE / "decks.tsv", cube)
@@ -153,7 +154,8 @@ def main():
            "together in all three drafts, by three different people. "
            "<b>Flex</b>: a lane's orbit — cards that rode with the full "
            "core in two of its three decks. <b>Banger</b>: maindecked in "
-           "every pod, in no lane core. Deck links go to sealeddeck.tech; "
+           "every pod, in no lane core. Lands are ignored throughout. Deck "
+           "links go to sealeddeck.tech; "
            "method and caveats at the end.</p>"]
 
     # -- Opening charts ------------------------------------------------
@@ -389,7 +391,7 @@ showGrp('{present[0]}');
         out.append(f"<div class='lane'><h3>{drafts[k].name}: "
                    f"{mana(colors_of(cards))} {deck_link(k, p)}</h3>")
         out.append(f"<p class='meta'>{len(distinct)} of {len(cards)} "
-                   f"nonbasic cards sit outside every lane (in no core or "
+                   f"nonland cards sit outside every lane (in no core or "
                    f"flex — though other decks may also run them):</p>")
         out.append("<p>" + ", ".join(chip(c, colors)
                    for c in distinct) + "</p>")
@@ -493,13 +495,16 @@ showGrp('{present[0]}');
         "lists all 45 picks). A companion in the sideboard slot counts "
         "as maindecked only if the deck passes its deckbuilding "
         "requirement — e.g. one of the three Lurrus decks fails the "
-        "mana-value test and is treated as a true sideboard card.</p>"
+        "mana-value test and is treated as a true sideboard card. "
+        "Lands are excluded from the entire analysis: a lane is 3+ "
+        "nonland cards.</p>"
         "<p class='meta'>Are lanes real? A permutation test keeps every "
         "player's picks and re-deals each maindeck as a random same-size "
-        "subset, 2,000 times: random deckbuilding averages 5.6 lanes / "
-        "20 lane-cards / largest 5 — it never once produced this data's "
-        "11 lanes, 53 lane-cards, or a 10-card core. The lane structure "
-        "is deliberate deckbuilding, not a pick-pool artifact.</p>"
+        "subset, 2,000 times: random deckbuilding averages 3.1 lanes / "
+        "10 lane-cards / largest ~4 — it never once produced this "
+        "data's 34 lane-cards or a 9-card core (7 lanes: p = .003). "
+        "The lane structure is deliberate deckbuilding, not a "
+        "pick-pool artifact.</p>"
         "<p class='meta'>Caveats: n = 3 drafts in one community; themes "
         "are hand-labeled; win rates are deliberately absent. Everything "
         "regenerates from the draft sheets via packages.py.</p>")
