@@ -49,7 +49,7 @@ def slugify(name):
 TARGET_SHEET_ID = "1VcZrPKd_UypiJUpbs3CJ6-ysmBhkGapnq8VJ3duJ3cc"
 TITLE = "Samp Cube Roto s4 — Pick Summary"
 COMPUTED_TABS = ["Pick Summary", "Win Rates", "Color Analysis",
-                 "Lanes (shared drafts)", f"Teams (2 of {len(SOURCES)})"]
+                 "Packages"]
 FUZZY_HEADERS = ("Avg", "Win Rate", "Score")  # float columns: rounding wiggle
 
 

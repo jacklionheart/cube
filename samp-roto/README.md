@@ -40,13 +40,12 @@ Google Sheet, at feature parity with the LoL roto sheet (`../roto/`).
   decks show blank MD, like LoL. `--md-picks` remains as a fallback
   mode (drafted = maindecked). Alternate-name pools are aliased
   (DECK_CARD_ALIASES: 'the scouring stormsoul' = Sandman).
-- **Lanes rescaled**: one shared owner-signature across 13 pods never
-  happens, so a lane is a connected component of the co-maindeck graph
-  (edges: co-maindecked in >= LANE_MIN_CO=6 of the 11 decked drafts),
-  with per-draft Host columns. Teams keep the LoL pair-core definition
-  at MIN_PAIR_CORE=12. `lane_compare.py` renders the definition
-  comparison (maximal same-deck groups at 7/6/5 support vs component
-  lanes) as an essay-style report.
+- **Packages tab** (replaces Lanes/Teams): every nonland card set
+  (pairs and bigger) whose whole set sat in one maindeck in more than
+  half of the drafts with known decklists. Subsets included; filter
+  the Maximal column to Y for non-subsets. Host columns name the
+  certifying deck per draft; W/L totals their match records.
+  `lane_compare.py` remains as the definition-exploration report.
 - Duplicated lands ("Hallowed Fountain 2") follow the template's suffix
   convention; `fetch_scryfall.py` strips the suffix for lookups and
   unions all 13 cube lists (556 cards; lists drift between waves).
