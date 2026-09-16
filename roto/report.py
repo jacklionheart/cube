@@ -471,14 +471,14 @@ showGrp('{present[0]}');
         pname = " + ".join(chip(c, colors) for c in pcards)
         lane_lab = (f"P{li + 1} {theme_str(lcards, themes) or ''} "
                     f"{mana(colors_of(lcards))}")
-        rides = ", ".join(f"{drafts[k].name} {html.escape(psig[k])}"
+        rides = ", ".join(f"{drafts[k].name} {deck_link(k, psig[k])}"
                           for k in agree)
         out.append(f"<tr><td>{pname}</td><td>{lane_lab}</td>"
                    f"<td>{rides}</td>"
                    f"<td>{drafts[k3].name} "
                    f"{mana(colors_of(by_deck[(k3, psig[k3])]))} "
                    f"{deck_link(k3, psig[k3])}</td>"
-                   f"<td>{html.escape(lsig[k3])}</td></tr>")
+                   f"<td>{deck_link(k3, lsig[k3])}</td></tr>")
     out.append("</table>")
 
     # -- Section 4: decks that carved their own lanes ------------------
