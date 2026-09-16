@@ -58,6 +58,10 @@ a:hover { text-decoration-color: #1a1a1a; }
 .pairs { margin: 8px 0 16px; }
 .pair { display: inline-flex; gap: 2px; margin: 3px 10px 3px 0; }
 .pair img { width: 104px; border-radius: 5px; }
+#hovercard { position: fixed; display: none; z-index: 10;
+             pointer-events: none; }
+#hovercard img { width: 250px; border-radius: 12px;
+                 box-shadow: 0 6px 18px rgba(0,0,0,.28); }
 .mana { width: 13px; height: 13px; vertical-align: -1px;
         margin-right: 1px; }
 .flex-list { font-size: 16px; margin: 6px 0 14px; padding-left: 22px; }
@@ -108,15 +112,20 @@ def mana(letters):
         f"{s}.svg' alt='{s}'>" for s in syms)
 
 
+IMG = {}
+
+
 def chip(card, colors):
     from urllib.parse import quote
-    return (f'<a href="https://scryfall.com/search?q=!%22{quote(card)}%22">'
-            f'{html.escape(card)}</a>')
+    img = IMG.get(card, {}).get("image", "")
+    return (f'<a href="https://scryfall.com/search?q=!%22{quote(card)}%22"'
+            f' data-img="{img}">{html.escape(card)}</a>')
 
 
 def main():
     drafts, cube, decks = load()
     scry = load_scryfall()
+    IMG.update(scry)
     owners = nonland_owners(maindeck_owners(drafts, cube, decks), scry)
     groups = signature_groups(owners)
     flex = flex_packages(groups, owners)
@@ -550,6 +559,26 @@ showGrp('{present[0]}');
         "<p class='meta'>Caveats: n = 3 drafts in one community; themes "
         "are hand-labeled; win rates are deliberately absent. Everything "
         "regenerates from the draft sheets via packages.py.</p>")
+
+    out.append("""<div id='hovercard'><img alt=''></div>
+<script>
+const hc = document.getElementById('hovercard');
+const hcImg = hc.querySelector('img');
+document.addEventListener('mouseover', e => {
+  const a = e.target.closest('a[data-img]');
+  if (a && a.dataset.img) { hcImg.src = a.dataset.img;
+    hc.style.display = 'block'; }
+  else if (!e.target.closest('#hovercard')) hc.style.display = 'none';
+});
+document.addEventListener('mousemove', e => {
+  if (hc.style.display !== 'block') return;
+  const w = 250, h = 349;
+  let x = e.clientX + 16, y = e.clientY + 12;
+  if (x + w > innerWidth - 8) x = e.clientX - w - 16;
+  if (y + h > innerHeight - 8) y = innerHeight - h - 8;
+  hc.style.left = x + 'px'; hc.style.top = Math.max(8, y) + 'px';
+});
+</script>""")
 
     dest = HERE / "out" / "lane-report.html"
     dest.parent.mkdir(exist_ok=True)
