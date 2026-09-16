@@ -71,6 +71,17 @@ th, td { padding: 6px 16px 6px 0; border-bottom: 1px solid #e8e8e8;
 .sbh { font: 600 11px -apple-system, 'Segoe UI', Helvetica, sans-serif;
        text-transform: uppercase; letter-spacing: .06em; color: #999;
        margin: 12px 0 2px; }
+.seats { display: grid; grid-template-columns: repeat(3, 1fr);
+         gap: 16px; margin: 18px 0;
+         font: 13px -apple-system, 'Segoe UI', Helvetica, sans-serif; }
+.seat { padding: 5px 9px; border-radius: 7px; margin: 4px 0;
+        border: 1px solid transparent; }
+.seat span { display: block; font-size: 11px; color: #6b6b6b; }
+.sAggro { background: #f7ebe8; } .sGreen { background: #ebf3e8; }
+.sBlue { background: #e8eff6; }
+.sRect { background: #fff; border: 1px dashed #b5b0a8; }
+.sLone { background: #f2f2f2; color: #6b6b6b; }
+.adj { border: 1px dashed #c9a; }
 #hovercard { position: fixed; display: none; z-index: 10;
              pointer-events: none; }
 #hovercard img { width: 250px; border-radius: 12px;
@@ -636,6 +647,73 @@ document.addEventListener('click', e => {
         out.append(f"<tr><td>{drafts[k].name} {html.escape(pl)}</td>"
                    f"<td>{fit}</td></tr>")
     out.append("</table>")
+
+    # --- the seat chart -----------------------------------------------
+    def seat_lean(k, pl):
+        """Strongest non-free affiliation of a core-less deck."""
+        labs = Counter()
+        for psig, _ in pair_teams:
+            if psig[k] != pl:
+                continue
+            for lsig, lcards in lanes:
+                if sum(a == b for a, b in zip(psig, lsig)) >= 2:
+                    labs[core_name(lcards)] += 1
+                    break
+            else:
+                if classify(psig) != "free":
+                    for kk, ppl in enumerate(psig):
+                        for nm in lane_of_deck.get((kk, ppl), []):
+                            labs[nm] += 1
+        return labs.most_common(1)[0][0] if labs else None
+
+    FAM_ORDER = ["Aggro", "Green", "Blue"]
+    out.append("<h2>The seat chart</h2>")
+    out.append(
+        "<p>Put it all together and every pod resolves to the same "
+        "shape: six drafters own the seven cores (one always doubles "
+        "up, always in green), two or three more are Rectangles "
+        "decks, and at most one deck sits outside the system "
+        "entirely. The one wrinkle is Arason — the only drafter in "
+        "any pod who filled a family's seat without owning one of "
+        "its cores.</p>")
+    out.append("<div class='seats'>")
+    for k, d in enumerate(drafts):
+        col = [f"<div><div class='sbh'>{d.name}</div>"]
+        rows = []
+        for pl in d.players:
+            cores_own = lane_of_deck.get((k, pl), [])
+            nm = html.escape(pl)
+            if cores_own:
+                fam = FAMILY[cores_own[0]]
+                lab = " + ".join(deck_core_lab[(k, pl)])
+                rows.append((0, FAM_ORDER.index(fam),
+                             f"<div class='seat s{fam}'>{nm}"
+                             f"<span>{lab}</span></div>"))
+            else:
+                main = coreless_label(k, pl)
+                if main == "Rectangles":
+                    lean = seat_lean(k, pl)
+                    lab = (f"Rectangles &middot; leans {lean}"
+                           if lean else "Rectangles")
+                    rows.append((2, 0, f"<div class='seat sRect'>{nm}"
+                                 f"<span>{lab}</span></div>"))
+                elif main:
+                    fam = FAMILY[main]
+                    rows.append((1, FAM_ORDER.index(fam),
+                                 f"<div class='seat s{fam} adj'>{nm}"
+                                 f"<span>{main} adjunct — no core"
+                                 f"</span></div>"))
+                else:
+                    rows.append((3, 0, f"<div class='seat sLone'>{nm}"
+                                 f"<span>no teams at all</span></div>"))
+        col += [h for _, __, h in sorted(rows, key=lambda r: r[:2])]
+        col.append("</div>")
+        out.append("".join(col))
+    out.append("</div>")
+    out.append("<p class='meta'>Every deck in every pod, by its place "
+               "in the team system. Tinted = owns a core (its family's "
+               "color). Dashed pink = family adjunct via pairs only. "
+               "Dashed white = Rectangles deck. Gray = no teams.</p>")
 
     # --- bar graph: cards in teams by color identity + pair gallery ---
     ident = Counter()
