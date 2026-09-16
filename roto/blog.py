@@ -164,7 +164,7 @@ def main():
 
     def lane_block(entry):
         sig, cards = entry
-        h = [gallery(cards)]
+        h = []
         sats = satellites(sig)
         if sats:
             h.append("<p class='meta'>Satellites — pairs kept by two of "
@@ -191,8 +191,13 @@ def main():
     out = [f"<meta charset='utf-8'><title>Three Rotos, One Cube</title>"
            f"<style>{CSS}</style>"]
     out.append("<h1>Three Rotos, One Cube</h1>")
-    out.append("<p class='meta'><span class='todo'>TODO: byline / hook "
-               "in Jack's voice</span></p>")
+    out.append(
+        "<p>Twenty-eight drafters. Three rotisserie pods. Five hundred "
+        "and forty cards, every pick public, every deck recovered. "
+        "When three groups of people who never talked to each other "
+        "keep building the same things, that's not taste — that's the "
+        "cube talking. <span class='todo'>[draft — make it yours]"
+        "</span></p>")
     out.append(
         "<p>The goal of this essay is a 10,000-foot view of the "
         "Lords of Limited Cube — drawn not from card evaluations but "
@@ -292,6 +297,20 @@ document.addEventListener('click', e => {
         return ""
 
     out.append("<h2>Two Mardu aggro decks</h2>")
+    out.append(
+        "<p>The aggro seats resolved into two cores that live one pip "
+        "apart. Boros Tokens is the largest and most stable structure "
+        "in the data — nine cards that three different drafters "
+        "assembled almost identically, a deck the cube practically "
+        "deals to whoever sits down in it. Rakdos Sac is its darker "
+        "sibling: Deadly Dispute, Marionette Apprentice, and Mayhem "
+        "Devil forming the sacrifice engine every pod rebuilt. The "
+        "two bridges below are why these read as one Mardu family — "
+        "Bastion of Remembrance and Voice of Victory, Magda and "
+        "Torch the Tower each lived in a Sac deck in one pod and a "
+        "Tokens deck in another. The white and red halves bleed into "
+        "each other; the black-red core just decides which half "
+        "you're in.</p>")
     out.append(f"<h3>{mana('WR')} Boros Tokens</h3>")
     out.append(lane_block(tokens))
     out.append(f"<h3>{mana('BR')} Rakdos Sac</h3>")
@@ -299,6 +318,15 @@ document.addEventListener('click', e => {
     out.append(family_bridges("Aggro"))
 
     out.append("<h2>Three green decks</h2>")
+    out.append(
+        "<p>Green produced three cores and one connected engine room. "
+        "The two ramp cores — the five-color Fires-of-Invention pile "
+        "and the Pizza build — share two of their three drafters, "
+        "which is to say: the people who ramp, ramp both ways. "
+        "Graveyard is the third leg, a mono-green Spider Spawning "
+        "value core that shares a drafter with Temur Ramp. Where "
+        "Aggro splits into two clean decks, Green is one ecosystem "
+        "with three stable expressions.</p>")
     out.append(f"<h3>{mana('URG')} Five-color Temur Ramp</h3>")
     out.append(lane_block(temur_ramp))
     out.append(f"<h3>{mana('BG')} Five-color Golgari Ramp</h3>")
@@ -308,6 +336,14 @@ document.addEventListener('click', e => {
     out.append(family_bridges("Green"))
 
     out.append("<h2>Two blue decks</h2>")
+    out.append(
+        "<p>Blue split along the oldest line there is: do you want to "
+        "answer things or untap and win. The Control core is pure "
+        "spell velocity — Consider, Think Twice, Expressive Iteration, "
+        "Demon Bolt. The Tempo core is the Censor-Quench-Shoreline "
+        "Looter package that taxes and chips. Hieroglyphic "
+        "Illumination and Lórien Revealed ride with both, the "
+        "card-flow glue of the family.</p>")
     out.append(f"<h3>{mana('UR')} Control</h3>")
     out.append(lane_block(blue_spells))
     out.append(f"<h3>{mana('U')} Tempo</h3>")
@@ -325,10 +361,11 @@ document.addEventListener('click', e => {
                 shared.append((LANE_NAME[colors_of(ci)],
                                LANE_NAME[colors_of(cj)], common))
     out.append("<h2>How the cores group</h2>")
-    out.append("<p class='meta'><span class='todo'>TODO: prose — the "
-               "seven cores collapse into three families (Aggro, Green, "
-               "Blue). The mechanical evidence: cores sharing decks."
-               "</span></p>")
+    out.append(
+        "<p>The seven cores are not seven islands. Sort them by which "
+        "actual decks they ran through and they collapse into the "
+        "three families above — and the grouping isn't aesthetic, "
+        "it's mechanical:</p>")
     for n1, n2, common in shared:
         cc = ", ".join(deck_link(k, pl) for k, pl in common)
         out.append(f"<p class='meta'>{n1} and {n2} share {cc}</p>")
@@ -336,10 +373,13 @@ document.addEventListener('click', e => {
     # --- categorizing the pairs ---------------------------------------
     out.append("<h2>Categorizing the pairs</h2>")
     out.append("<h3>Contested part of a core</h3>")
-    out.append("<p class='meta'><span class='todo'>TODO: prose — the "
-               "pair sat in two of a core's three decks; in the third "
-               "pod it was contested away, landing either with a macro "
-               "sibling or an unassociated deck.</span></p>")
+    out.append(
+        "<p>A contested pair is core material that got away once: it "
+        "sat in two of a core's three decks, and in the third pod "
+        "someone else took it. Every one of the five follows the same "
+        "law — the third deck is either a sibling from the same "
+        "family, or one of the unassociated decks. No pair was ever "
+        "contested <i>across</i> families.</p>")
     for psig, pcards in pair_teams:
         best = None
         for lsig, lcards in lanes:
@@ -366,10 +406,15 @@ document.addEventListener('click', e => {
                    f"{deck_link(k3, psig[k3])} ({kind})</span></div>")
 
     out.append("<h2>The Rectangles</h2>")
-    out.append("<p class='meta'><span class='todo'>TODO: framing — the "
-               "pairs living outside the core system, labeled as one "
-               "family: Rectangles. The eighth core that never quite "
-               "assembled.</span></p><div class='pairs'>")
+    out.append(
+        "<p>Seven pairs live entirely outside the core system — no "
+        "core claims two of their decks, no two cores share them. "
+        "Look at them together and they stop looking like leftovers: "
+        "white-black drain enchantments, white auras and adventures, "
+        "blue rooms and cases. We call the family Rectangles. It is "
+        "the eighth core that never quite assembled — the bonds kept "
+        "forming, in every pod, and never found their third card."
+        "</p><div class='pairs'>")
     for psig, pcards in free:
         out.append(pair_span(pcards))
     out.append("</div>")
@@ -392,10 +437,15 @@ document.addEventListener('click', e => {
                  for pl in d.players if (k, pl) not in lane_own_x]
     from collections import Counter as _Cn
     out.append("<h2>Where the core-less decks fit</h2>")
-    out.append("<p class='meta'><span class='todo'>TODO: framing — "
-               "label each pair, then ask which cores the ten decks "
-               "outside the core system were actually drafting."
-               "</span></p>")
+    out.append(
+        "<p>Ten decks own no core. Label every pair with its family "
+        "and ask what those ten decks were actually doing, and the "
+        "answer is mostly one word: Rectangles. Six of the nine "
+        "pair-holding decks touch it, and nothing else comes close. "
+        "Arason is the exception that proves the family system — his "
+        "equipment deck is functionally Sac's third seat — and roc "
+        "and ColdBrewNate lean Blue. One deck fits nothing at all; "
+        "he gets his own section.</p>")
     out.append("<table><tr><th>Deck</th><th>Their pairs say</th></tr>")
     for k, pl in no_lane_x:
         my = [pair_label(psig) for psig, _ in pair_teams if psig[k] == pl]
@@ -414,8 +464,9 @@ document.addEventListener('click', e => {
         if len(cl) >= 2:
             ident[cl] += len(cards)
     out.append("<h2>Where the teams live</h2>")
-    out.append("<p class='meta'><span class='todo'>TODO: framing "
-               "sentence</span></p>")
+    out.append(
+        "<p>Add the pairs to the cores and count where the teams "
+        "actually live:</p>")
     mx = max(ident.values())
     out.append("<div class='vchart'>")
     for cl, n in sorted(ident.items(), key=lambda x: -x[1]):
@@ -472,8 +523,11 @@ showPairs('{order[0]}');
         url = url_map.get((drafts[k].name, pl))
         link = (f'<a href="{url}">sealeddeck</a>' if url else "")
         out.append(f"<h2>The {html.escape(pl)} deck</h2>")
-        out.append("<p class='meta'><span class='todo'>TODO: "
-                   "celebration prose</span></p>")
+        out.append(
+            "<p>Raise a glass. Twenty-seven drafters built decks made "
+            "of teams — combinations the other pods discovered too. "
+            "One did not. <span class='todo'>[draft — make it yours]"
+            "</span></p>")
         out.append(
             f"<p>Every other drafter — all 27 of them — built a deck "
             f"containing at least one team: some two-card combination "
