@@ -42,6 +42,7 @@ a:hover { text-decoration: underline; }
          border-radius: 8px; padding: 0 8px; font-size: 12px; }
 .cards { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
 .cards img { width: 160px; border-radius: 7px; }
+.bangers img { width: 132px; }
 .flex-list { font-size: 13px; margin: 4px 0 12px; }
 .flex-list li { margin: 2px 0; }
 .chip { display: inline-block; border: 1px solid #bbb; border-radius: 10px;
@@ -188,13 +189,15 @@ def main():
     for g in group_order:
         if not by_grp[g]:
             continue
-        items = []
+        out.append(f"<h4>{g} ({len(by_grp[g])})</h4>"
+                   f"<div class='cards bangers'>")
         for c in by_grp[g]:
-            tag = (f" <span class='kept'>P{flex_of[c] + 1}</span>"
-                   if c in flex_of else "")
-            items.append(f"{chip(c, colors)}{tag}")
-        out.append(f"<p class='meta'><b>{g}</b> ({len(by_grp[g])})</p>"
-                   f"<p>{' '.join(items)}</p>")
+            img = scry[c].get("image")
+            tag = (f"<div class='kept' style='text-align:center'>"
+                   f"P{flex_of[c] + 1} flex</div>" if c in flex_of else "")
+            out.append(f"<div><img src='{img}' alt='{html.escape(c)}' "
+                       f"title='{html.escape(c)}' loading='lazy'>{tag}</div>")
+        out.append("</div>")
 
     # -- Section 4: decks that carved their own lanes ------------------
     claimed = set()
