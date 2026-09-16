@@ -254,14 +254,18 @@ def main():
         f"{guild(counts0[0][0])} is the most-laned color pair; "
         f"{zstr} never made a lane", rows0, "lanes"))
     team_classes = signature_groups(owners, min_size=2)
-    team_cards = [c for _, cards in team_classes for c in cards]
-    ident = Counter(colors_of([c]) for c in team_cards)
+    ident = Counter()
+    n_team_cards = 0
+    for _, cards in team_classes:
+        ident[colors_of(cards)] += len(cards)
+        n_team_cards += len(cards)
     rows_t = [(mana(cl), n) for cl, n in
               sorted(ident.items(), key=lambda x: -x[1])]
     top_cl = max(ident, key=ident.get)
     out.append(barchart(
-        f"The {len(team_cards)} cards on teams (lanes + pairs), by color "
-        f"identity — {guild(top_cl)} leads", rows_t, "cards"))
+        f"The {n_team_cards} cards on teams (lanes + pairs), by the "
+        f"team's color identity — {guild(top_cl)} leads",
+        rows_t, "cards"))
 
     import statistics
     med = int(statistics.median(touch.values()))
