@@ -16,7 +16,8 @@ Usage: python3 report.py
 import html
 import pathlib
 
-from packages import (card_colors, deck_sets, flex_packages, load,
+from packages import (card_colors, co_maindeck_counts, deck_sets,
+                      flex_packages, load,
                       nonland_owners,
                       load_scryfall, load_themes, maindeck_owners,
                       never_drafted, never_maindecked, signature_groups,
@@ -54,6 +55,9 @@ a:hover { text-decoration-color: #1a1a1a; }
 .cards { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 18px; }
 .cards img { width: 160px; border-radius: 6px; }
 .bangers img { width: 128px; }
+.pairs { margin: 8px 0 16px; }
+.pair { display: inline-flex; gap: 2px; margin: 3px 10px 3px 0; }
+.pair img { width: 104px; border-radius: 5px; }
 .mana { width: 13px; height: 13px; vertical-align: -1px;
         margin-right: 1px; }
 .flex-list { font-size: 16px; margin: 6px 0 14px; padding-left: 22px; }
@@ -373,6 +377,49 @@ function showGrp(g) {{
 }}
 showGrp('{present[0]}');
 </script></details>""")
+
+    # -- Always-together pairs -----------------------------------------
+    pairs3 = sorted(pr for pr, n in co_maindeck_counts(owners).items()
+                    if n == 3)
+    corder = list("WUBRG") + ["Multi", "C"]
+
+    def combo(pr):
+        g1, g2 = sorted((cgroup(pr[0]), cgroup(pr[1])),
+                        key=corder.index)
+        return (g1, g2)
+
+    from collections import Counter as _C
+    combo_counts = _C(combo(pr) for pr in pairs3)
+    out.append("<h2>Always together</h2>")
+    out.append(f"<p class='meta'>All {len(pairs3)} pairs of nonland cards "
+               "that shared a maindeck in every pod — the atomic bonds the "
+               "lanes are built from (pairs inside a lane count too). "
+               "Counted by the colors of the two cards:</p>")
+    out.append("<table><tr><th>Colors</th><th>Pairs</th></tr>")
+    for (g1, g2), n in sorted(combo_counts.items(), key=lambda x: -x[1]):
+        l1 = "Multi" if g1 == "Multi" else mana(g1)
+        l2 = "Multi" if g2 == "Multi" else mana(g2)
+        out.append(f"<tr><td>{l1} + {l2}</td><td>{n}</td></tr>")
+    out.append("</table>")
+    out.append(f"<details><summary class='meta'>Show all {len(pairs3)} "
+               "pairs</summary>")
+    by_combo = {}
+    for pr in pairs3:
+        by_combo.setdefault(combo(pr), []).append(pr)
+    for key in sorted(by_combo, key=lambda k: -len(by_combo[k])):
+        g1, g2 = key
+        l1 = "Multi" if g1 == "Multi" else mana(g1)
+        l2 = "Multi" if g2 == "Multi" else mana(g2)
+        out.append(f"<h4>{l1} + {l2} ({len(by_combo[key])})</h4>"
+                   f"<div class='pairs'>")
+        for a, b in by_combo[key]:
+            imgs = "".join(
+                f"<img src='{scry[c].get('image')}' "
+                f"alt='{html.escape(c)}' title='{html.escape(c)}' "
+                f"loading='lazy'>" for c in (a, b))
+            out.append(f"<span class='pair'>{imgs}</span>")
+        out.append("</div>")
+    out.append("</details>")
 
     # -- Section 4: decks that carved their own lanes ------------------
     claimed = set()
