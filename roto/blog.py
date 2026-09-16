@@ -131,8 +131,35 @@ def main():
     def lane_by_colors(cl, exclude=()):
         for sig, cards in lanes:
             if colors_of(cards) == cl and tuple(cards) not in exclude:
-                return cards
+                return sig, cards
         return None
+
+    pair_teams = [(sig, sorted(cards)) for sig, cards in groups
+                  if len(cards) == 2]
+
+    def satellites(lane_sig):
+        """Standalone pairs kept by at least two of this lane's decks."""
+        out = []
+        for psig, pcards in pair_teams:
+            if sum(a == b for a, b in zip(psig, lane_sig)) >= 2:
+                out.append(pcards)
+        return out
+
+    def lane_block(entry):
+        sig, cards = entry
+        h = [gallery(cards)]
+        sats = satellites(sig)
+        if sats:
+            h.append("<p class='meta'>Satellites — pairs kept by two of "
+                     "this lane's three decks:</p><div class='pairs'>")
+            for pcards in sats:
+                imgs = "".join(
+                    f"<img src='{scry[c].get('image')}' "
+                    f"alt='{html.escape(c)}' title='{html.escape(c)}' "
+                    f"loading='lazy'>" for c in pcards)
+                h.append(f"<span class='pair'>{imgs}</span>")
+            h.append("</div>")
+        return "".join(h)
 
     # Jack's taxonomy of the size-3+ teams (labels are his; mapping of
     # the two blue teams is a guess — swap if backwards)
@@ -247,23 +274,23 @@ document.addEventListener('click', e => {
 
     out.append("<h2>Two Mardu aggro decks</h2>")
     out.append(f"<h3>{mana('WR')} Boros Tokens</h3>")
-    out.append(gallery(tokens))
+    out.append(lane_block(tokens))
     out.append(f"<h3>{mana('BR')} Rakdos Sac</h3>")
-    out.append(gallery(sac))
+    out.append(lane_block(sac))
 
     out.append("<h2>Three green decks</h2>")
     out.append(f"<h3>{mana('URG')} Five-color Temur Ramp</h3>")
-    out.append(gallery(temur_ramp))
+    out.append(lane_block(temur_ramp))
     out.append(f"<h3>{mana('BG')} Five-color Golgari Ramp</h3>")
-    out.append(gallery(golgari_ramp))
+    out.append(lane_block(golgari_ramp))
     out.append(f"<h3>{mana('G')} Golgari Graveyard</h3>")
-    out.append(gallery(graveyard))
+    out.append(lane_block(graveyard))
 
     out.append("<h2>Two blue decks</h2>")
     out.append(f"<h3>{mana('UR')} Control</h3>")
-    out.append(gallery(blue_spells))
+    out.append(lane_block(blue_spells))
     out.append(f"<h3>{mana('U')} Tempo</h3>")
-    out.append(gallery(blue_tempo))
+    out.append(lane_block(blue_tempo))
 
     # --- bar graph: cards in teams by color identity + pair gallery ---
     from collections import Counter
