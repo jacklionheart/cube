@@ -386,6 +386,54 @@ document.addEventListener('click', e => {
         cc = ", ".join(deck_link(k, pl) for k, pl in common)
         out.append(f"<p class='meta'>{n1} and {n2} share {cc}</p>")
 
+    # --- the map ------------------------------------------------------
+    def svg_pips(cl, x, y):
+        return "".join(
+            f"<image href='https://svgs.scryfall.io/card-symbols/{s}.svg' "
+            f"x='{x + i * 15}' y='{y}' width='13' height='13'/>"
+            for i, s in enumerate(cl))
+
+    def node(x, y, cl, name):
+        w = 26 + max(len(cl) * 15, len(name) * 8)
+        return (f"<rect x='{x - w // 2}' y='{y - 20}' width='{w}' "
+                f"height='40' rx='9' fill='#fff' stroke='#999'/>"
+                + svg_pips(cl, x - (len(cl) * 15) // 2, y - 14)
+                + f"<text x='{x}' y='{y + 13}' text-anchor='middle' "
+                f"font-size='13' font-family='-apple-system,sans-serif' "
+                f"fill='#1a1a1a'>{name}</text>")
+
+    def region(x, y, w, h, fill, label):
+        return (f"<rect x='{x}' y='{y}' width='{w}' height='{h}' rx='14' "
+                f"fill='{fill}'/><text x='{x + 12}' y='{y + 20}' "
+                f"font-size='11' font-family='-apple-system,sans-serif' "
+                f"letter-spacing='.08em' fill='#8a8a8a'>{label}</text>")
+
+    bridge_labels = []
+    for psig, pcards in bridges:
+        short = " + ".join(c.split(",")[0] for c in pcards)
+        bridge_labels.append(short)
+    svg = ["<svg viewBox='0 0 660 300' style='max-width:660px;width:100%;"
+           "margin:16px 0'>"]
+    svg.append(region(6, 6, 200, 288, "#f7ebe8", "MARDU"))
+    svg.append(region(216, 6, 214, 288, "#ebf3e8", "GREEN"))
+    svg.append(region(440, 6, 214, 288, "#e8eff6", "BLUE"))
+    # bridge edge: Tokens -- Sac with pair labels
+    svg.append("<line x1='106' y1='90' x2='106' y2='210' "
+               "stroke='#b08b85' stroke-width='2'/>")
+    for i, lab in enumerate(bridge_labels):
+        svg.append(f"<text x='118' y='{140 + i * 18}' font-size='11' "
+                   f"font-family='-apple-system,sans-serif' "
+                   f"fill='#8a6a64'>{html.escape(lab)}</text>")
+    svg.append(node(106, 70, "WR", "Tokens"))
+    svg.append(node(106, 230, "BR", "Sac"))
+    svg.append(node(322, 70, "URG", "Ramp"))
+    svg.append(node(322, 150, "BG", "Ramp"))
+    svg.append(node(322, 230, "BG", "Graveyard"))
+    svg.append(node(546, 100, "UR", "Spells"))
+    svg.append(node(546, 200, "U", "Discard"))
+    svg.append("</svg>")
+    out.append("".join(svg))
+
     # --- categorizing the pairs ---------------------------------------
     out.append("<h2>Categorizing the pairs</h2>")
     out.append("<h3>Contested part of a core</h3>")
