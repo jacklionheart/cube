@@ -151,7 +151,7 @@ def main():
         sats = satellites(sig)
         if sats:
             h.append("<p class='meta'>Satellites — pairs kept by two of "
-                     "this lane's three decks:</p><div class='pairs'>")
+                     "this core's three decks:</p><div class='pairs'>")
             for pcards in sats:
                 imgs = "".join(
                     f"<img src='{scry[c].get('image')}' "
@@ -174,14 +174,19 @@ def main():
     out = [f"<meta charset='utf-8'><title>Three Rotos, One Cube</title>"
            f"<style>{CSS}</style>"]
     out.append("<h1>Three Rotos, One Cube</h1>")
-    out.append("<p class='meta'><span class='todo'>TODO: byline / intro "
-               "hook in Jack's voice</span></p>")
-
+    out.append("<p class='meta'><span class='todo'>TODO: byline / hook "
+               "in Jack's voice</span></p>")
     out.append(
-        "<p>Call two nonland cards a <b>team</b> if they were maindecked "
-        "together — in the same deck — in all three pods. Three "
-        "different drafters, three different decks, same two cards "
-        "ending up shoulder to shoulder every time.</p>")
+        "<p>The goal of this essay is a 10,000-foot view of the "
+        "Lords of Limited Cube — drawn not from card evaluations but "
+        "from what three rotisserie pods actually built. The unit of "
+        "analysis is the <b>team</b>: a set of nonland cards that were "
+        "maindecked together, in the same deck, in all three pods. "
+        "Three different drafters, three different decks, the same "
+        "cards ending up shoulder to shoulder every time.</p>")
+    out.append(
+        "<p>Teams come in two sizes: <b>Pairs</b> — exactly two cards — "
+        "and <b>Cores</b> — three or more.</p>")
 
     # --- explorer module: Pairs / Bangers / Lanes ---------------------
     from collections import Counter as _Ct
@@ -236,7 +241,7 @@ def main():
          tabbed("tb", bang_tabs,
                 lambda cl: f"{mana(cl)} {len(bang_by_cl[cl])}",
                 lambda cl: gallery(bang_by_cl[cl]))),
-        ("lanes", f"Lanes ({len(lanes)})",
+        ("lanes", f"Cores ({len(lanes)})",
          tabbed("tl", lanes_sorted,
                 lambda ln: f"{mana(colors_of(ln[1]))} {len(ln[1])}",
                 lambda ln: gallery(ln[1]))),
@@ -254,7 +259,7 @@ def main():
     out.append("</div></div>")
     out.append("<p class='meta'>Pairs: exactly-two-card teams. Bangers: "
                "nonland cards maindecked in all three pods that belong "
-               "to no team. Lanes: the teams of three or more.</p>")
+               "to no team. Cores: the teams of three or more.</p>")
     out.append("""<script>
 document.addEventListener('click', e => {
   const b = e.target.closest('button[data-show]');
@@ -268,8 +273,8 @@ document.addEventListener('click', e => {
 </script>""")
 
     out.append(
-        "<p>If you ask for teams of three or more cards, the data hands "
-        f"back {len(lanes)} of them — and they sort themselves into "
+        "<p>Ask for the Cores and the data hands "
+        f"back just {len(lanes)} — and they sort themselves into "
         "three families:</p>")
 
     LANE_NAME = {"WR": "Tokens", "BR": "Sac", "URG": "Temur Ramp",
@@ -320,7 +325,7 @@ document.addEventListener('click', e => {
                          f"{' ↔ '.join(sorted(touched))}</span></div>")
         if h:
             return ("<p class='meta'>Bridges — pairs whose decks span "
-                    "two of this family's lanes:</p>" + "".join(h))
+                    "two of this family's cores:</p>" + "".join(h))
         return ""
 
     out.append("<h2>Two Mardu aggro decks</h2>")
@@ -348,8 +353,8 @@ document.addEventListener('click', e => {
 
     out.append("<h2>The Rectangles</h2>")
     out.append("<p class='meta'><span class='todo'>TODO: framing — the "
-               "pairs living outside the lane system, labeled as one "
-               "family: Rectangles. The eighth lane that never quite "
+               "pairs living outside the core system, labeled as one "
+               "family: Rectangles. The eighth core that never quite "
                "assembled.</span></p><div class='pairs'>")
     for psig, pcards in free:
         out.append(pair_span(pcards))
@@ -372,10 +377,10 @@ document.addEventListener('click', e => {
     no_lane_x = [(k, pl) for k, d in enumerate(drafts)
                  for pl in d.players if (k, pl) not in lane_own_x]
     from collections import Counter as _Cn
-    out.append("<h2>Where the no-lane decks fit</h2>")
+    out.append("<h2>Where the core-less decks fit</h2>")
     out.append("<p class='meta'><span class='todo'>TODO: framing — "
-               "label each pair, then ask which lanes the ten decks "
-               "outside the lane system were actually drafting."
+               "label each pair, then ask which cores the ten decks "
+               "outside the core system were actually drafting."
                "</span></p>")
     out.append("<table><tr><th>Deck</th><th>Their pairs say</th></tr>")
     for k, pl in no_lane_x:
