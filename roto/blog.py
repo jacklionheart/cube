@@ -86,6 +86,17 @@ document.addEventListener('mousemove', e => {
 </script>"""
 
 
+CANON = (["W", "U", "B", "R", "G"]
+         + ["WU", "UB", "BR", "RG", "WG", "WB", "UR", "BG", "WR", "UG"]
+         + ["WUG", "WUB", "UBR", "BRG", "WRG",
+            "WBG", "WUR", "UBG", "WBR", "URG"]
+         + ["WUBR", "WUBG", "WURG", "WBRG", "UBRG", "WUBRG", "C"])
+
+
+def canon_key(cl):
+    return CANON.index(cl) if cl in CANON else len(CANON)
+
+
 def mana(letters):
     syms = [s for s in letters if s in "WUBRGC"] or ["C"]
     return "".join(
@@ -180,14 +191,14 @@ def main():
     pair_by_cl = {}
     for pr in pair_units_x:
         pair_by_cl.setdefault(colors_of(pr), []).append(pr)
-    pair_tabs = sorted(pair_by_cl, key=lambda k: -len(pair_by_cl[k]))
+    pair_tabs = sorted(pair_by_cl, key=canon_key)
 
     bang_by_cl = {}
     for c in bangers_x:
         bang_by_cl.setdefault(colors_of([c]), []).append(c)
-    bang_tabs = sorted(bang_by_cl, key=lambda k: -len(bang_by_cl[k]))
+    bang_tabs = sorted(bang_by_cl, key=canon_key)
 
-    lanes_sorted = sorted(lanes, key=lambda x: -len(x[1]))
+    lanes_sorted = sorted(lanes, key=lambda x: (canon_key(colors_of(x[1])), -len(x[1])))
 
     sets = [
         ("pairs", f"Pairs ({len(pair_units_x)})",
