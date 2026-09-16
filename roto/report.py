@@ -25,42 +25,46 @@ from roto_summary import COLOR_FILLS, load_decks
 HERE = pathlib.Path(__file__).parent
 
 CSS = """
-body { font-family: -apple-system, Segoe UI, Helvetica, Arial, sans-serif;
-       margin: 24px auto; max-width: 1080px; color: #222; }
-h1 { font-size: 24px; } h2 { font-size: 20px; margin: 30px 0 8px; }
-h3 { font-size: 16px; margin: 18px 0 4px; }
-h4 { font-size: 13px; margin: 10px 0 4px; }
-table { border-collapse: collapse; margin: 8px 0 16px; }
-th, td { border: 1px solid #ccc; padding: 4px 10px; font-size: 13px;
-         text-align: left; vertical-align: top; }
-th { background: #434343; color: #fff; }
-a { color: #1a56a0; text-decoration: none; }
-a:hover { text-decoration: underline; }
-.meta { color: #555; font-size: 13px; margin: 2px 0 10px; }
-.lane { border-top: 3px solid #434343; margin-top: 26px; padding-top: 6px; }
-.theme { display: inline-block; background: #434343; color: #fff;
-         border-radius: 8px; padding: 0 8px; font-size: 12px; }
-.cards { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
-.cards img { width: 160px; border-radius: 7px; }
-.bangers img { width: 132px; }
-.flex-list { font-size: 13px; margin: 4px 0 12px; }
-.flex-list li { margin: 2px 0; }
-.chip { display: inline-block; border: 1px solid #bbb; border-radius: 10px;
-        padding: 1px 8px; margin: 2px; font-size: 12px; }
-.kept { color: #555; }
+body { font-family: Charter, Georgia, 'Times New Roman', serif;
+       font-size: 19px; line-height: 1.65; color: #1a1a1a;
+       max-width: 680px; margin: 56px auto 120px; padding: 0 20px;
+       background: #fff; }
+h1 { font-size: 34px; line-height: 1.2; margin: 0 0 8px; }
+h2 { font-size: 25px; margin: 64px 0 10px; }
+h3 { font-size: 20px; margin: 40px 0 6px; }
+h4 { margin-top: 30px; font-family: -apple-system, 'Segoe UI', Helvetica, sans-serif;
+     font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+     color: #6b6b6b; margin: 26px 0 6px; font-weight: 600; }
+table { border-collapse: collapse; margin: 12px 0 20px; width: 100%;
+        font-family: -apple-system, 'Segoe UI', Helvetica, sans-serif;
+        font-size: 14px; }
+th { text-align: left; font-weight: 600; padding: 6px 14px 6px 0;
+     border-bottom: 1px solid #1a1a1a; }
+td { padding: 6px 14px 6px 0; border-bottom: 1px solid #e6e6e6;
+     vertical-align: top; }
+a { color: inherit; text-decoration: underline;
+    text-decoration-color: #b8b8b8; text-underline-offset: 2px; }
+a:hover { text-decoration-color: #1a1a1a; }
+.meta { font-family: -apple-system, 'Segoe UI', Helvetica, sans-serif;
+        font-size: 14px; color: #6b6b6b; margin: 2px 0 14px; }
+.lane { border-top: 1px solid #e6e6e6; margin-top: 60px; padding-top: 26px; }
+.num { font-family: -apple-system, 'Segoe UI', Helvetica, sans-serif;
+       font-size: 13px; color: #9a9a9a; font-weight: 400;
+       margin-right: 6px; }
+.cards { display: flex; flex-wrap: wrap; gap: 10px; margin: 22px 0 26px;
+         justify-content: center;
+         width: min(960px, calc(100vw - 40px));
+         margin-left: 50%; transform: translateX(-50%); }
+.cards img { width: 176px; border-radius: 8px; }
+.bangers img { width: 148px; }
+.flex-list { font-size: 16px; margin: 6px 0 14px; padding-left: 22px; }
+.flex-list li { margin: 3px 0; }
+.kept { color: #6b6b6b; font-size: .88em; }
 """
 
 
 def chip(card, colors):
-    cs = colors.get(card, set())
-    if len(cs) == 1:
-        fill = COLOR_FILLS[next(iter(cs))]
-    elif cs:
-        fill = COLOR_FILLS["multi"]
-    else:
-        fill = COLOR_FILLS["C"]
-    return (f'<span class="chip" style="background:#{fill}">'
-            f'{html.escape(card)}</span>')
+    return html.escape(card)
 
 
 def main():
@@ -109,17 +113,15 @@ def main():
            "the three decks). Deck links go to sealeddeck.tech.</p>"]
 
     # -- Section 1: the lanes ------------------------------------------
-    out.append("<h2>1. The Lanes</h2>")
+    out.append("<h2>The lanes</h2>")
     for gi, (sig, cards) in enumerate(groups):
         e = flex[gi]
-        out.append(f"<div class='lane'><h3>P{gi + 1} "
-                   f"<span class='theme'>{lane_theme(gi)}</span> "
+        out.append(f"<div class='lane'><h3><span class='num'>P{gi + 1}</span>{lane_theme(gi)} "
                    f"<span class='kept'>{colors_of(cards)} · "
                    f"core {len(cards)}</span></h3>")
         own = []
         for k, p in enumerate(sig):
-            w, l = drafts[k].records.get(p, (0, 0))
-            own.append(f"{drafts[k].name}: {deck_link(k, p)} ({w}–{l})")
+            own.append(f"{drafts[k].name}: {deck_link(k, p)}")
         out.append(f"<p class='meta'>{' · '.join(own)}</p>")
         out.append("<div class='cards'>")
         for c in sorted(cards):
@@ -146,7 +148,7 @@ def main():
             if lane_theme(g[0]) == lane_theme(g[1]) != "—"}
     cross = {d: g for d, g in two_lane.items() if d not in same}
     n_owners = len(lanes_of)
-    out.append("<h2>2. Two lanes per player</h2>")
+    out.append("<h2>Two lanes per player</h2>")
     out.append(f"<p class='meta'>{n_owners} players own a lane; "
                f"{len(two_lane)} of them own exactly two.</p>")
     for title, sub in [("Same theme twice — the theme pooled here, "
@@ -174,7 +176,7 @@ def main():
         c for c, sig in owners.items()
         if None not in sig and c not in core_cards
         and "Land" not in scry[c]["type_line"].split(" // ")[0])
-    out.append("<h2>3. Bangers</h2>")
+    out.append("<h2>Bangers</h2>")
     out.append(f"<p class='meta'>{len(ubiq)} nonland cards were maindecked "
                "in every pod yet belong to no lane core — good enough to "
                "play everywhere, tied to nothing. A P# tag means the card "
@@ -207,24 +209,24 @@ def main():
             claimed |= set(bucket)
     no_lane = [(k, p) for k, d in enumerate(drafts) for p in d.players
                if (k, p) not in lanes_of]
-    out.append("<h2>4. The decks that carved their own lanes</h2>")
+    out.append("<h2>The decks that carved their own lanes</h2>")
     out.append("<p class='meta'>No lane runs through these decks — their "
                "distinctive cards below appear in no lane core or flex.</p>")
     for k, p in no_lane:
         cards = by_deck[(k, p)]
         distinct = sorted(cards - claimed)
-        w, l = drafts[k].records.get(p, (0, 0))
         out.append(f"<div class='lane'><h3>{drafts[k].name}: "
                    f"{deck_link(k, p)} <span class='kept'>"
-                   f"{colors_of(cards)} · {w}–{l}</span></h3>")
+                   f"{colors_of(cards)}</span></h3>")
         out.append(f"<p class='meta'>{len(distinct)} of {len(cards)} "
                    f"nonbasic cards sit outside every lane (in no core or "
                    f"flex — though other decks may also run them):</p>")
-        out += [chip(c, colors) for c in distinct]
+        out.append("<p>" + ", ".join(chip(c, colors)
+                   for c in distinct) + "</p>")
         out.append("</div>")
 
     # -- Section 4: what's missing? ------------------------------------
-    out.append("<h2>5. What's missing?</h2>")
+    out.append("<h2>What's missing?</h2>")
     out.append("<p class='meta'>Color groups no lane occupies are the "
                "open, uncontested lanes.</p>")
     lane_colors = [(gi, set(colors_of(cards)) - {"C"})
