@@ -288,10 +288,14 @@ document.addEventListener('click', e => {
         for lsig, _ in lanes:
             if sum(a == b for a, b in zip(psig, lsig)) >= 2:
                 return "satellite"
-        touched = set()
-        for k, pl in enumerate(psig):
-            touched.update(lane_of_deck.get((k, pl), []))
-        return "bridge" if len(touched) >= 2 else "free"
+        per_deck = [set(lane_of_deck.get((k, pl), []))
+                    for k, pl in enumerate(psig)]
+        touched = set().union(*per_deck)
+        n_decks = sum(1 for s in per_deck if s)
+        # a true bridge spans lanes via different decks — one deck
+        # owning two lanes doesn't count
+        return ("bridge" if len(touched) >= 2 and n_decks >= 2
+                else "free")
 
     def pair_span(pcards):
         imgs = "".join(
@@ -342,13 +346,46 @@ document.addEventListener('click', e => {
     out.append(lane_block(blue_tempo))
     out.append(family_bridges("Blue"))
 
-    out.append("<h2>The free pairs</h2>")
-    out.append("<p class='meta'><span class='todo'>TODO: framing — "
-               "pairs living outside the lane system; the proto-lanes."
-               "</span></p><div class='pairs'>")
+    out.append("<h2>The Rectangles</h2>")
+    out.append("<p class='meta'><span class='todo'>TODO: framing — the "
+               "pairs living outside the lane system, labeled as one "
+               "family: Rectangles. The eighth lane that never quite "
+               "assembled.</span></p><div class='pairs'>")
     for psig, pcards in free:
         out.append(pair_span(pcards))
     out.append("</div>")
+
+    # --- which lanes do the no-lane decks fit into? -------------------
+    def pair_label(psig):
+        for lsig, lcards in lanes:
+            if sum(a == b for a, b in zip(psig, lsig)) >= 2:
+                return LANE_NAME[colors_of(lcards)]
+        if classify(psig) == "bridge":
+            per = set()
+            for k, pl in enumerate(psig):
+                per.update(lane_of_deck.get((k, pl), []))
+            return "/".join(sorted({FAMILY[n] for n in per}))
+        return "Rectangles"
+
+    lane_own_x = {(k, pl) for lsig, _ in lanes
+                  for k, pl in enumerate(lsig)}
+    no_lane_x = [(k, pl) for k, d in enumerate(drafts)
+                 for pl in d.players if (k, pl) not in lane_own_x]
+    from collections import Counter as _Cn
+    out.append("<h2>Where the no-lane decks fit</h2>")
+    out.append("<p class='meta'><span class='todo'>TODO: framing — "
+               "label each pair, then ask which lanes the ten decks "
+               "outside the lane system were actually drafting."
+               "</span></p>")
+    out.append("<table><tr><th>Deck</th><th>Their pairs say</th></tr>")
+    for k, pl in no_lane_x:
+        my = [pair_label(psig) for psig, _ in pair_teams if psig[k] == pl]
+        cnt = _Cn(my)
+        fit = ", ".join(f"{l} ×{n}" if n > 1 else l
+                        for l, n in cnt.most_common()) or "—"
+        out.append(f"<tr><td>{drafts[k].name} {html.escape(pl)}</td>"
+                   f"<td>{fit}</td></tr>")
+    out.append("</table>")
 
     # --- bar graph: cards in teams by color identity + pair gallery ---
     from collections import Counter
