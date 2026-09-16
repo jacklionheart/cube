@@ -23,6 +23,31 @@ from roto_summary import parse_draft
 HERE = pathlib.Path(__file__).parent
 WUBRG = "WUBRG"
 
+GUILDS = {
+    "W": "White", "U": "Blue", "B": "Black", "R": "Red", "G": "Green",
+    "WU": "Azorius", "UB": "Dimir", "BR": "Rakdos", "RG": "Gruul",
+    "WG": "Selesnya", "WB": "Orzhov", "UR": "Izzet", "BG": "Golgari",
+    "WR": "Boros", "UG": "Simic", "WUB": "Esper", "UBR": "Grixis",
+    "BRG": "Jund", "WBG": "Abzan", "WUG": "Bant", "UBG": "Sultai",
+    "WBR": "Mardu", "WUR": "Jeskai", "URG": "Temur", "WRG": "Naya",
+}
+
+
+def guild(letters):
+    return GUILDS.get(letters, letters)
+
+
+def is_land(name, scry):
+    """Front-face land check (MDFC spell//land faces count as nonland)."""
+    info = scry.get(name)
+    return bool(info) and "Land" in info["type_line"].split(" // ")[0]
+
+
+def card_link(name):
+    q = html.escape(name.replace(" 2", "", 1) if name.endswith(" 2") else name)
+    return (f"<a href='https://scryfall.com/search?q=!%22{q}%22'>"
+            f"{html.escape(name)}</a>")
+
 CSS = """
 body { font-family: Charter, Georgia, 'Times New Roman', serif;
        font-size: 19px; line-height: 1.65; color: #1a1a1a;
@@ -73,6 +98,10 @@ def load_data():
             card_decks.setdefault(c, set()).add(dk)
     scry = json.loads((HERE / "scryfall.json").read_text())
     images = json.loads((HERE / "images.json").read_text())
+    # lanes are about spells: drop lands from the co-maindeck universe
+    # (mirrors roto/packages.nonland_owners)
+    card_decks = {c: ds for c, ds in card_decks.items()
+                  if not is_land(c, scry)}
     return drafts, decks, card_decks, scry, images
 
 
@@ -171,19 +200,19 @@ def render_setting(out, tag, min_sup, min_size, card_decks, drafts, scry, images
         freq = {c: sum(c in maximal[i][0] for i in f) for c in union}
         order = sorted(union, key=lambda c: (-freq[c], c))
         best, best_ds = groups[0]
+        cl = "".join(colors_of(union, scry))
         out.append("<div class='lane'>")
         out.append(f"<h3><span class='num'>F{fi + 1}</span>"
-                   f"{mana(colors_of(union, scry))} "
-                   f"{len(union)}-card family "
-                   f"<span class='kept'>{len(f)} groups · best "
-                   f"{support(best_ds)}/13</span></h3>")
+                   f"{mana(cl)} {guild(cl)} family "
+                   f"<span class='kept'>{len(union)} cards · {len(f)} "
+                   f"groups · best {support(best_ds)}/13</span></h3>")
         out.append(f"<p class='meta'>Best group's decks — "
                    f"{host_line(best_ds, drafts)}</p>")
         out.append(card_grid(union, images, order))
         items = []
         for S, ds in groups[:8]:
             items.append(f"<li>[{support(ds)}/13, {len(S)}c] "
-                         + ", ".join(html.escape(c) for c in S) + "</li>")
+                         + ", ".join(card_link(c) for c in S) + "</li>")
         if len(groups) > 8:
             items.append(f"<li>… +{len(groups) - 8} more variants</li>")
         out.append(f"<ul class='variants'>{''.join(items)}</ul>")
@@ -232,7 +261,9 @@ def render_component_lanes(out, card_decks, drafts, scry, images, K=9):
     for i, cards in enumerate(lanes):
         out.append("<div class='lane'>")
         out.append(f"<h3><span class='num'>L{i + 1}</span>"
-                   f"{mana(colors_of(cards, scry))} {len(cards)} cards</h3>")
+                   f"{mana(''.join(colors_of(cards, scry)))} "
+                   f"{guild(''.join(colors_of(cards, scry)))} — "
+                   f"{len(cards)} cards</h3>")
         out.append(card_grid(cards, images))
         out.append("</div>")
 
@@ -247,11 +278,25 @@ def main():
     out.append("<p class='meta'>13 pods · maindeck = all 45 picks (v1) · "
                "generated from the same data as the published sheet</p>")
     out.append(
+        "<h2>How this works</h2>"
         "<p>The candidate definition: <i>a lane is a set of cards that were "
-        "all present and maindecked together — the whole set, in one deck — "
-        "in more than half of the drafts.</i> Below, that definition at the "
-        "chosen setting (≥9 of 13, size ≥4), then two looser settings, then "
-        "the pairwise component lanes the sheet currently uses.</p>")
+        "all maindecked together — the whole set, in one deck — in more "
+        "than half of the drafts.</i> Mining finds every <b>maximal</b> such "
+        "group (no card can be added without dropping below the threshold); "
+        "overlapping groups (≥2 shared cards) roll up into a "
+        "<b>family</b>, shown as one card grid ordered core-first. "
+        "<b>Lands are excluded</b> — otherwise every family is half "
+        "fetchlands. Below: the definition at the chosen setting "
+        "(≥9 of 13, size ≥4), two looser settings, then the pairwise "
+        "component lanes the published sheet currently uses.</p>"
+        "<p class='meta'>Caveats: maindeck currently means <i>all 45 "
+        "picks</i> (real 40-card decklists are scraped but not wired in "
+        "yet), so these are drafted-together lanes, not built-together "
+        "lanes — supports will only tighten once real maindecks land. "
+        "Duplicated lands aside, the cube drifted ~30 cards across the "
+        "season, so a card absent from early pods can support at most "
+        "the drafts it was available in. Source: the 13 s4 pod "
+        "spreadsheets + read-the-bones.</p>")
     render_setting(out, "Chosen", 9, 4, card_decks, drafts, scry, images)
     render_setting(out, "Looser", 8, 4, card_decks, drafts, scry, images)
     render_setting(out, "Loosest", 7, 3, card_decks, drafts, scry, images)
