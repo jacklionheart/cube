@@ -15,12 +15,12 @@ themselves into three families:
 
 ## Two Mardu aggro packages
 
-The RW tokens team is the largest team found in the data at 10 cards, while the RB sacrifice team is only 3 cards. I think this mostly reflects the fact that the tokens deck competed for cards with only the sacrifice decks, and only a little bit, so all 3 drafters were able to draft many of the same cards. The sacrifice decks at the three pods were much more different, and could play cards both from the tokens lanes as well as what I will later call the "esper rectangles" lane. While Aviseras did draft Weaponize the Monsters and put sacrifice synergies into his token deck, he didn't draft any of the cards in this "team"; in all 3 pods, the players in each pod drafting each of the two mardu aggro teams were different.
+The RW tokens team is the largest team found in the data at 9 cards, while the RB sacrifice team is only 3 cards. I think this mostly reflects the fact that the tokens deck competed for cards with only the sacrifice decks, and only a little bit, so all 3 drafters were able to draft many of the same cards. The sacrifice decks at the three pods were much more different, and could play cards both from the tokens lanes as well as what I will later call the "esper rectangles" lane. While Aviseras did draft Weaponize the Monsters and put sacrifice synergies into his token deck, he didn't draft any of the cards in this "team"; in all 3 pods, the players in each pod drafting each of the two mardu aggro teams were different.
 
 
 ## Three green packages for 2 decks
 
-There are 3 green teams, but they mostly represent two lanes. The three teams are Temur Ramp, Golgari Ramp, and Golgari Graveyard, but the green players often blended these strategies; every Golgari Ramp drafter was either also a Temur Ramp drafter or a Golgari Graveyard drafter.
+There are 3 green teams, but they mostly represent two lanes. The three teams are Temur Ramp, Golgari Ramp, and Golgari Graveyard, but the green players often blended these strategies: in every pod, just 2 drafters covered all 3 teams. Every Temur Ramp drafter also drafted a second green team — Golgari Ramp in two pods (lordtupperware, Greg), Golgari Graveyard in the third (Stardust2187).
 
 ## Two blue packages
 
