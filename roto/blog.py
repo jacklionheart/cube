@@ -652,7 +652,7 @@ document.addEventListener('click', e => {
                 else:
                     rows.append((3, 0, f"<div class='seat sLone'>{nm}"
                                  f"<span>wildcard — Gyruda, all even, "
-                                 f"no teams</span></div>"))
+                                 f"no packages</span></div>"))
         col += [h for _, __, h in sorted(rows, key=lambda r: r[:2])]
         col.append("</div>")
         sc.append("".join(col))
