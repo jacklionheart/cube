@@ -121,7 +121,7 @@ These are the 7 **pairs** that were drafted primarily by the drafters who did no
 
 There are 7 other pairs that were not part of any lane, but were drafted primarily by drafters within the three non-rectangles lanes. Two such pairs were always drafted by drafters within the same macro lane -- these can be seen as cards shared between themes in the same macro strategy. Five were drafted twice by a drafter in one lane and once by a "rectangles" drafter. These can be seen as cards that were fought over between rectangles and other lanes. 
 
-{{map}}
+{{fam-pairs-viewer}}
 
 ## The FOOMP deck
 

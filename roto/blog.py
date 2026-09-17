@@ -585,6 +585,25 @@ document.addEventListener('click', e => {
     rt.append("</table>")
     parts["pairs-rect-table"] = "\n".join(rt)
 
+    # selector over the stay-home pairs, one pane per macro lane
+    # (relies on the delegated click handler the lanes viewer installs)
+    FAM_BTN = [("Aggro", "R", "Red Aggro"),
+               ("Green", "G", "Green"),
+               ("Blue", "U", "Blue")]
+    fv = ["<div class='explorer'><div class='sidebar'>"]
+    fpanes = []
+    for i, (fam, cl, lab) in enumerate(FAM_BTN):
+        on = " class='on'" if i == 0 else ""
+        fv.append(f"<button{on} data-group='fampairs' "
+                  f"data-show='fp-{i}'>{mana(cl)} {lab}</button>")
+        hid = "" if i == 0 else " hidden"
+        fpanes.append(f"<div data-pane='fampairs' id='fp-{i}'{hid}>"
+                      + pair_rows_gallery(by_fam_pairs[fam]) + "</div>")
+    fv.append("</div><div class='vpanes'>")
+    fv += fpanes
+    fv.append("</div></div>")
+    parts["fam-pairs-viewer"] = "".join(fv)
+
     # --- which lanes do the no-lane decks fit into? -------------------
     def pair_label(psig):
         for lsig, lcards in lanes:
