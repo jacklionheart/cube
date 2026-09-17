@@ -139,8 +139,11 @@ def render_doc(text, parts):
         return parts[name]
 
     def sub(s):
-        return re.sub(r"\{\{([\w:-]+)\}\}",
-                      lambda m: resolve(m.group(1)), s)
+        s = re.sub(r"\{\{([\w:-]+)\}\}",
+                   lambda m: resolve(m.group(1)), s)
+        s = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
+        s = re.sub(r"(?<![\w*])\*([^*\n]+)\*(?![\w*])", r"<i>\1</i>", s)
+        return s.replace(" -- ", " — ")
 
     out = []
     for block in re.split(r"\n\s*\n", text):
