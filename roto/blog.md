@@ -41,7 +41,9 @@ Those 7 lanes describe 6 of the drafters at each pod.  There were 2 pods of 9 pe
 
 ## Satellite Pairs
 
-Now let's start to look at pairs and ask: when were they played together with the bigger "lanes"? By definition, none of these pairs were *always* played in the same lane, as they otherwiser would be included in that lane. However, if we look at our 7 packages as representing 3 macro lanes, ...
+Now let's start to look at pairs and ask: when were they played together with the bigger "lanes"? By definition, none of these pairs were *always* played in the same lane, as they otherwise would be included in that lane. However, if we look at our 7 packages as representing 3 macro lanes, a clean law shows up: every pair either orbits exactly one macro lane, or none at all. 7 of the 14 pairs are what I'll call **satellites** — pairs that sat inside a single macro lane's decks in at least 2 of the 3 pods. Two of them never left their lane at all: Hieroglyphic Illumination + Lórien Revealed lived in blue decks in all three pods, and Broodspinner + Disruptive Stormbrood in green ones. The other five sat with their lane twice, and in the third pod went to a deck outside the lane system entirely. What never happened, even once, was a pair sitting with one macro lane in one pod and a different macro lane in another. Whatever these pairs are, they know which lane they belong to. <span class='todo'>[draft — make it yours]</span>
+
+That leaves 7 pairs that never sat with any lane twice. They turn out to be the most interesting group in the data — and they're next. <span class='todo'>[draft — make it yours]</span>
 
 ## How the cores group
 
