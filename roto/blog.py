@@ -81,8 +81,10 @@ th, td { padding: 6px 16px 6px 0; border-bottom: 1px solid #e8e8e8;
 .sAggro { background: #f7ebe8; } .sGreen { background: #ebf3e8; }
 .sBlue { background: #e8eff6; }
 .sRect { background: #fff; border: 1px dashed #b5b0a8; }
-.sLone { background: #f2f2f2; color: #6b6b6b; }
-.adj { border: 1px dashed #c9a; }
+.sFoomp { background: #f0e7f8; }
+.fdot { color: #9a6bb8; }
+ul { list-style: none; padding-left: 4px; margin: 14px 0 18px; }
+li { margin: 5px 0; }
 #hovercard { position: fixed; display: none; z-index: 10;
              pointer-events: none; }
 #hovercard img { width: 250px; border-radius: 12px;
@@ -192,7 +194,7 @@ def main():
                     ("Everything Pizza", "Ramp"),
                     ("Spider Spawning", "Graveyard"),
                     ("Expressive Iteration", "Spells"),
-                    ("Shoreline Looter", "Discard")]
+                    ("Shoreline Looter", "Looting")]
 
     def core_name(cards):
         for marker, nm in CORE_MARKERS:
@@ -200,7 +202,7 @@ def main():
                 return nm
         return "?"
     FAMILY = {"Tokens": "Aggro", "Sac": "Aggro", "Ramp": "Green", "Graveyard": "Green",
-              "Spells": "Blue", "Discard": "Blue"}
+              "Spells": "Blue", "Looting": "Blue"}
 
     def colors_of(cards):
         u = set()
@@ -416,74 +418,70 @@ document.addEventListener('click', e => {
                      f"</title></image>")
         return "".join(s), h
 
-    # family-loyal extras: maindecked 3x, always inside the family's
-    # core decks, but in no core themselves — the family glue
-    fam_decks = {"Aggro": set(), "Green": set(), "Blue": set()}
-    core_cards_all = set()
-    for lsig, lcards in lanes:
-        fm = FAMILY[core_name(lcards)]
-        core_cards_all |= set(lcards)
-        for k, pl in enumerate(lsig):
-            fam_decks[fm].add((k, pl))
-
-    def fam_glue(fm):
-        return sorted(
-            c for c, sig in owners.items()
-            if None not in sig and c not in core_cards_all
-            and all((k, pl) in fam_decks[fm]
-                    for k, pl in enumerate(sig)))
-
-    def glue_strip(x, y, w, cards):
-        s = [f"<rect x='{x}' y='{y}' width='{w}' height='96' rx='9' "
+    # three family regions, six sub-archetype nodes (the two ramps
+    # merged), and each family's non-rectangle pairs placed inside it
+    def pairs_strip(x, y, w, prs):
+        rows = len(prs)
+        h = 26 + rows * 68
+        s = [f"<rect x='{x}' y='{y}' width='{w}' height='{h}' rx='9' "
              f"fill='none' stroke='#aaa' stroke-dasharray='4 3'/>",
              f"<text x='{x + 10}' y='{y + 16}' font-size='11' "
              f"font-family='-apple-system,sans-serif' fill='#8a8a8a'>"
-             f"FAMILY-WIDE</text>"]
-        for i, c in enumerate(cards):
-            img = scry[c].get("image")
-            s.append(f"<image href='{img}' x='{x + 8 + i * 48}' "
-                     f"y='{y + 24}' width='44' height='62'>"
-                     f"<title>{html.escape(c)}</title></image>")
-        return "".join(s)
+             f"PAIRS</text>"]
+        for r, (psig, pcards) in enumerate(prs):
+            for j, c in enumerate(sorted(pcards)):
+                img = scry[c].get("image")
+                s.append(f"<image href='{img}' x='{x + 8 + j * 46}' "
+                         f"y='{y + 22 + r * 68}' width='44' height='62'>"
+                         f"<title>{html.escape(c)}</title></image>")
+        return "".join(s), h
 
-    svg = ["<svg viewBox='0 0 680 830' style='max-width:680px;"
+    def pair_family(psig):
+        touched = set()
+        for k, pl in enumerate(psig):
+            touched.update(lane_of_deck.get((k, pl), []))
+        fams = {FAMILY[nm] for nm in touched}
+        assert len(fams) == 1, (psig, fams)
+        return fams.pop()
+
+    by_fam_pairs = {"Aggro": [], "Green": [], "Blue": []}
+    for t in sorted(pair_teams, key=lambda t: t[1]):
+        if classify(t[0]) != "free":
+            by_fam_pairs[pair_family(t[0])].append(t)
+
+    ramp_cards = sorted(temur_ramp[1] + golgari_ramp[1])
+    col_defs = [
+        ("MARDU", "#f7ebe8",
+         [("WR", "Tokens", tokens[1]), ("BR", "Sac", sac[1])],
+         by_fam_pairs["Aggro"]),
+        ("GREEN", "#ebf3e8",
+         [(colors_of(ramp_cards), "Ramp", ramp_cards),
+          ("BG", "Graveyard", graveyard[1])],
+         by_fam_pairs["Green"]),
+        ("BLUE", "#e8eff6",
+         [("UR", "Spells", blue_spells[1]),
+          ("U", "Looting", blue_tempo[1])],
+         by_fam_pairs["Blue"]),
+    ]
+    body, col_heights = [], []
+    for i, (lab, fill, nodes, prs) in enumerate(col_defs):
+        x = 30 + i * 226
+        y = 34
+        for cl, nm, cards in nodes:
+            ns, h = node_cards(x, y, cl, nm, cards)
+            body.append(ns)
+            y += h + 24
+        if prs:
+            ps, ph = pairs_strip(x, y, 168, prs)
+            body.append(ps)
+            y += ph
+        col_heights.append(y + 14)
+    H = max(col_heights)
+    svg = [f"<svg viewBox='0 0 680 {H + 12}' style='max-width:680px;"
            "width:100%;margin:16px 0'>"]
-    svg.append(region(6, 6, 216, 688, "#f7ebe8", "MARDU"))
-    svg.append(region(232, 6, 216, 688, "#ebf3e8", "GREEN"))
-    svg.append(region(458, 6, 216, 688, "#e8eff6", "BLUE"))
-    n_tok, h_tok = node_cards(30, 34, "WR", "Tokens", tokens[1])
-    n_sac, h_sac = node_cards(30, 34 + h_tok + 24, "BR", "Sac", sac[1])
-    svg += [n_tok, n_sac]
-    svg.append(glue_strip(30, 34 + h_tok + 24 + h_sac + 24, 168,
-                          fam_glue("Aggro")))
-    n1, h1 = node_cards(256, 34, "URG", "Ramp", temur_ramp[1])
-    n2, h2 = node_cards(256, 34 + h1 + 24, "BG", "Ramp", golgari_ramp[1])
-    n3, h3 = node_cards(256, 34 + h1 + 24 + h2 + 24, "BG", "Graveyard",
-                        graveyard[1])
-    svg += [n1, n2, n3]
-    svg.append(glue_strip(256, 34 + h1 + h2 + h3 + 72, 168,
-                          fam_glue("Green")))
-    n4, h4 = node_cards(482, 34, "UR", "Spells", blue_spells[1])
-    n5, h5 = node_cards(482, 34 + h4 + 24, "U", "Discard", blue_tempo[1])
-    svg += [n4, n5]
-    svg.append(glue_strip(482, 34 + h4 + 24 + h5 + 24, 168,
-                          fam_glue("Blue")))
-    # the ghost region: the family of free pairs that never found a core
-    ry = 706
-    svg.append(f"<rect x='6' y='{ry}' width='668' height='118' rx='14' "
-               f"fill='none' stroke='#b5b0a8' stroke-dasharray='6 4'/>")
-    svg.append(f"<text x='18' y='{ry + 20}' font-size='11' "
-               f"font-family='-apple-system,sans-serif' "
-               f"letter-spacing='.08em' fill='#8a8a8a'>RECTANGLES — "
-               f"THE CORE THAT NEVER ASSEMBLED</text>")
-    px = 16
-    for psig, pcards in free:
-        for j, c in enumerate(sorted(pcards)):
-            img = scry[c].get("image")
-            svg.append(f"<image href='{img}' x='{px + j * 44}' "
-                       f"y='{ry + 30}' width='42' height='59'>"
-                       f"<title>{html.escape(c)}</title></image>")
-        px += 94
+    for i, (lab, fill, _, _) in enumerate(col_defs):
+        svg.append(region(6 + i * 226, 6, 216, H, fill, lab))
+    svg += body
     svg.append("</svg>")
     parts["map"] = "".join(svg)
 
@@ -635,29 +633,25 @@ document.addEventListener('click', e => {
     sc = ["<div class='seats'>"]
     for k, d in enumerate(drafts):
         col = [f"<div><div class='sbh'>{d.name}</div>"]
-        rows = []
+        # seats stay in sheet (draft) order; color carries the lane
         for pl in d.players:
             cores_own = lane_of_deck.get((k, pl), [])
             nm = html.escape(pl)
             if cores_own:
                 fam = FAMILY[cores_own[0]]
                 lab = " + ".join(deck_core_lab[(k, pl)])
-                rows.append((0, FAM_ORDER.index(fam),
-                             f"<div class='seat s{fam}'>{nm}"
-                             f"<span>{lab}</span></div>"))
+                col.append(f"<div class='seat s{fam}'>{nm}"
+                           f"<span>{lab}</span></div>")
+            elif coreless_label(k, pl):
+                lean = seat_lean(k, pl)
+                lab = (f"Rectangles &middot; leans {lean}"
+                       if lean else "Rectangles")
+                col.append(f"<div class='seat sRect'>{nm}"
+                           f"<span>{lab}</span></div>")
             else:
-                main = coreless_label(k, pl)
-                if main:
-                    lean = seat_lean(k, pl)
-                    lab = (f"Rectangles &middot; leans {lean}"
-                           if lean else "Rectangles")
-                    rows.append((2, 0, f"<div class='seat sRect'>{nm}"
-                                 f"<span>{lab}</span></div>"))
-                else:
-                    rows.append((3, 0, f"<div class='seat sLone'>{nm}"
-                                 f"<span>wildcard — Gyruda, all even, "
-                                 f"no packages</span></div>"))
-        col += [h for _, __, h in sorted(rows, key=lambda r: r[:2])]
+                col.append(f"<div class='seat sFoomp'>{nm}"
+                           f"<span>Gyruda companion — no packages"
+                           f"</span></div>")
         col.append("</div>")
         sc.append("".join(col))
     sc.append("</div>")

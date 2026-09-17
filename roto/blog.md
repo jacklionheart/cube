@@ -17,13 +17,19 @@ I want to use today is what I am calling a **package**. A **package** of
 together in all 3 pods. We can use these cards as a lens towards what are
 some of the attractive lanes of the cube.
 
-By looking at these cards, I think we can see what I see as the lanes as drafted by the players in these drafts. This was of course just 3 drafts, and already the cube has been majorly redesigned. Nothing here will discuss which decks won, and this offers ~zero predictive power about how future drafts will behave. However, I find it fun to look at what actually happened nonetheless. To skip to the conclusion, when I look at the **packages** that appeared in these drafts, this is what I see:
+By looking at these cards, I think we can see what I see as the lanes as drafted by the players in these drafts. This was of course just 3 drafts, and already the cube has been majorly redesigned. Nothing here will discuss which decks won, and this offers ~zero predictive power about how future drafts will behave. However, I find it fun to look at what actually happened nonetheless. To skip to the conclusion, when I look at the **packages** that appeared in these drafts, this is what I see at each pod:
 
-* 2 Mardu aggro decks
-* 2 Green ramp/graveyard decks
-* 2 Blue spell/looting decks
-* 3 Esper rectangle decks
-+ 1 crazy companion
+* {{mana:WBR}} 2 Mardu aggro decks
+* {{mana:G}} 2 Green ramp/graveyard decks
+* {{mana:U}} 2 Blue spell/looting decks
+* {{mana:WUB}} 3 Esper rectangle decks
+* <span class='fdot'>●</span> 1 crazy companion
+
+{{seat-chart}}
+
+% Every drafter at every pod, in draft order. Tinted = owns one of the 7
+% big packages, colored by macro lane. Dashed white = Esper Rectangles.
+% Purple = the companion deck.
 
 Let me walk you through it!
 
@@ -79,32 +85,13 @@ Like with the mardu decks, the blue lanes split fairly cleanly, with two differe
 
 {{core-discard}}
 
-
 # Pairs
 
-{{seat-chart}}
+Those 7 lanes describe 6 of the drafters at each pod.  There were 2 pods of 9 people and 1 of 10 people, so this leaves 3-4 drafters per pod still undescribed by these well-grooved lanes. To answer this, I want to now look at all the **pairs** that were maindecked together in all 3 pods. There are 14 of them — and the most interesting seven are the ones that mostly *avoided* the lanes: <span class='todo'>[draft — make it yours]</span>
 
-% Every deck in every pod, by its place in the package system. Tinted = owns a
-% core (its family's color). Dashed white = Rectangles deck, with the family
-% its bonds lean toward. Gray = the wildcard.
+{{rectangles-gallery}}
 
-Those 7 lanes describe 6 of the drafters at each pod.  There were 2 pods of 9 people and 1 of 10 people, so this leaves 3-4 drafters per pod still undescribed by these well-grooved lanes. To answer this, I want to now look at all the **pairs** that were maindecked together in all 3 pods.
-
-{{pair-table}}
-
-## Pairs and the macro lanes
-
-Now let's start to look at pairs and ask: when were they played together with the bigger "lanes"? By definition, none of these pairs were *always* played in the same lane, as they otherwise would be included in that lane. However, if we look at our 7 packages as representing 3 macro lanes, we can ask, how often do they stay within the 3 macro lanes?
-
-There are 14 such pairs. Of those, 2 were always within a macro lane:
-
-{{pairs-in-lane}}
-
-and 5 were drafted within one macro lane 2x, and in the third pod were drafted by one of the drafters outside one of the 7 "lanes" we've currently explored:
-
-{{pairs-contested}}
-
-There are 7 pairs left. These 7 were drafted by at most one drafter in the lanes we've currently explored. They reveal what I would call the 4th macro lane, Esper Rectangles:
+These 7 pairs were drafted by at most one drafter in the lanes we've explored so far. They reveal what I would call the 4th macro lane, Esper Rectangles:
 
 {{pairs-rect-table}}
 
@@ -120,7 +107,57 @@ their third card. Call it the eighth core that never quite assembled, or
 the lane the cube keeps offering that nobody has fully accepted yet.
 <span class='todo'>[draft — make it yours]</span>
 
-{{rectangles-gallery}}
+## The pairs that stayed home
+
+The other 7 pairs never left the well-grooved lanes. Two lived inside a
+single macro lane in all three pods; five sat with one macro lane twice,
+with the stray copy going to one of the rectangles decks. Not once did a
+pair sit with one macro lane in one pod and a different macro lane in
+another. Here is the whole system on one map: the three families, their six
+sub-archetypes, and the seven pairs that orbit them.
+<span class='todo'>[draft — make it yours]</span>
+
+{{map}}
+
+## The FOOMP deck
+
+Which brings us to the purple seat at the top. FOOMP's deck is the only
+deck across all three pods with <i>no</i> package at all: not a single
+pair of its nonland cards was ever maindecked together at both other
+pods. Everyone else — all 27 of them — shared at least one bond with the
+other pods:
+<span class='todo'>[draft — make it yours]</span>
+
+{{teams-per-deck}}
+
+% Decks by number of packages (pairs or cores) in their maindeck.
+
+There's a mechanical reason: the companion is Gyruda, and every single
+nonland card in the deck has even mana value — a constraint that pulled
+this deck out of the card pool everyone else was drafting from.
+Twenty-eight decks, one true original. {{foomp-link}}
+
+{{foomp-gallery}}
+
+## The most original decks
+
+FOOMP wins one definition of "most original": no pair of cards shared with
+both other pods. But there's a second definition worth looking at: for
+each deck, the largest group of cards no other deck ever ran any two of —
+its unique ensemble, the part of the deck that was genuinely invented at
+that seat. (The three Yorion decks sit this one out: a 60-card maindeck
+gets extra room for unique pairs just by being big.) Core ownership turns
+out to be the opposite of originality: core decks average 9.9 unique
+cards, decks outside the core system 12.5.
+
+{{originality-hist}}
+
+% Decks by size of their largest unique ensemble (nonland cards, no pair
+% shared with any other deck). Yorion decks excluded.
+
+The record is 16, and it's a tie between Mark and tox 🍉:
+
+{{originality-winners}}
 
 ## Where the packages live
 
@@ -133,62 +170,5 @@ Add the pairs to the cores and count where the packages actually live:
 % The two-card packages, by color:
 
 {{pair-tabs}}
-
-## The most original decks
-
-Flip the question over. Instead of asking what recurred, ask what
-<i>never</i> did. There are two ways to be original here. The modest way:
-hold few packages — few of your two-card combinations were ever maindecked
-together in both other pods. The radical way: contain a large group of
-cards that <i>no other deck anywhere</i>, in any pod, ever ran two of
-together — a whole ensemble invented at your seat.
-
-### Fewest packages
-
-Count each deck's packages and the field bunches at two:
-
-{{teams-per-deck}}
-
-% Decks by number of packages (pairs or cores) in their maindeck.
-
-Twenty-seven decks hold at least one package. Exactly one holds zero — the
-gray seat from the chart, and it gets the full sendoff below.
-
-### The largest unique ensemble
-
-The radical way: for each deck, the largest group of cards no other deck
-ever ran any two of — its unique ensemble, the part of the deck that was
-genuinely invented at that table. (The three Yorion decks sit this one out:
-a 60-card maindeck gets extra room for unique pairs just by being big.)
-Core ownership turns out to be the opposite of originality: core decks
-average 9.9 unique cards, decks outside the core system 12.5.
-
-{{originality-hist}}
-
-% Decks by size of their largest unique ensemble (nonland cards, no pair
-% shared with any other deck). Yorion decks excluded.
-
-The record is 16, and it's a tie.
-
-{{originality-winners}}
-
-## The FOOMP deck
-
-Raise a glass. Twenty-seven drafters built decks made of packages —
-combinations the other pods discovered too. One did not. Three pods looked
-at the same 540 cards and kept drawing the same seven shapes; one drafter
-picked up Gyruda and drew a shape nobody else could even reach.
-<span class='todo'>[draft — make it yours]</span>
-
-Every other drafter — all 27 of them — built a deck containing at least one
-package: some two-card combination that also showed up, together, in both
-other pods. FOOMP is the exception. Not one pair of nonland cards in this
-deck was ever maindecked together in both other pods. There's a mechanical
-reason: the companion is Gyruda, and every single nonland card here has
-even mana value — a constraint that pulled this deck out of the card pool
-everyone else was drafting from. Twenty-eight decks, one true original.
-{{foomp-link}}
-
-{{foomp-gallery}}
 
 % <span class='todo'>TODO: continue — next sections from Jack's outline</span>
