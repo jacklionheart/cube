@@ -27,7 +27,9 @@ By looking at these cards, I think we can see what I see as the lanes as drafted
 
 Let me walk you through it!
 
-# The Major Lanes
+# The Well-Grooved Lanes
+
+{{lanes-viewer}}
 
 First, let's look at packages of size 3 or more -- these are large groups of cards that got played together in all 3 pods. There are 7 such packages of roughly 3 macro lanes: 2 mardu aggro packages, 3 green packages, and 2 blue packages.
 
@@ -35,12 +37,17 @@ Before we look at any individual package, let's review what this means. These ar
 
 However, the more cards that really do tend together, the more likely any subset of that group of cards is going to show up in this way. Therefore, while the presence of any specific card here means fairly little, the existence of some package in some general area is somewhat more robust.
 
-{{lanes-viewer}}
-
 ## Two Mardu aggro packages
 
 The RW tokens package is the largest package found in the data at 9 cards, while the RB sacrifice package is only 3 cards. I think this mostly reflects the fact that the tokens deck competed for cards with only the sacrifice decks, and only a little bit, so all 3 drafters were able to draft many of the same cards. The sacrifice decks at the three pods were much more different, and could play cards both from the tokens lanes as well as what I will later call the "esper rectangles" lane. While Aviseras did draft Weaponize the Monsters and put sacrifice synergies into his token deck, he didn't draft any of the cards in this "package"; in all 3 pods, the players in each pod drafting each of the two mardu aggro packages were different.
 
+### {{mana:WR}} Tokens
+
+{{core-tokens}}
+
+### {{mana:BR}} Sacrifice
+
+{{core-sac}}
 
 ## Three green packages for 2 decks
 
@@ -48,9 +55,29 @@ There are 3 green packages, but they represent two lanes. The three packages are
 
 As a group though, they demonstrate the two main ways for green to create an inevitable board presence: through ramp and the graveyard, and represent the two mana bases people are using to do it: temur and golgari.
 
+### {{mana:URG}} Temur Ramp
+
+{{core-ramp-urg}}
+
+### {{mana:BG}} Golgari Ramp
+
+{{core-ramp-bg}}
+
+### {{mana:BG}} Golgari Graveyard
+
+{{core-graveyard}}
+
 ## Two blue packages
 
 Like with the mardu decks, the blue lanes split fairly cleanly, with two different drafters in each pod for the two "lanes" of spells-matters and looting. The fact that the spells matter package is 5 cards while the looting package is only 3 cards reflects the open-endedness of the blue looting package: the decks using this package across pods were probably the most distinct of any of the packages. The spells package had a wider spectrum than the tokens decks, from tempo to control, but its wider core represents I think a clearer foundation of playing good cheap spells.
+
+### {{mana:UR}} Spells
+
+{{core-spells}}
+
+### {{mana:U}} Looting
+
+{{core-discard}}
 
 
 # Pairs
@@ -61,7 +88,7 @@ Like with the mardu decks, the blue lanes split fairly cleanly, with two differe
 % core (its family's color). Dashed white = Rectangles deck, with the family
 % its bonds lean toward. Gray = the wildcard.
 
-Those 7 lanes describe 6 of the drafters at each pod.  There were 2 pods of 9 people and 1 of 10 people, so this leaves 3-4 drafters per pod still undescribed by these major lanes. To answer this, I want to now look at all the **pairs** that were maindecked together in all 3 pods.
+Those 7 lanes describe 6 of the drafters at each pod.  There were 2 pods of 9 people and 1 of 10 people, so this leaves 3-4 drafters per pod still undescribed by these well-grooved lanes. To answer this, I want to now look at all the **pairs** that were maindecked together in all 3 pods.
 
 {{pair-table}}
 

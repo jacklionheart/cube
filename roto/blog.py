@@ -67,7 +67,7 @@ th, td { padding: 6px 16px 6px 0; border-bottom: 1px solid #e8e8e8;
     font: 15px -apple-system, 'Segoe UI', Helvetica, sans-serif;
     color: #6b6b6b; border-left: 2px solid transparent; }
 .sidebar button.on { color: #1a1a1a; border-left-color: #1a1a1a; }
-.vpanes { height: 560px; overflow-y: auto; }
+.vpanes { height: 400px; overflow-y: auto; }
 .vpanes .cards img { width: 122px; }
 .sbh { font: 600 11px -apple-system, 'Segoe UI', Helvetica, sans-serif;
        text-transform: uppercase; letter-spacing: .06em; color: #999;
@@ -347,13 +347,13 @@ document.addEventListener('click', e => {
                     "two of this family's cores:</p>" + "".join(h))
         return ""
 
-    parts["core-tokens"] = lane_block(tokens)
-    parts["core-sac"] = lane_block(sac)
-    parts["core-ramp-urg"] = lane_block(temur_ramp)
-    parts["core-ramp-bg"] = lane_block(golgari_ramp)
-    parts["core-graveyard"] = lane_block(graveyard)
-    parts["core-spells"] = lane_block(blue_spells)
-    parts["core-discard"] = lane_block(blue_tempo)
+    parts["core-tokens"] = gallery(tokens[1])
+    parts["core-sac"] = gallery(sac[1])
+    parts["core-ramp-urg"] = gallery(temur_ramp[1])
+    parts["core-ramp-bg"] = gallery(golgari_ramp[1])
+    parts["core-graveyard"] = gallery(graveyard[1])
+    parts["core-spells"] = gallery(blue_spells[1])
+    parts["core-discard"] = gallery(blue_tempo[1])
     parts["bridges-aggro"] = family_bridges("Aggro")
     parts["bridges-green"] = family_bridges("Green")
     parts["bridges-blue"] = family_bridges("Blue")
