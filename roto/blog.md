@@ -159,6 +159,13 @@ The record is 16, and it's a tie between Mark and tox 🍉:
 
 {{originality-winners}}
 
+The Yorion decks sat out the scoring, but one deserves the spotlight
+anyway — BladeTheKing, the arch-rectangles deck, still put together a
+13-card group nobody else ever echoed:
+<span class='todo'>[draft — make it yours]</span>
+
+{{originality-blade}}
+
 ## Where the packages live
 
 Add the pairs to the cores and count where the packages actually live:

@@ -768,6 +768,13 @@ showPairs('{order[0]}');
             "building:</p>")
         ow.append(gallery(ue[(lk, lpl)]))
     parts["originality-winners"] = "\n".join(ow)
+    blade = (0, "BladeTheKing")
+    assert len(ue[blade]) == 13 and len(by_deck_all[blade]) == 35, \
+        (len(ue[blade]), len(by_deck_all[blade]))  # blog.md hardcodes
+    parts["originality-blade"] = (
+        f"<p>{deck_link(*blade)}: {len(ue[blade])} of its "
+        f"{len(by_deck_all[blade])} nonland cards form a group that "
+        "exists nowhere else:</p>" + gallery(ue[blade]))
 
     # --- the FOOMP section --------------------------------------------
     by_deck = deck_sets(owners)
