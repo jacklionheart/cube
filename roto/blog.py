@@ -9,6 +9,7 @@ Usage: python3 blog.py
 
 import html
 import pathlib
+import random
 import re
 from collections import Counter
 from urllib.parse import quote
@@ -210,9 +211,16 @@ def main():
             u |= colors.get(c, set())
         return "".join(x for x in "WUBRG" if x in u) or "C"
 
-    def gallery(cards):
+    def gallery(cards, shuffle=False):
+        if shuffle:
+            # deterministic shuffle (seeded by the card set) so deck
+            # galleries don't read as alphabetical but builds stay stable
+            cards = sorted(cards)
+            random.Random(",".join(cards)).shuffle(cards)
+        else:
+            cards = sorted(cards)
         h = ["<div class='cards'>"]
-        for c in sorted(cards):
+        for c in cards:
             h.append(f"<img src='{scry[c].get('image')}' "
                      f"alt='{html.escape(c)}' title='{html.escape(c)}' "
                      f"loading='lazy'>")
@@ -599,7 +607,7 @@ document.addEventListener('click', e => {
         hid = "" if i == 0 else " hidden"
         fpanes.append(f"<div data-pane='fampairs' id='fp-{i}'{hid}>"
                       + pair_rows_gallery(by_fam_pairs[fam]) + "</div>")
-    fv.append("</div><div class='vpanes'>")
+    fv.append("</div><div>")
     fv += fpanes
     fv.append("</div></div>")
     parts["fam-pairs-viewer"] = "".join(fv)
@@ -785,7 +793,7 @@ showPairs('{order[0]}');
             f"{len(by_deck_all[(lk, lpl)])} nonland cards form a group "
             "that exists nowhere else in ninety decks' worth of "
             "building:</p>")
-        ow.append(gallery(ue[(lk, lpl)]))
+        ow.append(gallery(ue[(lk, lpl)], shuffle=True))
     parts["originality-winners"] = "\n".join(ow)
     blade = (0, "BladeTheKing")
     assert len(ue[blade]) == 13 and len(by_deck_all[blade]) == 35, \
@@ -793,7 +801,7 @@ showPairs('{order[0]}');
     parts["originality-blade"] = (
         f"<p>{deck_link(*blade)}: {len(ue[blade])} of its "
         f"{len(by_deck_all[blade])} nonland cards form a group that "
-        "exists nowhere else:</p>" + gallery(ue[blade]))
+        "exists nowhere else:</p>" + gallery(ue[blade], shuffle=True))
 
     # --- the FOOMP section --------------------------------------------
     by_deck = deck_sets(owners)
@@ -805,7 +813,7 @@ showPairs('{order[0]}');
     url = url_map.get((drafts[k].name, pl))
     parts["foomp-link"] = (f'<a href="{url}">sealeddeck</a>'
                            if url else "")
-    parts["foomp-gallery"] = gallery(by_deck[(k, pl)])
+    parts["foomp-gallery"] = gallery(by_deck[(k, pl)], shuffle=True)
 
     out = [f"<meta charset='utf-8'>"
            f"<title>The Lords of Limited Rotisserie Meta</title>"
