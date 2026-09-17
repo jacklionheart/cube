@@ -666,6 +666,25 @@ showPairs('{order[0]}');
 </script>""")
 
     # --- the most original decks --------------------------------------
+    # originality, weak sense: how few teams a deck holds at all
+    team_count = {(k, pl): sum(1 for sig, _ in groups if sig[k] == pl)
+                  for k, d in enumerate(drafts) for pl in d.players}
+    assert [dk for dk, n in team_count.items() if n == 0] \
+        == [(2, "FOOMP")]  # blog.md: exactly one team-less deck
+    tdist = Counter(team_count.values())
+    td = ["<div class='vchart'>"]
+    mxt = max(tdist.values())
+    for s in range(0, max(tdist) + 1):
+        n = tdist.get(s, 0)
+        hpx = round(n / mxt * 130) if n else 0
+        bar = (f"<div class='vbar' style='height:{hpx}px'></div>"
+               if n else "<div style='height:0'></div>")
+        td.append(f"<div class='vcol'><span class='vnum'>{n or ''}"
+                  f"</span>{bar}<span class='vlab'>{s}</span></div>")
+    td.append("</div>")
+    parts["teams-per-deck"] = "\n".join(td)
+
+    # originality, strong sense: unique ensembles.
     # Yorion-sized maindecks (35+ nonland) get more room for unique
     # pairs than 40-card decks, and not linearly — exclude them from
     # the scoring rather than trying to normalize.

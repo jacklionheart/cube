@@ -86,6 +86,20 @@ family.
 
 {{bridges-blue}}
 
+## The seat chart
+
+Before going any further, meet the pods. Every one of them resolves to
+the same shape: six drafters own the seven cores — one always doubles up,
+always in green. The dashed seats are the decks the core system never
+claimed; what <i>they</i> were building is where this essay is headed. And
+one deck bonded with nothing at all. It gets the final word.
+
+{{seat-chart}}
+
+% Every deck in every pod, by its place in the team system. Tinted = owns a
+% core (its family's color). Dashed white = Rectangles deck, with the family
+% its bonds lean toward. Gray = the wildcard.
+
 ## How the cores group
 
 The seven cores are not seven islands. Sort them by which actual decks they
@@ -131,21 +145,6 @@ deck fits nothing at all; it gets its own section.
 
 {{coreless-table}}
 
-## The seat chart
-
-Put it all together and every pod resolves to the same shape: six drafters
-own the seven cores (one always doubles up, always in green), and everyone
-else is a Rectangles drafter — except one wildcard. FOOMP's companion was
-Gyruda: every nonland card in that deck has even mana value, a constraint
-that pulled it out of everyone else's card pool entirely. That's why it
-bonded with nothing.
-
-{{seat-chart}}
-
-% Every deck in every pod, by its place in the team system. Tinted = owns a
-% core (its family's color). Dashed white = Rectangles deck, with the family
-% its bonds lean toward. Gray = the wildcard.
-
 ## Where the teams live
 
 Add the pairs to the cores and count where the teams actually live:
@@ -161,7 +160,26 @@ Add the pairs to the cores and count where the teams actually live:
 ## The most original decks
 
 Flip the question over. Instead of asking what recurred, ask what
-<i>never</i> did: for each deck, the largest group of cards no other deck
+<i>never</i> did. There are two ways to be original here. The modest way:
+hold few teams — few of your two-card combinations were ever maindecked
+together in both other pods. The radical way: contain a large group of
+cards that <i>no other deck anywhere</i>, in any pod, ever ran two of
+together — a whole ensemble invented at your seat.
+
+### Fewest teams
+
+Count each deck's teams and the field bunches at two:
+
+{{teams-per-deck}}
+
+% Decks by number of teams (pairs or cores) in their maindeck.
+
+Twenty-seven decks hold at least one team. Exactly one holds zero — the
+gray seat from the chart, and it gets the full sendoff below.
+
+### The largest unique ensemble
+
+The radical way: for each deck, the largest group of cards no other deck
 ever ran any two of — its unique ensemble, the part of the deck that was
 genuinely invented at that table. (The three Yorion decks sit this one out:
 a 60-card maindeck gets extra room for unique pairs just by being big.)
