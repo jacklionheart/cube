@@ -1,7 +1,7 @@
 # Three Rotos, One Cube
 
 I was recently fortunate enough to participate in some initial
-<a href="https://mtg.wiki/page/Rotisserie_Draft">rotisserie drafts</a> of the
+<a href="https://docs.google.com/spreadsheets/d/1i5IK8JKOeZpKZpV27YbqIFVNEkOQZq1rXRJQq-IBwCw/">rotisserie drafts</a> of the
 <a href="https://www.cubecobra.com/cube/list/0efda005-7243-457e-9d11-875e37d1b768">Lords of Limited cube</a>.
 Thanks to Ethan, Ben, and Greg of
 <a href="https://www.lordsoflimited.com">Lords of Limited</a> for envisioning,
