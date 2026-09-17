@@ -521,14 +521,12 @@ document.addEventListener('click', e => {
     out.append("<h2>Categorizing the pairs</h2>")
     out.append(
         "<p>Every pair, with the identity of its three owners. Where "
-        "a deck owns a core, that core is its label. The decks the "
-        "core system never claimed are labeled by what their own "
-        "pairs say — hold a free pair and you're a Rectangles deck; "
-        "Arason's equipment pile bonds only with Sac. A deck with no "
-        "pairs at all keeps its drafter's name. Read down the table "
-        "and the law shows itself: when a pair sits with a core "
-        "twice, the third owner is a sibling from the same family, "
-        "or Rectangles — never a core from another family.</p>")
+        "a deck owns a core, that core is its label; every core-less "
+        "deck is a Rectangles deck (a deck with no teams at all "
+        "keeps its drafter's name). Read down the table and the law "
+        "shows itself: when a pair sits with a core twice, the third "
+        "owner is a sibling from the same family, or Rectangles — "
+        "never a core from another family.</p>")
     deck_core_lab = {}
     for lsig, lcards in lanes:
         nm = core_name(lcards)
@@ -549,27 +547,13 @@ document.addEventListener('click', e => {
                 f"{html.escape(c)}</a>")
 
     def coreless_label(k, pl):
-        """Affiliation of a no-core deck, read off its own pairs:
-        Rectangles if it holds a free pair, else its satellite or
-        bridge core, else nothing."""
-        labs = Counter()
-        for psig, _ in pair_teams:
-            if psig[k] != pl:
-                continue
-            for lsig, lcards in lanes:
-                if sum(a == b for a, b in zip(psig, lsig)) >= 2:
-                    labs[core_name(lcards)] += 1
-                    break
-            else:
-                if classify(psig) == "free":
-                    labs["Rectangles"] += 1
-                else:
-                    for kk, ppl in enumerate(psig):
-                        for nm in lane_of_deck.get((kk, ppl), []):
-                            labs[nm] += 1
-        if "Rectangles" in labs:
+        """Affiliation of a no-core deck. Every core-less deck that
+        holds any team at all is a Rectangles deck (Arason's bonds
+        lean Sac, but the deck is non-creature tokens to the bone);
+        a deck with no teams (FOOMP) gets nothing."""
+        if any(psig[k] == pl for psig, _ in pair_teams):
             return "Rectangles"
-        return labs.most_common(1)[0][0] if labs else None
+        return None
 
     def owner_cell(k, pl):
         labs = deck_core_lab.get((k, pl))
@@ -632,12 +616,14 @@ document.addEventListener('click', e => {
     out.append(
         "<p>Ten decks own no core. Label every pair with its family "
         "and ask what those ten decks were actually doing, and the "
-        "answer is mostly one word: Rectangles. Six of the nine "
-        "pair-holding decks touch it, and nothing else comes close. "
-        "Arason is the exception that proves the family system — his "
-        "equipment deck is functionally Sac's third seat — and roc "
-        "and ColdBrewNate lean Blue. One deck fits nothing at all; "
-        "he gets his own section.</p>")
+        "answer is one word: Rectangles. Arason is the instructive "
+        "case — both of that deck's teams point at Sac, because its "
+        "rectangle-makers (Magda, Piggy Bank) got claimed by aggro "
+        "decks in the other pods. But the deck itself is rectangles "
+        "to the bone: Blood, Treasure, Junk, equipment tokens. Bonds "
+        "measure who else wanted your cards, not what your deck "
+        "does. roc and ColdBrewNate lean Blue the same way. One "
+        "deck fits nothing at all; it gets its own section.</p>")
     out.append("<table><tr><th>Deck</th><th>Their pairs say</th></tr>")
     for k, pl in no_lane_x:
         my = [pair_label(psig) for psig, _ in pair_teams if psig[k] == pl]
@@ -671,11 +657,11 @@ document.addEventListener('click', e => {
     out.append(
         "<p>Put it all together and every pod resolves to the same "
         "shape: six drafters own the seven cores (one always doubles "
-        "up, always in green), two or three more are Rectangles "
-        "decks, and at most one deck sits outside the system "
-        "entirely. The one wrinkle is Arason — the only drafter in "
-        "any pod who filled a family's seat without owning one of "
-        "its cores.</p>")
+        "up, always in green), and everyone else is a Rectangles "
+        "drafter — except one wildcard. FOOMP's companion was "
+        "Gyruda: every nonland card in that deck has even mana "
+        "value, a constraint that pulled it out of everyone else's "
+        "card pool entirely. That's why it bonded with nothing.</p>")
     out.append("<div class='seats'>")
     for k, d in enumerate(drafts):
         col = [f"<div><div class='sbh'>{d.name}</div>"]
@@ -691,29 +677,24 @@ document.addEventListener('click', e => {
                              f"<span>{lab}</span></div>"))
             else:
                 main = coreless_label(k, pl)
-                if main == "Rectangles":
+                if main:
                     lean = seat_lean(k, pl)
                     lab = (f"Rectangles &middot; leans {lean}"
                            if lean else "Rectangles")
                     rows.append((2, 0, f"<div class='seat sRect'>{nm}"
                                  f"<span>{lab}</span></div>"))
-                elif main:
-                    fam = FAMILY[main]
-                    rows.append((1, FAM_ORDER.index(fam),
-                                 f"<div class='seat s{fam} adj'>{nm}"
-                                 f"<span>{main} adjunct — no core"
-                                 f"</span></div>"))
                 else:
                     rows.append((3, 0, f"<div class='seat sLone'>{nm}"
-                                 f"<span>no teams at all</span></div>"))
+                                 f"<span>wildcard — Gyruda, all even, "
+                                 f"no teams</span></div>"))
         col += [h for _, __, h in sorted(rows, key=lambda r: r[:2])]
         col.append("</div>")
         out.append("".join(col))
     out.append("</div>")
     out.append("<p class='meta'>Every deck in every pod, by its place "
                "in the team system. Tinted = owns a core (its family's "
-               "color). Dashed pink = family adjunct via pairs only. "
-               "Dashed white = Rectangles deck. Gray = no teams.</p>")
+               "color). Dashed white = Rectangles deck, with the "
+               "family its bonds lean toward. Gray = the wildcard.</p>")
 
     # --- bar graph: cards in teams by color identity + pair gallery ---
     ident = Counter()
@@ -846,8 +827,11 @@ showPairs('{order[0]}');
             f"that also showed up, together, in both other pods. "
             f"{html.escape(pl)} is the exception. Not one pair of "
             f"nonland cards in this deck was ever maindecked together "
-            f"in both other pods. Twenty-eight decks, one true "
-            f"original. {link}</p>")
+            f"in both other pods. There's a mechanical reason: the "
+            f"companion is Gyruda, and every single nonland card here "
+            f"has even mana value — a constraint that pulled this "
+            f"deck out of the card pool everyone else was drafting "
+            f"from. Twenty-eight decks, one true original. {link}</p>")
         out.append(gallery(dcards))
 
     out.append("<p class='meta'><span class='todo'>TODO: continue — "
