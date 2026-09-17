@@ -161,6 +161,10 @@ def render_doc(text, parts):
         elif block.startswith("%"):
             txt = " ".join(l.lstrip("% ") for l in block.splitlines())
             out.append(f"<p class='meta'>{sub(txt)}</p>")
+        elif all(l.startswith(("* ", "+ ", "- ")) for l in block.splitlines()):
+            items = "".join(f"<li>{sub(l[2:])}</li>"
+                            for l in block.splitlines())
+            out.append(f"<ul>{items}</ul>")
         else:
             out.append(f"<p>{sub(' '.join(block.splitlines()))}</p>")
     return out
@@ -781,7 +785,8 @@ showPairs('{order[0]}');
                            if url else "")
     parts["foomp-gallery"] = gallery(by_deck[(k, pl)])
 
-    out = [f"<meta charset='utf-8'><title>Three Rotos, One Cube</title>"
+    out = [f"<meta charset='utf-8'>"
+           f"<title>The Lords of Limited Rotisserie Meta</title>"
            f"<style>{CSS}</style>"]
     out += render_doc((HERE / "blog.md").read_text(), parts)
     out.append(HOVER_JS)

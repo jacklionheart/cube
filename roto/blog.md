@@ -1,4 +1,4 @@
-# Three Rotos, One Cube
+# The Lords of Limited Rotisserie Meta
 
 I was recently fortunate enough to participate in some initial
 <a href="https://docs.google.com/spreadsheets/d/1i5IK8JKOeZpKZpV27YbqIFVNEkOQZq1rXRJQq-IBwCw/">rotisserie drafts</a> of the
@@ -17,9 +17,23 @@ I want to use today is what I am calling a **package**. A **package** of
 together in all 3 pods. We can use these cards as a lens towards what are
 some of the attractive lanes of the cube.
 
+By looking at these cards, I think we can see what I see as the lanes as drafted by the players in these drafts. This was of course just 3 drafts, and already the cube has been majorly redesigned. Nothing here will discuss which decks won, and this offers ~zero predictive power about how future drafts will behave. However, I find it fun to look at what actually happened nonetheless. To skip to the conclusion, when I look at the **packages** that appeared in these drafts, this is what I see:
+
+* 2 Mardu aggro decks
+* 2 Green ramp/graveyard decks
+* 2 Blue spell/looting decks
+* 3 Esper rectangle decks
++ 1 crazy companion
+
+Let me walk you through it!
+
 # The Major Lanes
 
-First, I want to look at packages of size 3 or more -- these are large groups of cards that got played together in all 3 pods. There are 7 such lanes of roughly 3 macro groups: 2 mardu aggro lanes, 3 green lanes, and 2 blue lanes:
+First, let's look at packages of size 3 or more -- these are large groups of cards that got played together in all 3 pods. There are 7 such packages of roughly 3 macro lanes: 2 mardu aggro packages, 3 green packages, and 2 blue packages.
+
+Before we look at any individual package, let's review what this means. These are sets of cards that were maindecked together, in the same deck, in the three pods. Cards that are more linear are more likely to show up here, since they are more likely to be drafted only by someone in a specific lane. However, this is only three drafts, and most cards are sometimes contested, so there is quite a bit of randomness in which cards happened to co-occur in this particular set of drafts.
+
+However, the more cards that really do tend together, the more likely any subset of that group of cards is going to show up in this way. Therefore, while the presence of any specific card here means fairly little, the existence of some package in some general area is somewhat more robust.
 
 {{lanes-viewer}}
 
@@ -30,7 +44,9 @@ The RW tokens package is the largest package found in the data at 9 cards, while
 
 ## Three green packages for 2 decks
 
-There are 3 green packages, but they mostly represent two lanes. The three packages are Temur Ramp, Golgari Ramp, and Golgari Graveyard, but the way the cards split into three packages is kinda arbitrary — an artifact of which decks happened to share them. Path to the World Tree and Everything Pizza are basically the same card, and they sit in different packages only because pod 1 split them between two decks. The green players blended these strategies freely: in every pod, just 2 drafters covered all 3 packages, with one of them running two green packages in the same deck.
+There are 3 green packages, but they represent two lanes. The three packages are Temur Ramp, Golgari Ramp, and Golgari Graveyard. The way the cards split into three packages is kinda arbitrary here. Each pod had only 2 drafters splitting these three packages.
+
+As a group though, they demonstrate the two main ways for green to create an inevitable board presence: through ramp and the graveyard, and represent the two mana bases people are using to do it: temur and golgari.
 
 ## Two blue packages
 
