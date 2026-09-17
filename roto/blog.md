@@ -28,7 +28,7 @@ By looking at these cards, I think we can see what I see as the lanes as drafted
 {{seat-chart}}
 
 % Every drafter at every pod, in draft order. Tinted = owns one of the 7
-% big packages, colored by macro lane. Dashed white = White Rectangles.
+% big packages, colored by macro lane. Cream = White Rectangles.
 % Purple = the companion deck.
 
 Let me walk you through it!

@@ -80,7 +80,7 @@ th, td { padding: 6px 16px 6px 0; border-bottom: 1px solid #e8e8e8;
 .seat span { display: block; font-size: 11px; color: #6b6b6b; }
 .sAggro { background: #f7ebe8; } .sGreen { background: #ebf3e8; }
 .sBlue { background: #e8eff6; }
-.sRect { background: #fff; border: 1px dashed #b5b0a8; }
+.sRect { background: #f6f1e2; }
 .sFoomp { background: #f0e7f8; }
 .fdot { color: #9a6bb8; }
 ul { list-style: none; padding-left: 4px; margin: 14px 0 18px; }
