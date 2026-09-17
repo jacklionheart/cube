@@ -542,6 +542,46 @@ document.addEventListener('click', e => {
     parts["rectangles-gallery"] = ("<div class='pairs'>" + "".join(
         pair_span(pcards) for psig, pcards in free) + "</div>")
 
+    # --- pairs-by-lane-affiliation components for the Pairs section --
+    # here core-less decks show their drafter's name (the Rectangles
+    # concept isn't introduced yet at this point in the essay)
+    def pre_rect_cell(k, pl):
+        labs = deck_core_lab.get((k, pl))
+        return (" / ".join(labs) if labs
+                else f"<i>{short_link(k, pl)}</i>")
+
+    nonfree = [(psig, pc) for psig, pc in pair_teams
+               if classify(psig) != "free"]
+    full_lane = [(psig, pc) for psig, pc in nonfree
+                 if all((k, pl) in lane_of_deck
+                        for k, pl in enumerate(psig))]
+    partial = [t for t in nonfree if t not in full_lane]
+    assert len(full_lane) == 2 and len(partial) == 5, \
+        (len(full_lane), len(partial))  # blog.md hardcodes 2 and 5
+
+    def pair_rows_gallery(rows):
+        h = []
+        for psig, pcards in sorted(rows, key=lambda t: t[1]):
+            lab = " &middot; ".join(pre_rect_cell(k, pl)
+                                    for k, pl in enumerate(psig))
+            h.append(f"<div class='pairs'>{pair_span(pcards)}"
+                     f"<span class='meta' style='margin-left:10px'>"
+                     f"{lab}</span></div>")
+        return "".join(h)
+
+    parts["pairs-in-lane"] = pair_rows_gallery(full_lane)
+    parts["pairs-contested"] = pair_rows_gallery(partial)
+
+    rt = ["<table class='pairtab'><tr><th>Pair</th><th>Draft 1</th>"
+          "<th>Draft 2</th><th>Draft 3</th></tr>"]
+    for psig, pcards in sorted(free, key=lambda t: t[1]):
+        pair_cell = "<br>".join(card_link(c) for c in pcards)
+        cells = "".join(f"<td>{pre_rect_cell(k, pl)}</td>"
+                        for k, pl in enumerate(psig))
+        rt.append(f"<tr><td>{pair_cell}</td>{cells}</tr>")
+    rt.append("</table>")
+    parts["pairs-rect-table"] = "\n".join(rt)
+
     # --- which lanes do the no-lane decks fit into? -------------------
     def pair_label(psig):
         for lsig, lcards in lanes:

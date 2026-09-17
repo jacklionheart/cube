@@ -1,17 +1,27 @@
 # Three Rotos, One Cube
 
-I was recently fortunate enough to participate in some initial rotisserie drafts of the Lords of Limited cube. A lot of fun was had by all: lots of love to Ethan, Ben, and Greg for envisioning, designing, and administering the cube. Today I want to explore what happened in those drafts by looking at which cards were maindecked together in what pods.
+I was recently fortunate enough to participate in some initial
+<a href="https://mtg.wiki/page/Rotisserie_Draft">rotisserie drafts</a> of the
+<a href="https://www.cubecobra.com/cube/list/0efda005-7243-457e-9d11-875e37d1b768">Lords of Limited cube</a>.
+A lot of fun was had by all: lots of love to Ethan, Ben, and Greg of
+<a href="https://www.lordsoflimited.com">Lords of Limited</a> for envisioning,
+designing, and administering the cube. Today I want to explore what happened
+in those drafts by looking at which cards were maindecked together in what
+pods.
 
-I put together a spreadsheet that says for each drafter which cards they maindecked.  The unit of analysis I want to use today is what I am calling a **team**. A **team** of (non-land) cards is any group of cards, 2 or more, that were maindecked together in all 3 pods. We can use these cards as a lens towards what are some of the attractive lanes of the cube.
+I put together
+<a href="https://docs.google.com/spreadsheets/d/1_w-YcYynXZgzObp13fPUB1q8XNxN6IH7gFkyHgH8E8w/">a spreadsheet</a>
+that says for each drafter which cards they maindecked. The unit of analysis
+I want to use today is what I am calling a **team**. A **team** of
+(non-land) cards is any group of cards, 2 or more, that were maindecked
+together in all 3 pods. We can use these cards as a lens towards what are
+some of the attractive lanes of the cube.
 
 # The Major Lanes
 
 First, I want to look at teams of size 3 or more -- these are large groups of cards that got played together in all 3 pods. There are 7 such lanes of roughly 3 macro groups: 2 mardu aggro lanes, 3 green lanes, and 2 blue lanes:
 
 {{lanes-viewer}}
-
-Ask for the Cores and the data hands back just seven — and they sort
-themselves into three families:
 
 ## Two Mardu aggro packages
 
@@ -24,7 +34,7 @@ There are 3 green teams, but they mostly represent two lanes. The three teams ar
 
 ## Two blue packages
 
-Like with the mardu decks, the blue lanes split fairly cleanly, with two different drafters in each pod for the two "lanes" of spells-matters and looting. The fact that the spells matter team is 5 cards while the looting team is only 3 cards reflects the open-endedness of the blue looting package: the decks using this package across pods were probably the most distince of any of the packages. The spells package had a wider spectrum than the tokens decks, from tempo to control, but its wider core represents I think a clearer foundation of playing good cheap spells. 
+Like with the mardu decks, the blue lanes split fairly cleanly, with two different drafters in each pod for the two "lanes" of spells-matters and looting. The fact that the spells matter team is 5 cards while the looting team is only 3 cards reflects the open-endedness of the blue looting package: the decks using this package across pods were probably the most distinct of any of the packages. The spells package had a wider spectrum than the tokens decks, from tempo to control, but its wider core represents I think a clearer foundation of playing good cheap spells.
 
 
 # Pairs
@@ -39,55 +49,35 @@ Those 7 lanes describe 6 of the drafters at each pod.  There were 2 pods of 9 pe
 
 {{pair-table}}
 
-## Satellite Pairs
+## Pairs and the macro lanes
 
-Now let's start to look at pairs and ask: when were they played together with the bigger "lanes"? By definition, none of these pairs were *always* played in the same lane, as they otherwise would be included in that lane. However, if we look at our 7 packages as representing 3 macro lanes, a clean law shows up: every pair either orbits exactly one macro lane, or none at all. 7 of the 14 pairs are what I'll call **satellites** — pairs that sat inside a single macro lane's decks in at least 2 of the 3 pods. Two of them never left their lane at all: Hieroglyphic Illumination + Lórien Revealed lived in blue decks in all three pods, and Broodspinner + Disruptive Stormbrood in green ones. The other five sat with their lane twice, and in the third pod went to a deck outside the lane system entirely. What never happened, even once, was a pair sitting with one macro lane in one pod and a different macro lane in another. Whatever these pairs are, they know which lane they belong to. <span class='todo'>[draft — make it yours]</span>
+Now let's start to look at pairs and ask: when were they played together with the bigger "lanes"? By definition, none of these pairs were *always* played in the same lane, as they otherwise would be included in that lane. However, if we look at our 7 packages as representing 3 macro lanes, we can ask, how often do they stay within the 3 macro lanes?
 
-That leaves 7 pairs that never sat with any lane twice. They turn out to be the most interesting group in the data — and they're next. <span class='todo'>[draft — make it yours]</span>
+There are 14 such pairs. Of those, 2 were always within a macro lane:
 
-## How the cores group
+{{pairs-in-lane}}
 
-The seven cores are not seven islands. Sort them by which actual decks they
-ran through and they collapse into the three families above — and the
-grouping isn't aesthetic, it's mechanical:
+and 5 were drafted within one macro lane 2x, and in the third pod were drafted by one of the drafters outside one of the 7 "lanes" we've currently explored:
 
-{{cores-shared}}
+{{pairs-contested}}
 
-{{map}}
+There are 7 pairs left. These 7 were drafted by at most one drafter in the lanes we've currently explored. They reveal what I would call the 4th macro lane, Esper Rectangles:
 
-## Categorizing the pairs
+{{pairs-rect-table}}
 
-Every pair, with the identity of its three owners. Where a deck owns a
-core, that core is its label; every core-less deck is a Rectangles deck (a
-deck with no teams at all keeps its drafter's name). Read down the table
-and the law shows itself: when a pair sits with a core twice, the third
-owner is a sibling from the same family, or Rectangles — never a core from
-another family.
-
-
-## The Rectangles
-
-Seven pairs live entirely outside the core system — no core claims two of
-their decks, no two cores share them. Look at them together and they stop
-looking like leftovers: white-black drain enchantments, white auras and
-adventures, blue rooms and cases. We call the family Rectangles. It is the
-eighth core that never quite assembled — the bonds kept forming, in every
-pod, and never found their third card.
+Is it fair to call this a lane? The cards make the case themselves: rooms,
+cases, sagas, omens, auras, adventures — white, black, and blue non-creature
+cardboard. Rectangles. The decks make it stronger: of the 21 deck-slots
+these 7 pairs occupy, 17 belong to decks outside the seven lanes, and the
+same names keep coming up — BladeTheKing hosted four of the seven pairs,
+Balbadorf and bengolds three each. The honest counterargument is that no
+three of these cards ever assembled in one deck across all three pods, the
+way the real lanes did — the bonds kept forming pairwise and never found
+their third card. Call it the eighth core that never quite assembled, or
+the lane the cube keeps offering that nobody has fully accepted yet.
+<span class='todo'>[draft — make it yours]</span>
 
 {{rectangles-gallery}}
-
-## Where the core-less decks fit
-
-Ten decks own no core. Label every pair with its family and ask what those
-ten decks were actually doing, and the answer is one word: Rectangles.
-Arason is the instructive case — both of that deck's teams point at Sac,
-because its rectangle-makers (Magda, Piggy Bank) got claimed by aggro decks
-in the other pods. But the deck itself is rectangles to the bone: Blood,
-Treasure, Junk, equipment tokens. Bonds measure who else wanted your cards,
-not what your deck does. roc and ColdBrewNate lean Blue the same way. One
-deck fits nothing at all; it gets its own section.
-
-{{coreless-table}}
 
 ## Where the teams live
 
