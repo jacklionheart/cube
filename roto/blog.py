@@ -819,7 +819,10 @@ showPairs('{order[0]}');
         out.append(
             "<p>Raise a glass. Twenty-seven drafters built decks made "
             "of teams — combinations the other pods discovered too. "
-            "One did not. <span class='todo'>[draft — make it yours]"
+            "One did not. Three pods looked at the same 540 cards and "
+            "kept drawing the same seven shapes; one drafter picked "
+            "up Gyruda and drew a shape nobody else could even "
+            "reach. <span class='todo'>[draft — make it yours]"
             "</span></p>")
         out.append(
             f"<p>Every other drafter — all 27 of them — built a deck "
