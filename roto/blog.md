@@ -107,59 +107,36 @@ clearer foundation: good cheap spells.
 
 {{core-discard}}
 
-# Pairs
+# The 4th Lane: White Rectangles
 
 Those 7 lanes describe 6 drafters at each pod. With 2 pods of 9 and 1 of
-10, that leaves 3-4 drafters per pod undescribed. So now the **pairs**
-maindecked together in all 3 pods. There are 14 — and the most interesting
-seven mostly *avoided* the lanes: <span class='todo'>[draft — make it
-yours]</span>
+10, that leaves 3-4 drafters per pod undescribed. With one exception, I 
+think all of those drafters can be described as being in the "White Rectangles" macrolane.
 
 {{rectangles-gallery}}
 
-Each of these 7 pairs had at most one home among the lanes above. They
-reveal what I would call the 4th macro lane, White Rectangles:
+These are the 7 **pairs** that were drafted primarily by the drafters who did not draft any of the larger packages discussed earlier.  The rectangles lane is more modular than the other lanes, and relies more on specific card interactions rather than broad strategic alignment; therefore, it shows up only when you look at the card pairs -- the decks in the rectangles lane are too different from each other to show up in the larger packages.
 
-{{pairs-rect-table}}
+## Contested pairs
 
-Is it fair to call this a lane? The cards make the case: rooms, cases,
-sagas, omens, auras, adventures — white, black, and blue non-creature
-cardboard. Rectangles. The decks make it stronger: of the 21 deck-slots
-these 7 pairs occupy, 17 lie outside the seven lanes, and the same names
-recur — BladeTheKing hosted four of the seven pairs, Balbadorf and
-bengolds three each. The honest counterargument: no three of these cards
-ever assembled in one deck across all three pods, as the real lanes did —
-the bonds formed pairwise and never found a third card. Call it the
-eighth core that never assembled, or the lane the cube keeps offering
-that nobody has fully accepted.
-<span class='todo'>[draft — make it yours]</span>
-
-## The pairs that stayed home
-
-The other 7 pairs never left the well-grooved lanes. Two stayed inside a
-single macro lane in all three pods; five sat with one lane twice, the
-stray copy going to a rectangles deck. Not once did a pair sit with two
-different macro lanes. The whole system on one map — three families, six
-sub-archetypes, and the seven pairs that orbit them:
-<span class='todo'>[draft — make it yours]</span>
+There are 7 other pairs that were not part of any lane, but were drafted primarily by drafters within the three non-rectangles lanes. Two such pairs were always drafted by drafters within the same macro lane -- these can be seen as cards shared between themes in the same macro strategy. Five were drafted twice by a drafter in one lane and once by a "rectangles" drafter. These can be seen as cards that were fought over between rectangles and other lanes. 
 
 {{map}}
 
 ## The FOOMP deck
 
 Which brings us to the purple seat. FOOMP's is the only deck in all three
-pods with <i>no</i> package: not one pair of its nonland cards was ever
+pods with <i>no</i> package: not one pair of its nonland cards was 
 maindecked together at both other pods. The other 27 drafters all shared
-at least one bond:
-<span class='todo'>[draft — make it yours]</span>
+at least one pair with the other two pods:
 
 {{teams-per-deck}}
 
 % Decks by number of packages (pairs or cores) in their maindeck.
 
-There's a mechanical reason: the companion is Gyruda, so every nonland
-card has even mana value — a constraint that pulled the deck out of
-everyone else's card pool. Twenty-eight decks, one true original.
+There's a mechanical reason for this: FOOMP's deck has a Gyruda companion. In my opinion, it is
+an awesome statistical artifact validating how companions make deckbuilding truly unique.
+
 {{foomp-link}}
 
 {{foomp-gallery}}
@@ -167,11 +144,9 @@ everyone else's card pool. Twenty-eight decks, one true original.
 ## The most original decks
 
 FOOMP wins one definition of "most original": no pair shared with both
-other pods. A second definition: each deck's largest group of cards no
-other deck ever ran two of — its unique ensemble, the part invented at
-that seat. (The three Yorion decks sit out: a 60-card maindeck gets room
-for unique pairs just by being big.) Core ownership is the opposite of
-originality: core decks average 9.9 unique cards, the rest 12.5.
+other pods. But I explored as a second definition: which decks had the 
+largest set of cards which had no pair as a subset -- i.e., no 2 of its cards were ever maindecked together in any other deck.
+
 
 {{originality-hist}}
 
@@ -181,13 +156,6 @@ originality: core decks average 9.9 unique cards, the rest 12.5.
 The record is 16, and it's a tie between Mark and tox 🍉:
 
 {{originality-winners}}
-
-The Yorion decks sat out the scoring, but one deserves a spotlight
-anyway: BladeTheKing, the arch-rectangles deck, assembled a 13-card group
-nobody else echoed:
-<span class='todo'>[draft — make it yours]</span>
-
-{{originality-blade}}
 
 ## Where the packages live
 
