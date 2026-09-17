@@ -1,23 +1,23 @@
 # The Lords of Limited Rotisserie Meta
 
-I was recently fortunate enough to participate in some initial
+I recently had the good fortune to play in some initial
 <a href="https://docs.google.com/spreadsheets/d/1i5IK8JKOeZpKZpV27YbqIFVNEkOQZq1rXRJQq-IBwCw/">rotisserie drafts</a> of the
 <a href="https://www.cubecobra.com/cube/list/0efda005-7243-457e-9d11-875e37d1b768">Lords of Limited cube</a>.
 Thanks to Ethan, Ben, and Greg of
 <a href="https://www.lordsoflimited.com">Lords of Limited</a> for envisioning,
-designing, and administering the cube. Today I want to explore what happened
-in those drafts by looking at which cards were maindecked together in what
-pods.
+designing, and administering the cube. Here I explore those drafts by
+asking which cards were maindecked together in which pods.
 
 I put together
 <a href="https://docs.google.com/spreadsheets/d/1_w-YcYynXZgzObp13fPUB1q8XNxN6IH7gFkyHgH8E8w/">a spreadsheet</a>
-that identifies which cards were maindecked by which players. The unit of analysis
-I want to use today is what I am calling a **package**. A **package** of
-(non-land) cards is any group of cards, 2 or more, that were maindecked
-together in all 3 pods. We can use these cards as a lens towards what are
-some of the attractive lanes of the cube.
+of which cards each player maindecked. My unit of analysis is the
+**package**: any group of 2 or more non-land cards maindecked together in
+all 3 pods. Packages are a lens on the cube's attractive lanes.
 
-By looking at these cards, I think we can see what I see as the lanes as drafted by the players in these drafts. This was of course just 3 drafts, and already the cube has been majorly redesigned. Nothing here will discuss which decks won, and this offers ~zero predictive power about how future drafts will behave. However, I find it fun to look at what actually happened nonetheless. To skip to the conclusion, when I look at the **packages** that appeared in these drafts, this is what I see at each pod:
+This was just 3 drafts, and the cube has already been majorly redesigned.
+Nothing here discusses which decks won, and it offers ~zero predictive
+power about future drafts. Still, it's fun to look at what happened. To
+skip to the conclusion, here is what I see at each pod:
 
 * {{mana:R}} 2 Red aggro decks
 * {{mana:G}} 2 Green ramp/graveyard decks
@@ -37,15 +37,28 @@ Let me walk you through it!
 
 {{lanes-viewer}}
 
-First, let's look at packages of size 3 or more -- these are large groups of cards that got played together in all 3 pods. There are 7 such packages of roughly 3 macro lanes: 2 red aggro packages, 3 green packages, and 2 blue packages.
+First, the packages of size 3 or more. There are 7, in roughly 3 macro
+lanes: 2 red aggro, 3 green, and 2 blue.
 
-Before we look at any individual package, let's review what this means. These are sets of cards that were maindecked together, in the same deck, in the three pods. Cards that are more linear are more likely to show up here, since they are more likely to be drafted only by someone in a specific lane. However, this is only three drafts, and most cards are sometimes contested, so there is quite a bit of randomness in which cards happened to co-occur in this particular set of drafts.
+What does membership mean? These cards landed in the same deck in all
+three pods. Linear cards show up more often — only their lane wants them.
+But three drafts is a small sample, and most cards are sometimes
+contested, so chance plays a large part in which cards co-occurred.
 
-However, the more cards that really do tend together, the more likely any subset of that group of cards is going to show up in this way. Therefore, while the presence of any specific card here means fairly little, the existence of some package in some general area is somewhat more robust.
+Still, the more cards that truly run together, the likelier some subset
+surfaces here. Any single card means little; a package in a general area
+means more.
 
 ## Two Red aggro packages
 
-The RW tokens package is the largest package found in the data at 9 cards, while the RB sacrifice package is only 3 cards. I think this mostly reflects the fact that the tokens deck competed for cards with only the sacrifice decks, and only a little bit, so all 3 drafters were able to draft many of the same cards. The sacrifice decks at the three pods were much more different, and could play cards both from the tokens lanes as well as what I will later call the "white rectangles" lane. While Aviseras did draft Weaponize the Monsters and put sacrifice synergies into his token deck, he didn't draft any of the cards in this "package"; in all 3 pods, the players in each pod drafting each of the two red aggro packages were different.
+The RW tokens package, at 9 cards, is the largest in the data; the RB
+sacrifice package has only 3. The difference is competition. Only the
+sacrifice decks contested the tokens cards, and only lightly, so all 3
+tokens drafters took many of the same cards. The sacrifice decks varied
+far more, borrowing from both the tokens lane and what I will call the
+"white rectangles" lane. Aviseras drafted Weaponize the Monsters and
+built sacrifice synergies into his token deck, but took none of this
+package; in all 3 pods, different players drafted the two packages.
 
 ### {{mana:WR}} Tokens
 
@@ -57,9 +70,13 @@ The RW tokens package is the largest package found in the data at 9 cards, while
 
 ## Three green packages for 2 decks
 
-There are 3 green packages, but they represent two lanes. The three packages are Temur Ramp, Golgari Ramp, and Golgari Graveyard. The way the cards split into three packages is kinda arbitrary here. Each pod had only 2 drafters splitting these three packages.
+There are 3 green packages — Temur Ramp, Golgari Ramp, and Golgari
+Graveyard — but they represent two lanes. The split into three is kinda
+arbitrary. Each pod had just 2 drafters covering all three.
 
-As a group though, they demonstrate the two main ways for green to create an inevitable board presence: through ramp and the graveyard, and represent the two mana bases people are using to do it: temur and golgari.
+Together they show green's two ways of building an inevitable board —
+ramp and the graveyard — and the two mana bases used to do it: temur and
+golgari.
 
 ### {{mana:URG}} Temur Ramp
 
@@ -75,7 +92,12 @@ As a group though, they demonstrate the two main ways for green to create an ine
 
 ## Two blue packages
 
-Like with the red decks, the blue lanes split fairly cleanly, with two different drafters in each pod for the two "lanes" of spells-matters and looting. The fact that the spells matter package is 5 cards while the looting package is only 3 cards reflects the open-endedness of the blue looting package: the decks using this package across pods were probably the most distinct of any of the packages. The spells package had a wider spectrum than the tokens decks, from tempo to control, but its wider core represents I think a clearer foundation of playing good cheap spells.
+As with red, the blue lanes split cleanly: in each pod, different
+drafters took spells-matters and looting. The spells package has 5 cards,
+looting only 3 — the gap reflects looting's open-endedness; its decks
+were the most distinct of any package's. The spells decks ranged from
+tempo to control, wider than tokens, but their larger core marks a
+clearer foundation: good cheap spells.
 
 ### {{mana:UR}} Spells
 
@@ -87,68 +109,69 @@ Like with the red decks, the blue lanes split fairly cleanly, with two different
 
 # Pairs
 
-Those 7 lanes describe 6 of the drafters at each pod.  There were 2 pods of 9 people and 1 of 10 people, so this leaves 3-4 drafters per pod still undescribed by these well-grooved lanes. To answer this, I want to now look at all the **pairs** that were maindecked together in all 3 pods. There are 14 of them — and the most interesting seven are the ones that mostly *avoided* the lanes: <span class='todo'>[draft — make it yours]</span>
+Those 7 lanes describe 6 drafters at each pod. With 2 pods of 9 and 1 of
+10, that leaves 3-4 drafters per pod undescribed. So now the **pairs**
+maindecked together in all 3 pods. There are 14 — and the most interesting
+seven mostly *avoided* the lanes: <span class='todo'>[draft — make it
+yours]</span>
 
 {{rectangles-gallery}}
 
-These 7 pairs were drafted by at most one drafter in the lanes we've explored so far. They reveal what I would call the 4th macro lane, White Rectangles:
+Each of these 7 pairs had at most one home among the lanes above. They
+reveal what I would call the 4th macro lane, White Rectangles:
 
 {{pairs-rect-table}}
 
-Is it fair to call this a lane? The cards make the case themselves: rooms,
-cases, sagas, omens, auras, adventures — white, black, and blue non-creature
+Is it fair to call this a lane? The cards make the case: rooms, cases,
+sagas, omens, auras, adventures — white, black, and blue non-creature
 cardboard. Rectangles. The decks make it stronger: of the 21 deck-slots
-these 7 pairs occupy, 17 belong to decks outside the seven lanes, and the
-same names keep coming up — BladeTheKing hosted four of the seven pairs,
-Balbadorf and bengolds three each. The honest counterargument is that no
-three of these cards ever assembled in one deck across all three pods, the
-way the real lanes did — the bonds kept forming pairwise and never found
-their third card. Call it the eighth core that never quite assembled, or
-the lane the cube keeps offering that nobody has fully accepted yet.
+these 7 pairs occupy, 17 lie outside the seven lanes, and the same names
+recur — BladeTheKing hosted four of the seven pairs, Balbadorf and
+bengolds three each. The honest counterargument: no three of these cards
+ever assembled in one deck across all three pods, as the real lanes did —
+the bonds formed pairwise and never found a third card. Call it the
+eighth core that never assembled, or the lane the cube keeps offering
+that nobody has fully accepted.
 <span class='todo'>[draft — make it yours]</span>
 
 ## The pairs that stayed home
 
-The other 7 pairs never left the well-grooved lanes. Two lived inside a
-single macro lane in all three pods; five sat with one macro lane twice,
-with the stray copy going to one of the rectangles decks. Not once did a
-pair sit with one macro lane in one pod and a different macro lane in
-another. Here is the whole system on one map: the three families, their six
-sub-archetypes, and the seven pairs that orbit them.
+The other 7 pairs never left the well-grooved lanes. Two stayed inside a
+single macro lane in all three pods; five sat with one lane twice, the
+stray copy going to a rectangles deck. Not once did a pair sit with two
+different macro lanes. The whole system on one map — three families, six
+sub-archetypes, and the seven pairs that orbit them:
 <span class='todo'>[draft — make it yours]</span>
 
 {{map}}
 
 ## The FOOMP deck
 
-Which brings us to the purple seat at the top. FOOMP's deck is the only
-deck across all three pods with <i>no</i> package at all: not a single
-pair of its nonland cards was ever maindecked together at both other
-pods. Everyone else — all 27 of them — shared at least one bond with the
-other pods:
+Which brings us to the purple seat. FOOMP's is the only deck in all three
+pods with <i>no</i> package: not one pair of its nonland cards was ever
+maindecked together at both other pods. The other 27 drafters all shared
+at least one bond:
 <span class='todo'>[draft — make it yours]</span>
 
 {{teams-per-deck}}
 
 % Decks by number of packages (pairs or cores) in their maindeck.
 
-There's a mechanical reason: the companion is Gyruda, and every single
-nonland card in the deck has even mana value — a constraint that pulled
-this deck out of the card pool everyone else was drafting from.
-Twenty-eight decks, one true original. {{foomp-link}}
+There's a mechanical reason: the companion is Gyruda, so every nonland
+card has even mana value — a constraint that pulled the deck out of
+everyone else's card pool. Twenty-eight decks, one true original.
+{{foomp-link}}
 
 {{foomp-gallery}}
 
 ## The most original decks
 
-FOOMP wins one definition of "most original": no pair of cards shared with
-both other pods. But there's a second definition worth looking at: for
-each deck, the largest group of cards no other deck ever ran any two of —
-its unique ensemble, the part of the deck that was genuinely invented at
-that seat. (The three Yorion decks sit this one out: a 60-card maindeck
-gets extra room for unique pairs just by being big.) Core ownership turns
-out to be the opposite of originality: core decks average 9.9 unique
-cards, decks outside the core system 12.5.
+FOOMP wins one definition of "most original": no pair shared with both
+other pods. A second definition: each deck's largest group of cards no
+other deck ever ran two of — its unique ensemble, the part invented at
+that seat. (The three Yorion decks sit out: a 60-card maindeck gets room
+for unique pairs just by being big.) Core ownership is the opposite of
+originality: core decks average 9.9 unique cards, the rest 12.5.
 
 {{originality-hist}}
 
@@ -159,16 +182,16 @@ The record is 16, and it's a tie between Mark and tox 🍉:
 
 {{originality-winners}}
 
-The Yorion decks sat out the scoring, but one deserves the spotlight
-anyway — BladeTheKing, the arch-rectangles deck, still put together a
-13-card group nobody else ever echoed:
+The Yorion decks sat out the scoring, but one deserves a spotlight
+anyway: BladeTheKing, the arch-rectangles deck, assembled a 13-card group
+nobody else echoed:
 <span class='todo'>[draft — make it yours]</span>
 
 {{originality-blade}}
 
 ## Where the packages live
 
-Add the pairs to the cores and count where the packages actually live:
+Add the pairs to the cores and count where the packages live:
 
 {{teams-chart}}
 
