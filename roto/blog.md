@@ -1,104 +1,47 @@
 # Three Rotos, One Cube
 
-Twenty-eight drafters. Three rotisserie pods. Five hundred and forty cards,
-every pick public, every deck recovered. When three groups of people who
-never talked to each other keep building the same things, that's not taste —
-that's the cube talking. <span class='todo'>[draft — make it yours]</span>
+I was recently fortunate enough to participate in some initial rotisserie drafts of the Lords of Limited cube. A lot of fun was had by all: lots of love to Ethan, Ben, and Greg for envisioning, designing, and administering the cube. Today I want to explore what happened in those drafts by looking at which cards were maindecked together in what pods.
 
-The goal of this essay is a 10,000-foot view of the Lords of Limited Cube —
-drawn not from card evaluations but from what three rotisserie pods actually
-built. The unit of analysis is the <b>team</b>: a set of nonland cards that
-were maindecked together, in the same deck, in all three pods. Three
-different drafters, three different decks, the same cards ending up shoulder
-to shoulder every time.
+I put together a spreadsheet that says for each drafter which cards they maindecked.  The unit of analysis I want to use today is what I am calling a **team**. A **team** of (non-land) cards is any group of cards, 2 or more, that were maindecked together in all 3 pods. We can use these cards as a lens towards what are some of the attractive lanes of the cube.
 
-Teams come in two sizes: <b>Pairs</b> — exactly two cards — and
-<b>Cores</b> — three or more.
+# The Major Lanes
+
+First, I want to look at teams of size 3 or more -- these are large groups of cards that got played together in all 3 pods. There are 7 such lanes of roughly 3 macro groups: 2 mardu aggro lanes, 3 green lanes, and 2 blue lanes:
 
 {{lanes-viewer}}
 
 Ask for the Cores and the data hands back just seven — and they sort
 themselves into three families:
 
-## Two Mardu aggro decks
+## Two Mardu aggro packages
 
-The aggro seats resolved into two cores that live one pip apart. Tokens is
-the largest and most stable structure in the data — nine cards that three
-different drafters assembled almost identically, a deck the cube practically
-deals to whoever sits down in it. Sac is its darker sibling: Deadly Dispute,
-Marionette Apprentice, and Mayhem Devil forming the sacrifice engine every
-pod rebuilt. The two bridges below are why these read as one Mardu family —
-Bastion of Remembrance and Voice of Victory, Magda and Torch the Tower each
-lived in a Sac deck in one pod and a Tokens deck in another. The white and
-red halves bleed into each other; the black-red core just decides which half
-you're in.
+The RW tokens team is the largest team found in the data at 10 cards, while the RB sacrifice team is only 3 cards. I think this mostly reflects the fact that the tokens deck competed for cards with only the sacrifice decks, and only a little bit, so all 3 drafters were able to draft many of the same cards. The sacrifice decks at the three pods were much more different, and could play cards both from the tokens lanes as well as what I will later call the "esper rectangles" lane. While Aviseras did draft Weaponize the Monsters and put sacrifice synergies into his token deck, he didn't draft any of the cards in this "team"; in all 3 pods, the players in each pod drafting each of the two mardu aggro teams were different.
 
-### {{mana:WR}} Tokens
 
-{{core-tokens}}
+## Three green packages for 2 decks
 
-### {{mana:BR}} Sac
+There are 3 green teams, but they mostly represent two lanes. The three teams are Temur Ramp, Golgari Ramp, and Golgari Graveyard, but the green players often blended these strategies; every Golgari Ramp drafter was either also a Temur Ramp drafter or a Golgari Graveyard drafter.
 
-{{core-sac}}
+## Two blue packages
 
-{{bridges-aggro}}
+Like with the mardu decks, the blue lanes split fairly cleanly, with two different drafters in each pod for the two "lanes" of spells-matters and looting. The fact that the spells matter team is 5 cards while the looting team is only 3 cards reflects the open-endedness of the blue looting package: the decks using this package across pods were probably the most distince of any of the packages. The spells package had a wider spectrum than the tokens decks, from tempo to control, but its wider core represents I think a clearer foundation of playing good cheap spells. 
 
-## Three green decks
 
-Green produced three cores and one connected engine room. The two ramp
-cores — the five-color Fires-of-Invention pile and the Pizza build — share
-two of their three drafters, which is to say: the people who ramp, ramp both
-ways. Graveyard is the third leg — a Spider Spawning value core, Golgari
-once you count the flashback cost — sharing a drafter with Fires Ramp. Where
-Aggro splits into two clean decks, Green is one ecosystem with three stable
-expressions.
-
-### {{mana:URG}} Ramp
-
-{{core-ramp-urg}}
-
-### {{mana:BG}} Ramp
-
-{{core-ramp-bg}}
-
-### {{mana:G}} Graveyard
-
-{{core-graveyard}}
-
-{{bridges-green}}
-
-## Two blue decks
-
-Blue split along the oldest line there is: do you want to answer things or
-untap and win. The Spells core is pure spell velocity — Consider, Think
-Twice, Expressive Iteration, Demon Bolt. The Discard core is the
-Censor-Quench-Shoreline Looter package that taxes and chips. Hieroglyphic
-Illumination and Lórien Revealed ride with both, the card-flow glue of the
-family.
-
-### {{mana:UR}} Spells
-
-{{core-spells}}
-
-### {{mana:U}} Discard
-
-{{core-discard}}
-
-{{bridges-blue}}
-
-## The seat chart
-
-Before going any further, meet the pods. Every one of them resolves to
-the same shape: six drafters own the seven cores — one always doubles up,
-always in green. The dashed seats are the decks the core system never
-claimed; what <i>they</i> were building is where this essay is headed. And
-one deck bonded with nothing at all. It gets the final word.
+# Pairs
 
 {{seat-chart}}
 
 % Every deck in every pod, by its place in the team system. Tinted = owns a
 % core (its family's color). Dashed white = Rectangles deck, with the family
 % its bonds lean toward. Gray = the wildcard.
+
+Those 7 lanes describe 6 of the drafters at each pod.  There were 2 pods of 9 people and 1 of 10 people, so this leaves 3-4 drafters per pod still undescribed by these major lanes. To answer this, I want to now look at all the **pairs** that were maindecked together in all 3 pods.
+
+{{pair-table}}
+
+## Satellite Pairs
+
+Now let's start to look at pairs and ask: when were they played together with the bigger "lanes"? By definition, none of these pairs were *always* played in the same lane, as they otherwiser would be included in that lane. However, if we look at our 7 packages as representing 3 macro lanes, ...
 
 ## How the cores group
 
@@ -119,7 +62,6 @@ and the law shows itself: when a pair sits with a core twice, the third
 owner is a sibling from the same family, or Rectangles — never a core from
 another family.
 
-{{pair-table}}
 
 ## The Rectangles
 
