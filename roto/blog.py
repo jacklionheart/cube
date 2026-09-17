@@ -304,6 +304,7 @@ document.addEventListener('click', e => {
 </script>""")
     parts["lanes-viewer"] = "\n".join(vh)
 
+    CORE_COLORS = {core_name(lc): colors_of(lc) for _, lc in lanes}
     lane_of_deck = {}
     for lsig, lcards in lanes:
         nm = core_name(lcards)
@@ -451,7 +452,7 @@ document.addEventListener('click', e => {
 
     ramp_cards = sorted(temur_ramp[1] + golgari_ramp[1])
     col_defs = [
-        ("MARDU", "#f7ebe8",
+        ("RED", "#f7ebe8",
          [("WR", "Tokens", tokens[1]), ("BR", "Sac", sac[1])],
          by_fam_pairs["Aggro"]),
         ("GREEN", "#ebf3e8",
@@ -644,7 +645,8 @@ document.addEventListener('click', e => {
                            f"<span>{lab}</span></div>")
             elif coreless_label(k, pl):
                 lean = seat_lean(k, pl)
-                lab = (f"Rectangles &middot; leans {lean}"
+                lab = (f"Rectangles &middot; leans "
+                       f"{mana(CORE_COLORS[lean])}&thinsp;{lean}"
                        if lean else "Rectangles")
                 col.append(f"<div class='seat sRect'>{nm}"
                            f"<span>{lab}</span></div>")
