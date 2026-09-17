@@ -117,6 +117,19 @@ think all of those drafters can be described as being in the "White Rectangles" 
 
 These are the 7 **pairs** that were drafted primarily by the drafters who did not draft any of the larger packages discussed earlier.  The rectangles lane is more modular than the other lanes, and relies more on specific card interactions rather than broad strategic alignment; therefore, it shows up only when you look at the card pairs -- the decks in the rectangles lane are too different from each other to show up in the larger packages.
 
+The rectangles decks rarely stayed pure — they tend to compete with, or
+hybridize with, the other lanes. Classify each by the lane it shared the
+most cards with across pods, and pods 2 and 3 split perfectly, one
+rectangles deck per neighbor: one blending with sacrifice (imrahil327's
+Lurrus aristocrats, Balbadorf's WB aristocrats), one with blue (roc,
+ColdBrewNate), one with green (tox 🍉's food deck, bengolds). Pod 1
+leaned green twice (BladeTheKing, DefeatistElitist) and left sacrifice
+to Arason's red equipment build. Ramp also reached back the other way:
+pod 2's double-ramp deck maindecked three of the seven rectangle pairs
+itself. And in every case, each rectangles deck's largest overlap of all
+was with the other rectangles decks — the lane is real.
+<span class='todo'>[draft — make it yours]</span>
+
 ## Contested pairs
 
 There are 7 other pairs that were not part of any lane, but were drafted primarily by drafters within the three non-rectangles lanes. Two such pairs were always drafted by drafters within the same macro lane -- these can be seen as cards shared between themes in the same macro strategy. Five were drafted twice by a drafter in one lane and once by a "rectangles" drafter. These can be seen as cards that were fought over between rectangles and other lanes. 
