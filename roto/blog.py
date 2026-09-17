@@ -9,6 +9,7 @@ Usage: python3 blog.py
 
 import html
 import pathlib
+import re
 from collections import Counter
 from urllib.parse import quote
 
@@ -127,6 +128,41 @@ def mana(letters):
         f"{s}.svg' alt='{s}'>" for s in syms)
 
 
+def render_doc(text, parts):
+    """The essay copy lives in blog.md: markdown-ish headings and
+    paragraphs (raw HTML passes through), '%'-prefixed lines for
+    captions/meta, and {{name}} slots for generated components (block
+    when alone on a line, inline otherwise). {{mana:WR}} renders pips."""
+    def resolve(name):
+        if name.startswith("mana:"):
+            return mana(name[5:])
+        return parts[name]
+
+    def sub(s):
+        return re.sub(r"\{\{([\w:-]+)\}\}",
+                      lambda m: resolve(m.group(1)), s)
+
+    out = []
+    for block in re.split(r"\n\s*\n", text):
+        block = block.strip()
+        if not block:
+            continue
+        if re.fullmatch(r"\{\{[\w:-]+\}\}", block):
+            out.append(resolve(block[2:-2]))
+        elif block.startswith("### "):
+            out.append(f"<h3>{sub(block[4:])}</h3>")
+        elif block.startswith("## "):
+            out.append(f"<h2>{sub(block[3:])}</h2>")
+        elif block.startswith("# "):
+            out.append(f"<h1>{sub(block[2:])}</h1>")
+        elif block.startswith("%"):
+            txt = " ".join(l.lstrip("% ") for l in block.splitlines())
+            out.append(f"<p class='meta'>{sub(txt)}</p>")
+        else:
+            out.append(f"<p>{sub(' '.join(block.splitlines()))}</p>")
+    return out
+
+
 def main():
     drafts, cube, decks = load()
     scry = load_scryfall()
@@ -220,27 +256,8 @@ def main():
     blue_spells = core_by_marker("Expressive Iteration")
     blue_tempo = core_by_marker("Shoreline Looter")
 
-    out = [f"<meta charset='utf-8'><title>Three Rotos, One Cube</title>"
-           f"<style>{CSS}</style>"]
-    out.append("<h1>Three Rotos, One Cube</h1>")
-    out.append(
-        "<p>Twenty-eight drafters. Three rotisserie pods. Five hundred "
-        "and forty cards, every pick public, every deck recovered. "
-        "When three groups of people who never talked to each other "
-        "keep building the same things, that's not taste — that's the "
-        "cube talking. <span class='todo'>[draft — make it yours]"
-        "</span></p>")
-    out.append(
-        "<p>The goal of this essay is a 10,000-foot view of the "
-        "Lords of Limited Cube — drawn not from card evaluations but "
-        "from what three rotisserie pods actually built. The unit of "
-        "analysis is the <b>team</b>: a set of nonland cards that were "
-        "maindecked together, in the same deck, in all three pods. "
-        "Three different drafters, three different decks, the same "
-        "cards ending up shoulder to shoulder every time.</p>")
-    out.append(
-        "<p>Teams come in two sizes: <b>Pairs</b> — exactly two cards — "
-        "and <b>Cores</b> — three or more.</p>")
+    parts = {}
+    assert len(lanes) == 7, len(lanes)  # blog.md says "seven"
 
     # --- the Lanes viewer: Macro -> Core sidebar + card viewer --------
     fam_order = ["Aggro", "Green", "Blue"]
@@ -248,24 +265,24 @@ def main():
     for lsig, lcards in lanes:
         nm = core_name(lcards)
         cores_by_fam[FAMILY[nm]].append((nm, lsig, lcards))
-    out.append("<div class='explorer'><div class='sidebar'>")
+    vh = ["<div class='explorer'><div class='sidebar'>"]
     idx = 0
     panes = []
     for f in fam_order:
-        out.append(f"<div class='sbh'>{f}</div>")
+        vh.append(f"<div class='sbh'>{f}</div>")
         for nm, lsig, lcards in cores_by_fam[f]:
             on = " class='on'" if idx == 0 else ""
-            out.append(f"<button{on} data-group='cores' "
-                       f"data-show='core-{idx}'>{mana(colors_of(lcards))} "
-                       f"{nm}</button>")
+            vh.append(f"<button{on} data-group='cores' "
+                      f"data-show='core-{idx}'>{mana(colors_of(lcards))} "
+                      f"{nm}</button>")
             hid = "" if idx == 0 else " hidden"
             panes.append(f"<div data-pane='cores' id='core-{idx}'{hid}>"
                          f"{gallery(lcards)}</div>")
             idx += 1
-    out.append("</div><div class='vpanes'>")
-    out += panes
-    out.append("</div></div>")
-    out.append("""<script>
+    vh.append("</div><div class='vpanes'>")
+    vh += panes
+    vh.append("</div></div>")
+    vh.append("""<script>
 document.addEventListener('click', e => {
   const b = e.target.closest('button[data-show]');
   if (!b) return;
@@ -276,12 +293,7 @@ document.addEventListener('click', e => {
     x => x.classList.toggle('on', x === b));
 });
 </script>""")
-
-
-    out.append(
-        "<p>Ask for the Cores and the data hands "
-        f"back just {len(lanes)} — and they sort themselves into "
-        "three families:</p>")
+    parts["lanes-viewer"] = "\n".join(vh)
 
     lane_of_deck = {}
     for lsig, lcards in lanes:
@@ -328,60 +340,16 @@ document.addEventListener('click', e => {
                     "two of this family's cores:</p>" + "".join(h))
         return ""
 
-    out.append("<h2>Two Mardu aggro decks</h2>")
-    out.append(
-        "<p>The aggro seats resolved into two cores that live one pip "
-        "apart. Tokens is the largest and most stable structure "
-        "in the data — nine cards that three different drafters "
-        "assembled almost identically, a deck the cube practically "
-        "deals to whoever sits down in it. Sac is its darker "
-        "sibling: Deadly Dispute, Marionette Apprentice, and Mayhem "
-        "Devil forming the sacrifice engine every pod rebuilt. The "
-        "two bridges below are why these read as one Mardu family — "
-        "Bastion of Remembrance and Voice of Victory, Magda and "
-        "Torch the Tower each lived in a Sac deck in one pod and a "
-        "Tokens deck in another. The white and red halves bleed into "
-        "each other; the black-red core just decides which half "
-        "you're in.</p>")
-    out.append(f"<h3>{mana('WR')} Tokens</h3>")
-    out.append(lane_block(tokens))
-    out.append(f"<h3>{mana('BR')} Sac</h3>")
-    out.append(lane_block(sac))
-    out.append(family_bridges("Aggro"))
-
-    out.append("<h2>Three green decks</h2>")
-    out.append(
-        "<p>Green produced three cores and one connected engine room. "
-        "The two ramp cores — the five-color Fires-of-Invention pile "
-        "and the Pizza build — share two of their three drafters, "
-        "which is to say: the people who ramp, ramp both ways. "
-        "Graveyard is the third leg — a Spider Spawning value core, "
-        "Golgari once you count the flashback cost — sharing a drafter "
-        "with Fires Ramp. Where "
-        "Aggro splits into two clean decks, Green is one ecosystem "
-        "with three stable expressions.</p>")
-    out.append(f"<h3>{mana('URG')} Ramp</h3>")
-    out.append(lane_block(temur_ramp))
-    out.append(f"<h3>{mana('BG')} Ramp</h3>")
-    out.append(lane_block(golgari_ramp))
-    out.append(f"<h3>{mana('G')} Graveyard</h3>")
-    out.append(lane_block(graveyard))
-    out.append(family_bridges("Green"))
-
-    out.append("<h2>Two blue decks</h2>")
-    out.append(
-        "<p>Blue split along the oldest line there is: do you want to "
-        "answer things or untap and win. The Spells core is pure "
-        "spell velocity — Consider, Think Twice, Expressive Iteration, "
-        "Demon Bolt. The Discard core is the Censor-Quench-Shoreline "
-        "Looter package that taxes and chips. Hieroglyphic "
-        "Illumination and Lórien Revealed ride with both, the "
-        "card-flow glue of the family.</p>")
-    out.append(f"<h3>{mana('UR')} Spells</h3>")
-    out.append(lane_block(blue_spells))
-    out.append(f"<h3>{mana('U')} Discard</h3>")
-    out.append(lane_block(blue_tempo))
-    out.append(family_bridges("Blue"))
+    parts["core-tokens"] = lane_block(tokens)
+    parts["core-sac"] = lane_block(sac)
+    parts["core-ramp-urg"] = lane_block(temur_ramp)
+    parts["core-ramp-bg"] = lane_block(golgari_ramp)
+    parts["core-graveyard"] = lane_block(graveyard)
+    parts["core-spells"] = lane_block(blue_spells)
+    parts["core-discard"] = lane_block(blue_tempo)
+    parts["bridges-aggro"] = family_bridges("Aggro")
+    parts["bridges-green"] = family_bridges("Green")
+    parts["bridges-blue"] = family_bridges("Blue")
 
     # --- how the cores group ------------------------------------------
     shared = []
@@ -394,15 +362,10 @@ document.addEventListener('click', e => {
                 shared.append((f"{mana(colors_of(ci))} {core_name(ci)}",
                                f"{mana(colors_of(cj))} {core_name(cj)}",
                                common))
-    out.append("<h2>How the cores group</h2>")
-    out.append(
-        "<p>The seven cores are not seven islands. Sort them by which "
-        "actual decks they ran through and they collapse into the "
-        "three families above — and the grouping isn't aesthetic, "
-        "it's mechanical:</p>")
-    for n1, n2, common in shared:
-        cc = ", ".join(deck_link(k, pl) for k, pl in common)
-        out.append(f"<p class='meta'>{n1} and {n2} share {cc}</p>")
+    parts["cores-shared"] = "\n".join(
+        f"<p class='meta'>{n1} and {n2} share "
+        + ", ".join(deck_link(k, pl) for k, pl in common) + "</p>"
+        for n1, n2, common in shared)
 
     # --- the map ------------------------------------------------------
     def svg_pips(cl, x, y):
@@ -515,18 +478,9 @@ document.addEventListener('click', e => {
                        f"<title>{html.escape(c)}</title></image>")
         px += 94
     svg.append("</svg>")
-    out.append("".join(svg))
+    parts["map"] = "".join(svg)
 
     # --- categorizing the pairs ---------------------------------------
-    out.append("<h2>Categorizing the pairs</h2>")
-    out.append(
-        "<p>Every pair, with the identity of its three owners. Where "
-        "a deck owns a core, that core is its label; every core-less "
-        "deck is a Rectangles deck (a deck with no teams at all "
-        "keeps its drafter's name). Read down the table and the law "
-        "shows itself: when a pair sits with a core twice, the third "
-        "owner is a sibling from the same family, or Rectangles — "
-        "never a core from another family.</p>")
     deck_core_lab = {}
     for lsig, lcards in lanes:
         nm = core_name(lcards)
@@ -572,28 +526,18 @@ document.addEventListener('click', e => {
     prows = sorted(pair_teams,
                    key=lambda t: (CAT_RANK[classify(t[0])],
                                   sat_core(t[0]), t[1]))
-    out.append("<table class='pairtab'><tr><th>Pair</th>"
-               "<th>Draft 1</th><th>Draft 2</th><th>Draft 3</th></tr>")
+    pt = ["<table class='pairtab'><tr><th>Pair</th>"
+          "<th>Draft 1</th><th>Draft 2</th><th>Draft 3</th></tr>"]
     for psig, pcards in prows:
         pair_cell = "<br>".join(card_link(c) for c in pcards)
         cells = "".join(f"<td>{owner_cell(k, pl)}</td>"
                         for k, pl in enumerate(psig))
-        out.append(f"<tr><td>{pair_cell}</td>{cells}</tr>")
-    out.append("</table>")
+        pt.append(f"<tr><td>{pair_cell}</td>{cells}</tr>")
+    pt.append("</table>")
+    parts["pair-table"] = "\n".join(pt)
 
-    out.append("<h2>The Rectangles</h2>")
-    out.append(
-        "<p>Seven pairs live entirely outside the core system — no "
-        "core claims two of their decks, no two cores share them. "
-        "Look at them together and they stop looking like leftovers: "
-        "white-black drain enchantments, white auras and adventures, "
-        "blue rooms and cases. We call the family Rectangles. It is "
-        "the eighth core that never quite assembled — the bonds kept "
-        "forming, in every pod, and never found their third card."
-        "</p><div class='pairs'>")
-    for psig, pcards in free:
-        out.append(pair_span(pcards))
-    out.append("</div>")
+    parts["rectangles-gallery"] = ("<div class='pairs'>" + "".join(
+        pair_span(pcards) for psig, pcards in free) + "</div>")
 
     # --- which lanes do the no-lane decks fit into? -------------------
     def pair_label(psig):
@@ -611,28 +555,16 @@ document.addEventListener('click', e => {
                   for k, pl in enumerate(lsig)}
     no_lane_x = [(k, pl) for k, d in enumerate(drafts)
                  for pl in d.players if (k, pl) not in lane_own_x]
-    from collections import Counter as _Cn
-    out.append("<h2>Where the core-less decks fit</h2>")
-    out.append(
-        "<p>Ten decks own no core. Label every pair with its family "
-        "and ask what those ten decks were actually doing, and the "
-        "answer is one word: Rectangles. Arason is the instructive "
-        "case — both of that deck's teams point at Sac, because its "
-        "rectangle-makers (Magda, Piggy Bank) got claimed by aggro "
-        "decks in the other pods. But the deck itself is rectangles "
-        "to the bone: Blood, Treasure, Junk, equipment tokens. Bonds "
-        "measure who else wanted your cards, not what your deck "
-        "does. roc and ColdBrewNate lean Blue the same way. One "
-        "deck fits nothing at all; it gets its own section.</p>")
-    out.append("<table><tr><th>Deck</th><th>Their pairs say</th></tr>")
+    ct = ["<table><tr><th>Deck</th><th>Their pairs say</th></tr>"]
     for k, pl in no_lane_x:
         my = [pair_label(psig) for psig, _ in pair_teams if psig[k] == pl]
-        cnt = _Cn(my)
+        cnt = Counter(my)
         fit = ", ".join(f"{l} ×{n}" if n > 1 else l
                         for l, n in cnt.most_common()) or "—"
-        out.append(f"<tr><td>{drafts[k].name} {html.escape(pl)}</td>"
-                   f"<td>{fit}</td></tr>")
-    out.append("</table>")
+        ct.append(f"<tr><td>{drafts[k].name} {html.escape(pl)}</td>"
+                  f"<td>{fit}</td></tr>")
+    ct.append("</table>")
+    parts["coreless-table"] = "\n".join(ct)
 
     # --- the seat chart -----------------------------------------------
     def seat_lean(k, pl):
@@ -653,16 +585,7 @@ document.addEventListener('click', e => {
         return labs.most_common(1)[0][0] if labs else None
 
     FAM_ORDER = ["Aggro", "Green", "Blue"]
-    out.append("<h2>The seat chart</h2>")
-    out.append(
-        "<p>Put it all together and every pod resolves to the same "
-        "shape: six drafters own the seven cores (one always doubles "
-        "up, always in green), and everyone else is a Rectangles "
-        "drafter — except one wildcard. FOOMP's companion was "
-        "Gyruda: every nonland card in that deck has even mana "
-        "value, a constraint that pulled it out of everyone else's "
-        "card pool entirely. That's why it bonded with nothing.</p>")
-    out.append("<div class='seats'>")
+    sc = ["<div class='seats'>"]
     for k, d in enumerate(drafts):
         col = [f"<div><div class='sbh'>{d.name}</div>"]
         rows = []
@@ -689,12 +612,9 @@ document.addEventListener('click', e => {
                                  f"no teams</span></div>"))
         col += [h for _, __, h in sorted(rows, key=lambda r: r[:2])]
         col.append("</div>")
-        out.append("".join(col))
-    out.append("</div>")
-    out.append("<p class='meta'>Every deck in every pod, by its place "
-               "in the team system. Tinted = owns a core (its family's "
-               "color). Dashed white = Rectangles deck, with the "
-               "family its bonds lean toward. Gray = the wildcard.</p>")
+        sc.append("".join(col))
+    sc.append("</div>")
+    parts["seat-chart"] = "\n".join(sc)
 
     # --- bar graph: cards in teams by color identity + pair gallery ---
     ident = Counter()
@@ -702,20 +622,15 @@ document.addEventListener('click', e => {
         cl = colors_of(cards)
         if len(cl) >= 2:
             ident[cl] += len(cards)
-    out.append("<h2>Where the teams live</h2>")
-    out.append(
-        "<p>Add the pairs to the cores and count where the teams "
-        "actually live:</p>")
     mx = max(ident.values())
-    out.append("<div class='vchart'>")
+    tc = ["<div class='vchart'>"]
     for cl, n in sorted(ident.items(), key=lambda x: -x[1]):
         hpx = round(n / mx * 130)
-        out.append(f"<div class='vcol'><span class='vnum'>{n}</span>"
-                   f"<div class='vbar' style='height:{hpx}px'></div>"
-                   f"<span class='vlab'>{mana(cl)}</span></div>")
-    out.append("</div>")
-    out.append("<p class='meta'>Cards in teams of each color identity "
-               "(teams of two or more colors).</p>")
+        tc.append(f"<div class='vcol'><span class='vnum'>{n}</span>"
+                  f"<div class='vbar' style='height:{hpx}px'></div>"
+                  f"<span class='vlab'>{mana(cl)}</span></div>")
+    tc.append("</div>")
+    parts["teams-chart"] = "\n".join(tc)
 
     pair_units = [sorted(cards) for _, cards in groups if len(cards) == 2]
     by_cl = {}
@@ -735,11 +650,11 @@ document.addEventListener('click', e => {
             pane.append(f"<span class='pair'>{imgs}</span>")
         pane.append("</div>")
         panes.append("".join(pane))
-    out.append("<p class='meta'>The two-card teams, by color:</p>")
-    out.append(f"<div class='tabs'>{''.join(tabs)}</div>")
-    out += panes
     cls = ",".join(f"'{c}'" for c in order)
-    out.append(f"""<script>
+    parts["pair-tabs"] = (
+        f"<div class='tabs'>{''.join(tabs)}</div>"
+        + "\n".join(panes)
+        + f"""<script>
 const pairGroups = [{cls}];
 function showPairs(g) {{
   for (const x of pairGroups) {{
@@ -764,81 +679,49 @@ showPairs('{order[0]}');
                 / sum(1 for dk in sizes if dk in lane_own_u))
     avg_free = (sum(v for dk, v in sizes.items() if dk not in lane_own_u)
                 / sum(1 for dk in sizes if dk not in lane_own_u))
-    out.append("<h2>The most original decks</h2>")
-    out.append(
-        "<p>Flip the question over. Instead of asking what recurred, "
-        "ask what <i>never</i> did: for each deck, the largest group of "
-        "cards no other deck ever ran any two of — its unique ensemble, "
-        "the part of the deck that was genuinely invented at that "
-        "table. (The three Yorion decks sit this one out: a 60-card "
-        "maindeck gets extra room for unique pairs just by being big.) "
-        "Core ownership turns out to be the opposite of originality: "
-        f"core decks average {avg_lane:.1f} unique cards, "
-        f"decks outside the core system {avg_free:.1f}.</p>")
-    from collections import Counter as _Ch
-    hist = _Ch(sizes.values())
-    out.append("<div class='vchart'>")
+    # blog.md hardcodes these; assert so copy drift gets caught
+    assert (round(avg_lane, 1), round(avg_free, 1)) == (9.9, 12.5), \
+        (avg_lane, avg_free)
+    hist = Counter(sizes.values())
+    oh = ["<div class='vchart'>"]
     mxh = max(hist.values())
     for s in range(min(hist), max(hist) + 1):
         n = hist.get(s, 0)
         hpx = round(n / mxh * 130) if n else 0
         bar = (f"<div class='vbar' style='height:{hpx}px'></div>"
                if n else "<div style='height:0'></div>")
-        out.append(f"<div class='vcol'><span class='vnum'>{n or ''}"
-                   f"</span>{bar}<span class='vlab'>{s}</span></div>")
-    out.append("</div>")
-    out.append("<p class='meta'>Decks by size of their largest unique "
-               "ensemble (nonland cards, no pair shared with any other "
-               "deck). Yorion decks excluded.</p>")
+        oh.append(f"<div class='vcol'><span class='vnum'>{n or ''}"
+                  f"</span>{bar}<span class='vlab'>{s}</span></div>")
+    oh.append("</div>")
+    parts["originality-hist"] = "\n".join(oh)
     max_size = max(sizes.values())
     leaders = sorted(dk for dk in sizes if sizes[dk] == max_size)
-    out.append(
-        f"<p>The record is {max_size}"
-        + ("." if len(leaders) == 1 else ", and it's a tie.")
-        + "</p>")
+    assert max_size == 16 and len(leaders) == 2, (max_size, leaders)
+    ow = []
     for lk, lpl in leaders:
-        out.append(
+        ow.append(
             f"<p>{deck_link(lk, lpl)}: {sizes[(lk, lpl)]} of its "
             f"{len(by_deck_all[(lk, lpl)])} nonland cards form a group "
             "that exists nowhere else in ninety decks' worth of "
             "building:</p>")
-        out.append(gallery(ue[(lk, lpl)]))
+        ow.append(gallery(ue[(lk, lpl)]))
+    parts["originality-winners"] = "\n".join(ow)
 
     # --- the FOOMP section --------------------------------------------
     by_deck = deck_sets(owners)
-    zero_team = []
-    for k, d in enumerate(drafts):
-        for pl in d.players:
-            if not any(sig[k] == pl for sig, _ in groups):
-                zero_team.append((k, pl))
-    for k, pl in zero_team:
-        dcards = by_deck[(k, pl)]
-        url = url_map.get((drafts[k].name, pl))
-        link = (f'<a href="{url}">sealeddeck</a>' if url else "")
-        out.append(f"<h2>The {html.escape(pl)} deck</h2>")
-        out.append(
-            "<p>Raise a glass. Twenty-seven drafters built decks made "
-            "of teams — combinations the other pods discovered too. "
-            "One did not. Three pods looked at the same 540 cards and "
-            "kept drawing the same seven shapes; one drafter picked "
-            "up Gyruda and drew a shape nobody else could even "
-            "reach. <span class='todo'>[draft — make it yours]"
-            "</span></p>")
-        out.append(
-            f"<p>Every other drafter — all 27 of them — built a deck "
-            f"containing at least one team: some two-card combination "
-            f"that also showed up, together, in both other pods. "
-            f"{html.escape(pl)} is the exception. Not one pair of "
-            f"nonland cards in this deck was ever maindecked together "
-            f"in both other pods. There's a mechanical reason: the "
-            f"companion is Gyruda, and every single nonland card here "
-            f"has even mana value — a constraint that pulled this "
-            f"deck out of the card pool everyone else was drafting "
-            f"from. Twenty-eight decks, one true original. {link}</p>")
-        out.append(gallery(dcards))
+    zero_team = [(k, pl) for k, d in enumerate(drafts)
+                 for pl in d.players
+                 if not any(sig[k] == pl for sig, _ in groups)]
+    assert zero_team == [(2, "FOOMP")], zero_team  # blog.md names FOOMP
+    k, pl = zero_team[0]
+    url = url_map.get((drafts[k].name, pl))
+    parts["foomp-link"] = (f'<a href="{url}">sealeddeck</a>'
+                           if url else "")
+    parts["foomp-gallery"] = gallery(by_deck[(k, pl)])
 
-    out.append("<p class='meta'><span class='todo'>TODO: continue — "
-               "next sections from Jack's outline</span></p>")
+    out = [f"<meta charset='utf-8'><title>Three Rotos, One Cube</title>"
+           f"<style>{CSS}</style>"]
+    out += render_doc((HERE / "blog.md").read_text(), parts)
     out.append(HOVER_JS)
 
     dest = HERE / "out" / "blog-post.html"
