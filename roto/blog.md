@@ -20,7 +20,7 @@ The RW tokens team is the largest team found in the data at 9 cards, while the R
 
 ## Three green packages for 2 decks
 
-There are 3 green teams, but they mostly represent two lanes. The three teams are Temur Ramp, Golgari Ramp, and Golgari Graveyard, but the green players often blended these strategies: in every pod, just 2 drafters covered all 3 teams, with one of them running two green teams in the same deck.
+There are 3 green teams, but they mostly represent two lanes. The three teams are Temur Ramp, Golgari Ramp, and Golgari Graveyard, but the way the cards split into three teams is kinda arbitrary — an artifact of which decks happened to share them. Path to the World Tree and Everything Pizza are basically the same card, and they sit in different teams only because pod 1 split them between two decks. The green players blended these strategies freely: in every pod, just 2 drafters covered all 3 teams, with one of them running two green teams in the same deck.
 
 ## Two blue packages
 
