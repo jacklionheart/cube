@@ -173,7 +173,7 @@ The other 27 drafters all shared at least one pair with the other two pods:
 
 {{teams-per-deck}}
 
-% Decks by number of packages (of any size) in their maindeck.
+% Decks by number of maindeck cards that belong to any (maximal) package.
 
 There's a mechanical reason for this: FOOMP's deck has a Gyruda companion. In my opinion, it is
 an awesome statistical artifact validating how companions make deckbuilding truly unique.

@@ -844,11 +844,12 @@ showPairs('{order[0]}');
 </script>""")
 
     # --- the most original decks --------------------------------------
-    # originality, weak sense: how few teams a deck holds at all
-    team_count = {(k, pl): sum(1 for sig, _ in groups if sig[k] == pl)
+    # originality, weak sense: how much of each maindeck was communal
+    team_count = {(k, pl): sum(len(cards) for sig, cards in groups
+                               if sig[k] == pl)
                   for k, d in enumerate(drafts) for pl in d.players}
     assert [dk for dk, n in team_count.items() if n == 0] \
-        == [(2, "FOOMP")]  # blog.md: exactly one team-less deck
+        == [(2, "FOOMP")]  # blog.md: exactly one package-less deck
     tdist = Counter(team_count.values())
     td = ["<div class='vchart'>"]
     mxt = max(tdist.values())
