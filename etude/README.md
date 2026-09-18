@@ -38,11 +38,19 @@ Blocks are separated by blank lines:
 - `**bold**`, `*italic*`, and ` -- ` becomes an em dash
 - `% ...` — a caption/meta paragraph (`.meta` styling); consecutive
   `%` lines join into one caption
-- `* item` / `- item` / `+ item` — a list (every line of the block must
-  be a list item)
+- `* item` / `- item` / `+ item` — list items; a block may mix stem
+  lines (rendered as paragraphs) with bullet runs. A list whose items
+  are all pips/HTML chips gets `class='plain'` (no markers)
+- a block starting with `<` — raw HTML, passed through without `<p>`
+  wrapping (slots still substituted)
 - `{{name}}` — a component slot. Alone on its own block it is inserted
   as a block; inline it is substituted into the surrounding text
 - `{{mana:WUBRG}}` — inline mana pips (no components.py entry needed)
+- posts can define their own inline tokens: a callable stored under a
+  key ending in `:` receives everything after the first colon — e.g.
+  `parts["deck:"]` makes `{{deck:1:Mark}}` render
+  `parts["deck:"]("1:Mark")`. The lol-roto-meta post uses this for
+  `{{deck:N:Player}}` and `{{drafter:N:Player}}` links
 
 Every other `{{name}}` must have a matching key in the dict returned by
 `components.build()` — a missing key fails the build (KeyError), which
@@ -62,7 +70,12 @@ is what you want.
 
    Optional module attributes: `CSS` (a full stylesheet replacing
    `ESSAY_CSS` — usually `ESSAY_CSS + "..."`), `HOVER = False` to drop
-   the hover-card layer if the post has no `data-img` links.
+   the hover-card layer if the post has no `data-img` links, and
+   `SCRIPTS` — raw HTML appended after the doc, before the hover layer.
+   `SCRIPTS` may be set by `build()` via `global` when it depends on
+   computed data; the lol-roto-meta post emits its `deckImgs` dict this
+   way, which the shared hover layer reads to show a whole-deck gallery
+   over any `[data-deck]` element.
 3. `python3 build.py my-post` and open `site/my-post/index.html`.
 
 Conventions that make posts hold up:

@@ -43,6 +43,7 @@ def build_post(post_dir):
         text, parts,
         css=getattr(mod, "CSS", ESSAY_CSS),
         hover=getattr(mod, "HOVER", True),
+        scripts=getattr(mod, "SCRIPTS", ""),
     )
 
 

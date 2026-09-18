@@ -7,6 +7,7 @@ build time. Prose is Jack's; this file only makes charts and galleries.
 """
 
 import html
+import json
 import pathlib
 import random
 import sys
@@ -20,13 +21,14 @@ for p in (str(ETUDE), str(ROTO)):
     if p not in sys.path:
         sys.path.insert(0, p)
 
-from etudelib.render import mana  # noqa: E402
+from etudelib.render import canon_key, mana  # noqa: E402
 from packages import (card_colors, deck_sets, load, load_scryfall,  # noqa: E402
                       maindeck_owners, nonland_owners, signature_groups,
                       unique_ensembles)
 from roto_summary import load_decks  # noqa: E402
 
 TITLE = "The Lords of Limited Rotisserie Meta"
+SCRIPTS = ""  # set by build(): the deckImgs data for [data-deck] hovers
 
 
 def build():
@@ -39,10 +41,12 @@ def build():
     url_map = {(dr, pl): u for dr, pl, kind, u, used in links
                if used == "Y" and "manual-" not in u}
 
-    def deck_link(k, pl):
+    def deck_link(k, pl, short=False):
         url = url_map.get((drafts[k].name, pl))
-        lab = html.escape(f"{drafts[k].name} {pl}")
-        return f'<a href="{url}">{lab}</a>' if url else lab
+        lab = html.escape(pl if short else f"{drafts[k].name} {pl}")
+        dd = f" data-deck='{k}:{html.escape(pl)}'"
+        return (f'<a href="{url}"{dd}>{lab}</a>' if url
+                else f'<a{dd}>{lab}</a>')
     lanes = [(sig, sorted(cards)) for sig, cards in groups
              if len(cards) >= 3]
     CORE_MARKERS = [("Rally at the Hornburg", "Tokens"),
@@ -67,7 +71,7 @@ def build():
             u |= colors.get(c, set())
         return "".join(x for x in "WUBRG" if x in u) or "C"
 
-    def gallery(cards, shuffle=False):
+    def gallery(cards, shuffle=False, small=False):
         if shuffle:
             # deterministic shuffle (seeded by the card set) so deck
             # galleries don't read as alphabetical but builds stay stable
@@ -75,7 +79,8 @@ def build():
             random.Random(",".join(cards)).shuffle(cards)
         else:
             cards = sorted(cards)
-        h = ["<div class='cards'>"]
+        cls = " small" if small else ""
+        h = [f"<div class='cards{cls}'>"]
         for c in cards:
             h.append(f"<img src='{scry[c].get('image')}' "
                      f"alt='{html.escape(c)}' title='{html.escape(c)}' "
@@ -214,13 +219,13 @@ document.addEventListener('click', e => {
                     "two of this family's cores:</p>" + "".join(h))
         return ""
 
-    parts["core-tokens"] = gallery(tokens[1])
-    parts["core-sac"] = gallery(sac[1])
-    parts["core-ramp-urg"] = gallery(temur_ramp[1])
-    parts["core-ramp-bg"] = gallery(golgari_ramp[1])
-    parts["core-graveyard"] = gallery(graveyard[1])
-    parts["core-spells"] = gallery(blue_spells[1])
-    parts["core-discard"] = gallery(blue_tempo[1])
+    parts["core-tokens"] = gallery(tokens[1], small=True)
+    parts["core-sac"] = gallery(sac[1], small=True)
+    parts["core-ramp-urg"] = gallery(temur_ramp[1], small=True)
+    parts["core-ramp-bg"] = gallery(golgari_ramp[1], small=True)
+    parts["core-graveyard"] = gallery(graveyard[1], small=True)
+    parts["core-spells"] = gallery(blue_spells[1], small=True)
+    parts["core-discard"] = gallery(blue_tempo[1], small=True)
     parts["bridges-aggro"] = family_bridges("Aggro")
     parts["bridges-green"] = family_bridges("Green")
     parts["bridges-blue"] = family_bridges("Blue")
@@ -362,7 +367,9 @@ document.addEventListener('click', e => {
     def short_link(k, pl):
         url = url_map.get((drafts[k].name, pl))
         lab = html.escape(pl)
-        return f'<a href="{url}">{lab}</a>' if url else lab
+        dd = f" data-deck='{k}:{html.escape(pl)}'"
+        return (f'<a href="{url}"{dd}>{lab}</a>' if url
+                else f'<a{dd}>{lab}</a>')
 
     def card_link(c):
         img = scry[c].get("image") or ""
@@ -633,11 +640,12 @@ showPairs('{order[0]}');
 </script>""")
 
     # --- the most original decks --------------------------------------
-    # originality, weak sense: how few teams a deck holds at all
-    team_count = {(k, pl): sum(1 for sig, _ in groups if sig[k] == pl)
+    # originality, weak sense: how much of each maindeck was communal
+    team_count = {(k, pl): sum(len(cards) for sig, cards in groups
+                               if sig[k] == pl)
                   for k, d in enumerate(drafts) for pl in d.players}
     assert [dk for dk, n in team_count.items() if n == 0] \
-        == [(2, "FOOMP")]  # post.md: exactly one team-less deck
+        == [(2, "FOOMP")]  # post.md: exactly one package-less deck
     tdist = Counter(team_count.values())
     td = ["<div class='vchart'>"]
     mxt = max(tdist.values())
@@ -683,15 +691,35 @@ showPairs('{order[0]}');
     max_size = max(sizes.values())
     leaders = sorted(dk for dk in sizes if sizes[dk] == max_size)
     assert max_size == 16 and len(leaders) == 2, (max_size, leaders)
-    ow = []
-    for lk, lpl in leaders:
-        ow.append(
-            f"<p>{deck_link(lk, lpl)}: {sizes[(lk, lpl)]} of its "
-            f"{len(by_deck_all[(lk, lpl)])} nonland cards form a group "
-            "that exists nowhere else in ninety decks' worth of "
-            "building:</p>")
-        ow.append(gallery(ue[(lk, lpl)], shuffle=True))
-    parts["originality-winners"] = "\n".join(ow)
+    assert leaders == [(0, "Mark"), (1, "tox 🍉")], leaders
+    parts["ensemble-mark"] = gallery(ue[(0, "Mark")], shuffle=True)
+    parts["ensemble-tox"] = gallery(ue[(1, "tox 🍉")], shuffle=True)
+    cbn = (2, "ColdBrewNate")
+    assert len(ue[cbn]) == 18 and len(by_deck_all[cbn]) == 37, \
+        (len(ue[cbn]), len(by_deck_all[cbn]))  # post.md hardcodes
+    parts["ensemble-cbn"] = gallery(ue[cbn], shuffle=True)
+
+    # bangers: all-3-pod cards that joined no package
+    in_pkg = {c for _, cards in groups for c in cards}
+    bangers = sorted(c for c, sig in owners.items()
+                     if None not in sig and c not in in_pkg)
+    assert len(bangers) == 48, len(bangers)  # post.md hardcodes
+    by_bc = {}
+    for c in bangers:
+        by_bc.setdefault(colors_of([c]), []).append(c)
+    order_bc = sorted(by_bc, key=canon_key)
+    bt = ["<div class='tabs'>"]
+    bpanes = []
+    for i, cl in enumerate(order_bc):
+        on = " class='on'" if i == 0 else ""
+        bt.append(f"<button{on} data-group='bangers' "
+                  f"data-show='bg-{i}'>{mana(cl)} {len(by_bc[cl])}"
+                  f"</button>")
+        hid = "" if i == 0 else " hidden"
+        bpanes.append(f"<div data-pane='bangers' id='bg-{i}'{hid}>"
+                      + gallery(by_bc[cl]) + "</div>")
+    bt.append("</div>")
+    parts["bangers-gallery"] = "".join(bt) + "\n".join(bpanes)
     blade = (0, "BladeTheKing")
     assert len(ue[blade]) == 13 and len(by_deck_all[blade]) == 35, \
         (len(ue[blade]), len(by_deck_all[blade]))  # post.md hardcodes
@@ -708,8 +736,28 @@ showPairs('{order[0]}');
     assert zero_team == [(2, "FOOMP")], zero_team  # post.md names FOOMP
     k, pl = zero_team[0]
     url = url_map.get((drafts[k].name, pl))
-    parts["foomp-link"] = (f'<a href="{url}">sealeddeck</a>'
-                           if url else "")
+    parts["foomp-link"] = (
+        f'<a href="{url}" data-deck="{k}:FOOMP">sealeddeck</a>'
+        if url else "")
     parts["foomp-gallery"] = gallery(by_deck[(k, pl)], shuffle=True)
+
+    # inline tokens: {{deck:N:Player}} (full link) and
+    # {{drafter:N:Player}} (name-only link), both deck-hoverable
+    def deck_token(arg, short=False):
+        num, dpl = arg.split(":", 1)
+        return deck_link(int(num) - 1, dpl, short=short)
+    parts["deck:"] = deck_token
+    parts["drafter:"] = lambda arg: deck_token(arg, short=True)
+
+    # the deckImgs data the shared [data-deck] hover layer reads
+    all_decks = deck_sets(owners)
+    deck_imgs = {f"{dk}:{dpl}": [scry[c].get("image")
+                                 for c in sorted(cards)
+                                 if scry[c].get("image")]
+                 for (dk, dpl), cards in all_decks.items()}
+    global SCRIPTS
+    SCRIPTS = ("<script>const deckImgs = "
+               + json.dumps(deck_imgs, separators=(",", ":"))
+               + ";</script>")
 
     return parts
