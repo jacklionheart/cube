@@ -78,7 +78,7 @@ sacrifice package has only 3. The difference is competition. Only the
 sacrifice decks contested the tokens cards, and only lightly, so all 3
 tokens drafters took many of the same cards. The sacrifice decks varied
 far more, borrowing from both the tokens package and what I will call the
-"White Rectangles" lane. Aviseras drafted Weaponize the Monsters and
+"White Rectangles" lane. {{drafter:2:Aviseras}} drafted Weaponize the Monsters and
 built sacrifice synergies into his tokens deck, but took none of this
 particular package; in all 3 pods, different drafters drafted the two packages.
 
@@ -231,3 +231,23 @@ of them, led by white.
 % The 48 bangers, tabbed by color.
 
 {{bangers-gallery}}
+
+## Appendix: checking the work
+
+Everything in this post regenerates from
+<a href="https://docs.google.com/spreadsheets/d/1_w-YcYynXZgzObp13fPUB1q8XNxN6IH7gFkyHgH8E8w/">the spreadsheet</a>
+and a few hundred lines of Python in
+<a href="https://github.com/jacklionheart/cube/tree/main/roto">the repo</a>.
+
+Are 7 big packages a lot? A permutation test says yes. Keep every
+drafter's picks, but re-deal each maindeck as a random same-size subset
+of their own pool, 2,000 times: random deckbuilding averages 3.1 big
+packages covering about 10 cards, with the largest around 4 — and it
+never once produced this data's 34 package-cards or a 9-card package
+(for 7 big packages, p = .003). The lanes are deliberate deckbuilding,
+not an artifact of who happened to draft what.
+<span class='todo'>[draft — make it yours]</span>
+
+One note on generalizing: the definitions here are tuned to 3 pods —
+"all 3 pods" is a strict bar. For a bigger season you would loosen
+"all pods" to "more than half." That's a different post.
