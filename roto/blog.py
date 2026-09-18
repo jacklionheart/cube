@@ -915,7 +915,7 @@ showPairs('{order[0]}');
                   f"</button>")
         hid = "" if i == 0 else " hidden"
         bpanes.append(f"<div data-pane='bangers' id='bg-{i}'{hid}>"
-                      + gallery(by_bc[cl], small=True) + "</div>")
+                      + gallery(by_bc[cl]) + "</div>")
     bt.append("</div>")
     parts["bangers-gallery"] = "".join(bt) + "\n".join(bpanes)
     blade = (0, "BladeTheKing")

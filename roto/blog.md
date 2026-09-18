@@ -58,7 +58,7 @@ sacrifice package has only 3. The difference is competition. Only the
 sacrifice decks contested the tokens cards, and only lightly, so all 3
 tokens drafters took many of the same cards. The sacrifice decks varied
 far more, borrowing from both the tokens lane and what I will call the
-"white rectangles" lane. Aviseras drafted Weaponize the Monsters and
+"White Rectangles" lane. Aviseras drafted Weaponize the Monsters and
 built sacrifice synergies into his token deck, but took none of this
 particular package; in all 3 pods, different players drafted the two packages.
 
@@ -70,14 +70,14 @@ particular package; in all 3 pods, different players drafted the two packages.
 
 {{core-sac}}
 
-## Three green packages for 2 decks
+## Three Green packages for 2 decks
 
 There are 3 green packages — Temur Ramp, Golgari Ramp, and Golgari
-Graveyard — but they represent just two lanes -- each pod had just 2 drafters drafting the 3 packages.
+Graveyard — but they represent just two lanes — each pod had only 2 drafters drafting the 3 packages.
 
 Together they show green's two ways of building an inevitable board —
 ramp and the graveyard — and the two mana bases used to do it: Temur and
-Golgari. One package is the "temur ramp package", another is the "golgari graveyard package", and the third is sort of a hybrid/mixture.
+Golgari. One is the Temur ramp package, another the Golgari graveyard package, and the third is sort of a hybrid of the two.
 
 ### {{mana:URG}} Temur Ramp
 
@@ -91,9 +91,9 @@ Golgari. One package is the "temur ramp package", another is the "golgari gravey
 
 {{core-ramp-bg}}
 
-## Two blue packages
+## Two Blue packages
 
-As with red, the blue lanes split cleanly: in each pod, different
+As with Red, the Blue lanes split cleanly: in each pod, different
 drafters took spells-matters and looting cards. The spells package has 5 cards,
 looting only 3 — the gap reflects looting's open-endedness; its decks
 were the most distinct of any package's. The spells decks ranged from
@@ -111,24 +111,24 @@ clearer foundation — good cheap spells — than the core of the mysterious loo
 # The 4th Lane: White Rectangles
 
 Those 7 lanes describe 6 drafters at each pod. That's all that shows up when you look for packages of size 3 or more.
-However, if you look at the **pairs**, packages of size 2, you can find the 4th lane: White Rectangles, which covers all but 1 of the other drafters (to whom we will get, eventually).
+However, if you look at the **pairs**, packages of size 2, you can find the 4th lane: White Rectangles, which covers all but 1 of the other drafters (we will get to them, eventually).
 
 
 Half of the pairs showed up either only or mostly in decks that also played larger packages. These pairs can be thought of as contested cards within the 3 lanes above: in most pods
-they went to those lanes, but for five of the seven, one pod's White Rectangles drafter took them instead. But half of the pairs were drafted mostly by decks outside the 3 established lanes. If you look at these 7 pairs, they
+they went to those lanes, but for 5 of the 7, one pod's White Rectangles drafter took them instead. But the other half were drafted mostly by decks outside the 3 established lanes. If you look at these 7 pairs, they
 are all clearly "rectangles" cards, mostly W and touching U and B.
 
 {{rectangles-gallery}}
 
-The contested pairs, for the record: 
+The contested pairs, for the record:
 
 {{fam-pairs-viewer}}
 
-What's different about the White Rectangles lane is that it fights with everyone. While the cards that define the lane are all esper cards, these cards can be played alongside any of the other three lanes.
-For the most part, the synergistic pairs that are sought out by the Blue, Red, and Green lanes are disjoint, and they do not fight with each other. But they all want to play some rectangles cards and a rectangles
+What's different about the White Rectangles lane is that it fights with everyone. While the cards that define the lane are all Esper cards, these cards can be played alongside any of the other three lanes.
+For the most part, the synergistic pairs that are sought out by the Blue, Red, and Green lanes are disjoint, and they do not fight with each other. But they all want to play some rectangles cards, and a rectangles
 core can be made to play well with cards from any of the three other lanes.
 
-Rectangles decks borrow elements from the 3 other lanes. Many of the decks borrow primarily from one other lane, but some decks have more complex mixtures. Adding 3 rectangles drafters to a pod is kind of like adding another drafter to each of the other lanes, but mixed rather than distilled.
+Rectangles decks borrow elements from the 3 other lanes. Most borrow primarily from one; some are more complex mixtures. Adding 3 rectangles drafters to a pod is kind of like adding another drafter to each of the other lanes, but mixed rather than distilled.
 
 {{rect-compete-chart}}
 
@@ -138,10 +138,10 @@ Rectangles decks borrow elements from the 3 other lanes. Many of the decks borro
 
 ## Gyruda
 
-Which brings us to the purple seat. In a statistical sense, it would 
+Which brings us to the purple seat. In a statistical sense, it would
 be reasonable to say FOOMP drafted the most unique deck of all the drafters.
 FOOMP's is the only deck in all three
-pods with <i>no</i> package: not one pair of its nonland cards was 
+pods with <i>no</i> package: not one pair of its non-land cards was
 maindecked together at both other pods.
 
 The other 27 drafters all shared at least one pair with the other two pods:
@@ -160,35 +160,35 @@ an awesome statistical artifact validating how companions make deckbuilding trul
 ## The most original decks
 
 FOOMP wins one definition of "most original": no pair shared with both
-other pods. But I explored as a second definition: which decks had the 
-largest set of cards which had no pair as a subset -- i.e., no 2 of its cards were ever maindecked together in any other deck.
+other pods. But I explored a second definition: which decks had the
+largest set of cards with no pair as a subset -- i.e., no 2 of its cards were ever maindecked together in any other deck.
 
 The biggest such set of all belongs to {{deck:3:ColdBrewNate}} — 18
-of its 37 nonland cards:
+of its 37 non-land cards:
 <span class='todo'>[draft — make it yours]</span>
 
 {{ensemble-cbn}}
 
-But ColdBrewNate had a cheat sky noodle: Yorion companion. The record for a 40-card deck is 16 — a tie between
+But ColdBrewNate had a cheat sky noodle: a Yorion companion. The record for a 40-card deck is 16 — a tie between
 Mark and tox 🍉:
 <span class='todo'>[draft — make it yours]</span>
 
 {{originality-hist}}
 
-% Decks by size of their largest unique ensemble (nonland cards, no pair
+% Decks by size of their largest unique ensemble (non-land cards, no pair
 % shared with any other deck). Yorion decks excluded.
 
-{{deck:1:Mark}}: 16 of its 24 nonland cards did not co-occur elsewhere:
+{{deck:1:Mark}}: 16 of its 24 non-land cards did not co-occur elsewhere:
 
 {{ensemble-mark}}
 
-{{deck:2:tox 🍉}}: 16 of its 24 nonland did not co-occur elsewhere:
+{{deck:2:tox 🍉}}: likewise 16 of 24 — a completely different sixteen:
 
 {{ensemble-tox}}
 
 ## Bangers
 
-Not every card that was maindecked in all 3 pods joined a package.
+I want to leave you with a list of bangers. Not every card that was maindecked in all 3 pods joined a package.
 
 <div class='defn'><div class='dlabel'>Definition</div>
 <div class='deq'><span class='dterm'>banger</span>
