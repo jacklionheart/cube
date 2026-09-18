@@ -12,11 +12,11 @@ I put together
 <a href="https://docs.google.com/spreadsheets/d/1_w-YcYynXZgzObp13fPUB1q8XNxN6IH7gFkyHgH8E8w/">a spreadsheet</a>
 of which cards each player maindecked. My unit of analysis is the
 **package**: any group of 2 or more non-land cards maindecked together in
-all 3 pods. Packages are a lens on the cube's attractive lanes.
+all 3 pods. Packages are a lens on the cube's attractive potential.
 
 This was just 3 drafts, and the cube has already been majorly redesigned.
 Nothing here discusses which decks won, and it offers ~zero predictive
-power about future drafts. Still, it's fun to look at what happened. To
+power about future drafts. Still, it's fun to look at what happened! To
 skip to the conclusion, here is what I see at each pod:
 
 * {{mana:R}} 2 Red aggro decks
@@ -46,8 +46,7 @@ But three drafts is a small sample, and most cards are sometimes
 contested, so chance plays a large part in which cards co-occurred.
 
 Still, the more cards that truly run together, the likelier some subset
-surfaces here. Any single card means little; a package in a general area
-means more.
+surfaces here. Which cards show up here is not super important; what lanes they imply is more meaningful.
 
 ## Two Red aggro packages
 
@@ -58,7 +57,7 @@ tokens drafters took many of the same cards. The sacrifice decks varied
 far more, borrowing from both the tokens lane and what I will call the
 "white rectangles" lane. Aviseras drafted Weaponize the Monsters and
 built sacrifice synergies into his token deck, but took none of this
-package; in all 3 pods, different players drafted the two packages.
+particular package; in all 3 pods, different players drafted the two packages.
 
 ### {{mana:WR}} Tokens
 
@@ -71,12 +70,12 @@ package; in all 3 pods, different players drafted the two packages.
 ## Three green packages for 2 decks
 
 There are 3 green packages — Temur Ramp, Golgari Ramp, and Golgari
-Graveyard — but they represent two lanes. The split into three is kinda
-arbitrary. Each pod had just 2 drafters covering all three.
+Graveyard — but they represent two lanes. The split into three is mostly
+arbitrary. Each pod had just 2 drafters drafting all 3 packages.
 
 Together they show green's two ways of building an inevitable board —
-ramp and the graveyard — and the two mana bases used to do it: temur and
-golgari.
+ramp and the graveyard — and the two mana bases used to do it: Temur and
+Golgari.
 
 ### {{mana:URG}} Temur Ramp
 
@@ -93,11 +92,11 @@ golgari.
 ## Two blue packages
 
 As with red, the blue lanes split cleanly: in each pod, different
-drafters took spells-matters and looting. The spells package has 5 cards,
+drafters took spells-matters and looting cards. The spells package has 5 cards,
 looting only 3 — the gap reflects looting's open-endedness; its decks
 were the most distinct of any package's. The spells decks ranged from
 tempo to control, wider than tokens, but their larger core marks a
-clearer foundation: good cheap spells.
+clearer foundation — good cheap spells — than the core of the mysterious looting deck.
 
 ### {{mana:UR}} Spells
 
@@ -109,26 +108,25 @@ clearer foundation: good cheap spells.
 
 # The 4th Lane: White Rectangles
 
-Those 7 lanes describe 6 drafters at each pod. With 2 pods of 9 and 1 of
-10, that leaves 3-4 drafters per pod undescribed. With one exception, I 
-think all of those drafters can be described as being in the "White Rectangles" macrolane.
+Those 7 lanes describe 6 drafters at each pod. That's all that shows up when you look for packages of size 3 or more.
+However, if you look at the **pairs**, packages of size 2, you can find the 4th lane: White Rectangles, which covers all but 1 of the other drafters (to whom we will get, eventually).
+
+
+Half of the pairs showed up either only or mostly in decks that also played larger packages. These pairs can be thought of as contested cards within the 3 lanes above: in most pods
+they went to those lanes, but for five of the seven, one pod's White Rectangles drafter took them instead. But half of the pairs were drafted mostly by decks outside the 3 established lanes. If you look at these 7 pairs, they
+are all clearly "rectangles" cards, mostly W and touching U and B.
 
 {{rectangles-gallery}}
 
-These are the 7 **pairs** that were drafted primarily by the drafters who did not draft any of the larger packages discussed earlier.  The rectangles lane is more modular than the other lanes, and relies more on specific card interactions rather than broad strategic alignment; therefore, it shows up only when you look at the card pairs -- the decks in the rectangles lane are too different from each other to show up in the larger packages.
+The contested pairs, for the record: 
 
-The rectangles decks rarely stayed pure — they tend to compete with, or
-hybridize with, the other lanes. Classify each by the lane it shared the
-most cards with across pods, and pods 2 and 3 split perfectly, one
-rectangles deck per neighbor: one blending with sacrifice (imrahil327's
-Lurrus aristocrats, Balbadorf's WB aristocrats), one with blue (roc,
-ColdBrewNate), one with green (tox 🍉's food deck, bengolds). Pod 1
-leaned green twice (BladeTheKing, DefeatistElitist) and left sacrifice
-to Arason's red equipment build. Ramp also reached back the other way:
-pod 2's double-ramp deck maindecked three of the seven rectangle pairs
-itself. And in every case, each rectangles deck's largest overlap of all
-was with the other rectangles decks — the lane is real.
-<span class='todo'>[draft — make it yours]</span>
+{{fam-pairs-viewer}}
+
+What's different about the White Rectangles lane is that it fights with everyone. While the cards that define the lane are all esper cards, these cards can be played alongside any of the other three lanes.
+For the most part, the synergistic pairs that are sought out by the Blue, Red, and Green lanes are disjoint, and they do not fight with each other. But they all want to play some rectangles cards and a rectangles
+core can be made to play well with cards from any of the three other lanes.
+
+If you actually look at the decks playing these cards, they tend to blend elements from one of the lanes, but the exact distributions are a bit uneven and personalized. Adding 3 rectangles drafters to a pod is kind of like adding another drafter to each of the other lanes, but mixed rather than distilled.
 
 {{rect-compete-chart}}
 
@@ -136,18 +134,15 @@ was with the other rectangles decks — the lane is real.
 % {{mana:R}} aggro, {{mana:G}} green, and {{mana:U}} blue lanes.
 % Rectangles-to-rectangles overlap (each deck's largest) not shown.
 
-## Contested pairs
+## Gyruda
 
-There are 7 other pairs that were not part of any lane, but were drafted primarily by drafters within the three non-rectangles lanes. Two such pairs were always drafted by drafters within the same macro lane -- these can be seen as cards shared between themes in the same macro strategy. Five were drafted twice by a drafter in one lane and once by a "rectangles" drafter. These can be seen as cards that were fought over between rectangles and other lanes. 
-
-{{fam-pairs-viewer}}
-
-## The FOOMP deck
-
-Which brings us to the purple seat. FOOMP's is the only deck in all three
+Which brings us to the purple seat. In a statistical sense, it would 
+be reasonable to say FOOMP drafted the most unique deck of all the drafters.
+FOOMP's is the only deck in all three
 pods with <i>no</i> package: not one pair of its nonland cards was 
-maindecked together at both other pods. The other 27 drafters all shared
-at least one pair with the other two pods:
+maindecked together at both other pods.
+
+The other 27 drafters all shared at least one pair with the other two pods:
 
 {{teams-per-deck}}
 
@@ -165,7 +160,6 @@ an awesome statistical artifact validating how companions make deckbuilding trul
 FOOMP wins one definition of "most original": no pair shared with both
 other pods. But I explored as a second definition: which decks had the 
 largest set of cards which had no pair as a subset -- i.e., no 2 of its cards were ever maindecked together in any other deck.
-
 
 {{originality-hist}}
 
