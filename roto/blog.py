@@ -36,6 +36,7 @@ a:hover { text-decoration-color: #1a1a1a; }
 .mana { width: 13px; height: 13px; vertical-align: -1px; margin-right: 1px; }
 .cards { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 18px; }
 .cards img { width: 160px; border-radius: 6px; }
+.cards.small img { width: 118px; }
 .todo { background: #fff8dc; padding: 2px 6px; font-family: -apple-system,
         'Segoe UI', Helvetica, sans-serif; font-size: 13px; }
 .vchart { display: flex; align-items: flex-end; gap: 18px;
@@ -61,15 +62,17 @@ th, td { padding: 6px 16px 6px 0; border-bottom: 1px solid #e8e8e8;
 .pair { display: inline-flex; gap: 2px; margin: 3px 10px 3px 0; }
 .pair img { width: 128px; border-radius: 5px; }
 [hidden] { display: none !important; }
-.explorer { display: grid; grid-template-columns: 110px 1fr; gap: 20px;
-            margin: 24px 0 8px; }
+.explorer { display: grid; grid-template-columns: 120px 1fr; gap: 20px;
+            width: min(920px, calc(100vw - 32px));
+            margin: 24px 0 8px;
+            margin-left: calc((100% - min(920px, 100vw - 32px)) / 2); }
 .sidebar button { display: block; width: 100%; text-align: left;
     background: none; border: none; cursor: pointer; padding: 6px 8px;
     font: 15px -apple-system, 'Segoe UI', Helvetica, sans-serif;
     color: #6b6b6b; border-left: 2px solid transparent; }
 .sidebar button.on { color: #1a1a1a; border-left-color: #1a1a1a; }
-.vpanes { height: 400px; overflow-y: auto; }
-.vpanes .cards img { width: 122px; }
+.vpanes { height: 620px; overflow-y: auto; }
+.vpanes .cards img { width: 172px; }
 .sbh { font: 600 11px -apple-system, 'Segoe UI', Helvetica, sans-serif;
        text-transform: uppercase; letter-spacing: .06em; color: #999;
        margin: 12px 0 2px; }
@@ -244,7 +247,7 @@ def main():
             u |= colors.get(c, set())
         return "".join(x for x in "WUBRG" if x in u) or "C"
 
-    def gallery(cards, shuffle=False):
+    def gallery(cards, shuffle=False, small=False):
         if shuffle:
             # deterministic shuffle (seeded by the card set) so deck
             # galleries don't read as alphabetical but builds stay stable
@@ -252,7 +255,8 @@ def main():
             random.Random(",".join(cards)).shuffle(cards)
         else:
             cards = sorted(cards)
-        h = ["<div class='cards'>"]
+        cls = " small" if small else ""
+        h = [f"<div class='cards{cls}'>"]
         for c in cards:
             h.append(f"<img src='{scry[c].get('image')}' "
                      f"alt='{html.escape(c)}' title='{html.escape(c)}' "
@@ -391,13 +395,13 @@ document.addEventListener('click', e => {
                     "two of this family's cores:</p>" + "".join(h))
         return ""
 
-    parts["core-tokens"] = gallery(tokens[1])
-    parts["core-sac"] = gallery(sac[1])
-    parts["core-ramp-urg"] = gallery(temur_ramp[1])
-    parts["core-ramp-bg"] = gallery(golgari_ramp[1])
-    parts["core-graveyard"] = gallery(graveyard[1])
-    parts["core-spells"] = gallery(blue_spells[1])
-    parts["core-discard"] = gallery(blue_tempo[1])
+    parts["core-tokens"] = gallery(tokens[1], small=True)
+    parts["core-sac"] = gallery(sac[1], small=True)
+    parts["core-ramp-urg"] = gallery(temur_ramp[1], small=True)
+    parts["core-ramp-bg"] = gallery(golgari_ramp[1], small=True)
+    parts["core-graveyard"] = gallery(graveyard[1], small=True)
+    parts["core-spells"] = gallery(blue_spells[1], small=True)
+    parts["core-discard"] = gallery(blue_tempo[1], small=True)
     parts["bridges-aggro"] = family_bridges("Aggro")
     parts["bridges-green"] = family_bridges("Green")
     parts["bridges-blue"] = family_bridges("Blue")

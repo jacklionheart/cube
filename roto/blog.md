@@ -18,9 +18,7 @@ of which cards each player maindecked. To do this analysis, I define a
 <span class='dsym'>≔</span>
 <span class='dbody'>a set of 2 or more non-land cards that were all drafted and maindecked together by the same drafter in all 3 pods</span></div></div>
 
-Packages are a pattern in how people build decks in this cube.
-
-This was just 3 drafts, and the cube has already been majorly redesigned.
+Packages are a pattern in how people build decks in this cube. This was just 3 drafts, and the cube has already been majorly redesigned.
 Nothing here discusses which decks won, and it offers ~zero predictive
 power about future drafts. Still, it's fun to look at what happened! To
 skip to the conclusion, here is what I see at each pod:
@@ -75,24 +73,23 @@ particular package; in all 3 pods, different players drafted the two packages.
 ## Three green packages for 2 decks
 
 There are 3 green packages — Temur Ramp, Golgari Ramp, and Golgari
-Graveyard — but they represent two lanes. The split into three is mostly
-arbitrary. Each pod had just 2 drafters drafting all 3 packages.
+Graveyard — but they represent just two lanes -- each pod had just 2 drafters drafting the 3 packages.
 
 Together they show green's two ways of building an inevitable board —
 ramp and the graveyard — and the two mana bases used to do it: Temur and
-Golgari.
+Golgari. One package is the "temur ramp package", another is the "golgari graveyard package", and the third is sort of a hybrid/mixture.
 
 ### {{mana:URG}} Temur Ramp
 
 {{core-ramp-urg}}
 
-### {{mana:BG}} Golgari Ramp
-
-{{core-ramp-bg}}
-
 ### {{mana:BG}} Golgari Graveyard
 
 {{core-graveyard}}
+
+### {{mana:BG}} Golgari Ramp
+
+{{core-ramp-bg}}
 
 ## Two blue packages
 
