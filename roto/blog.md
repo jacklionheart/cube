@@ -16,8 +16,7 @@ of which cards each player maindecked. To do this analysis, I define a
 <div class='defn'><div class='dlabel'>Definition</div>
 <div class='deq'><span class='dterm'>package</span>
 <span class='dsym'>≔</span>
-<span class='dbody'>a set of 2 or more non-land cards, all maindecked
-in the same deck, in every one of the 3 pods</span></div></div>
+<span class='dbody'>a set of 2 or more non-land cards that were all drafted and maindecked together by the same drafter in all 3 pods</span></div></div>
 
 Packages are a pattern in how people build decks in this cube.
 
