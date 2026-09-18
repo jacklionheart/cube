@@ -128,7 +128,7 @@ What's different about the White Rectangles lane is that it fights with everyone
 For the most part, the synergistic pairs that are sought out by the Blue, Red, and Green lanes are disjoint, and they do not fight with each other. But they all want to play some rectangles cards and a rectangles
 core can be made to play well with cards from any of the three other lanes.
 
-If you actually look at the decks playing these cards, they tend to blend elements from one of the lanes, but the exact distributions are a bit uneven and personalized. Adding 3 rectangles drafters to a pod is kind of like adding another drafter to each of the other lanes, but mixed rather than distilled.
+Rectangles decks borrow elements from the 3 other lanes. Many of the decks borrow primarily from one other lane, but some decks have more complex mixtures. Adding 3 rectangles drafters to a pod is kind of like adding another drafter to each of the other lanes, but mixed rather than distilled.
 
 {{rect-compete-chart}}
 
@@ -171,6 +171,14 @@ largest set of cards which had no pair as a subset -- i.e., no 2 of its cards we
 The record is 16, and it's a tie between Mark and tox 🍉:
 
 {{originality-winners}}
+
+Both winners were 40-card decks. The three Yorion decks were excluded
+from this measure — a 60-card maindeck gets extra room for unique pairs
+just by being big — but for the record, the biggest raw set of all
+belongs to ColdBrewNate's Yorion deck:
+<span class='todo'>[draft — make it yours]</span>
+
+{{originality-cbn}}
 
 ## Where the packages live
 

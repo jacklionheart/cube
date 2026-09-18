@@ -99,6 +99,11 @@ th, td { padding: 6px 16px 6px 0; border-bottom: 1px solid #e8e8e8;
 ul { margin: 14px 0 18px; padding-left: 26px; }
 ul.plain { list-style: none; padding-left: 4px; }
 li { margin: 5px 0; }
+#deckhover { position: fixed; display: none; z-index: 11;
+             pointer-events: none; background: #fff;
+             border: 1px solid #ddd; border-radius: 10px; padding: 6px;
+             box-shadow: 0 6px 18px rgba(0,0,0,.25); width: 480px; }
+#deckhover img { width: 64px; border-radius: 3px; margin: 1px; }
 #hovercard { position: fixed; display: none; z-index: 10;
              pointer-events: none; }
 #hovercard img { width: 250px; border-radius: 12px;
@@ -106,22 +111,33 @@ li { margin: 5px 0; }
 """
 
 HOVER_JS = """<div id='hovercard'><img alt=''></div>
+<div id='deckhover'></div>
 <script>
 const hc = document.getElementById('hovercard');
 const hcImg = hc.querySelector('img');
+const dh = document.getElementById('deckhover');
 document.addEventListener('mouseover', e => {
+  const d = e.target.closest('[data-deck]');
   const a = e.target.closest('a[data-img]');
-  if (a && a.dataset.img) { hcImg.src = a.dataset.img;
-    hc.style.display = 'block'; }
-  else if (!e.target.closest('#hovercard')) hc.style.display = 'none';
+  if (d && d.dataset.deck && deckImgs[d.dataset.deck]) {
+    dh.innerHTML = deckImgs[d.dataset.deck].map(
+      u => `<img src='${u}' loading='lazy'>`).join('');
+    dh.style.display = 'block'; hc.style.display = 'none';
+  } else if (a && a.dataset.img) {
+    hcImg.src = a.dataset.img;
+    hc.style.display = 'block'; dh.style.display = 'none';
+  } else { hc.style.display = 'none'; dh.style.display = 'none'; }
 });
 document.addEventListener('mousemove', e => {
-  if (hc.style.display !== 'block') return;
-  const w = 250, h = 349;
+  const el = dh.style.display === 'block' ? dh
+           : (hc.style.display === 'block' ? hc : null);
+  if (!el) return;
+  const r = el.getBoundingClientRect();
+  const w = r.width || 250, h = r.height || 349;
   let x = e.clientX + 16, y = e.clientY + 12;
   if (x + w > innerWidth - 8) x = e.clientX - w - 16;
   if (y + h > innerHeight - 8) y = innerHeight - h - 8;
-  hc.style.left = x + 'px'; hc.style.top = Math.max(8, y) + 'px';
+  el.style.left = x + 'px'; el.style.top = Math.max(8, y) + 'px';
 });
 </script>"""
 
@@ -222,7 +238,9 @@ def main():
     def deck_link(k, pl):
         url = url_map.get((drafts[k].name, pl))
         lab = html.escape(f"{drafts[k].name} {pl}")
-        return f'<a href="{url}">{lab}</a>' if url else lab
+        dd = f" data-deck='{k}:{html.escape(pl)}'"
+        return (f'<a href="{url}"{dd}>{lab}</a>' if url
+                else f'<a{dd}>{lab}</a>')
     lanes = [(sig, sorted(cards)) for sig, cards in groups
              if len(cards) >= 3]
     CORE_MARKERS = [("Rally at the Hornburg", "Tokens"),
@@ -543,7 +561,9 @@ document.addEventListener('click', e => {
     def short_link(k, pl):
         url = url_map.get((drafts[k].name, pl))
         lab = html.escape(pl)
-        return f'<a href="{url}">{lab}</a>' if url else lab
+        dd = f" data-deck='{k}:{html.escape(pl)}'"
+        return (f'<a href="{url}"{dd}>{lab}</a>' if url
+                else f'<a{dd}>{lab}</a>')
 
     def card_link(c):
         img = scry[c].get("image") or ""
@@ -873,6 +893,12 @@ showPairs('{order[0]}');
             "building:</p>")
         ow.append(gallery(ue[(lk, lpl)], shuffle=True))
     parts["originality-winners"] = "\n".join(ow)
+    cbn = (2, "ColdBrewNate")
+    assert len(ue[cbn]) == 18 and len(by_deck_all[cbn]) == 37, \
+        (len(ue[cbn]), len(by_deck_all[cbn]))  # blog.md hardcodes
+    parts["originality-cbn"] = (
+        f"<p>{deck_link(*cbn)}: 18 of its 37 nonland cards:</p>"
+        + gallery(ue[cbn], shuffle=True))
     blade = (0, "BladeTheKing")
     assert len(ue[blade]) == 13 and len(by_deck_all[blade]) == 35, \
         (len(ue[blade]), len(by_deck_all[blade]))  # blog.md hardcodes
@@ -889,14 +915,24 @@ showPairs('{order[0]}');
     assert zero_team == [(2, "FOOMP")], zero_team  # blog.md names FOOMP
     k, pl = zero_team[0]
     url = url_map.get((drafts[k].name, pl))
-    parts["foomp-link"] = (f'<a href="{url}">sealeddeck</a>'
-                           if url else "")
+    parts["foomp-link"] = (
+        f'<a href="{url}" data-deck="{k}:FOOMP">sealeddeck</a>'
+        if url else "")
     parts["foomp-gallery"] = gallery(by_deck[(k, pl)], shuffle=True)
 
+    import json as _json
+    all_decks = deck_sets(owners)
+    deck_imgs = {f"{k}:{pl}": [scry[c].get("image")
+                               for c in sorted(cards)
+                               if scry[c].get("image")]
+                 for (k, pl), cards in all_decks.items()}
     out = [f"<meta charset='utf-8'>"
            f"<title>The Lords of Limited Rotisserie Meta</title>"
            f"<style>{CSS}</style>"]
     out += render_doc((HERE / "blog.md").read_text(), parts)
+    out.append("<script>const deckImgs = "
+               + _json.dumps(deck_imgs, separators=(",", ":"))
+               + ";</script>")
     out.append(HOVER_JS)
 
     dest = HERE / "out" / "blog-post.html"
