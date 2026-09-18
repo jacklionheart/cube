@@ -118,7 +118,7 @@ drafters took spells-matters and looting cards. The spells package has 5 cards,
 looting only 3 — the gap reflects looting's open-endedness; its decks
 were the most distinct of any package's. The spells decks ranged from
 tempo to control, wider than tokens, but their larger package marks a
-clearer foundation — good cheap spells — than the mysterious looting package.
+clearer foundation — good cheap spells — than that of the mysterious blue tempo deck.
 
 ### {{mana:UR}} Spells
 
