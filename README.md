@@ -15,6 +15,7 @@ Cube building and MTG limited analysis.
   - `fantasia.py` — preserve Fantasia's board membership while live-updating tags: mainboard keeps only Allies/Enemies, maybeboard receives cross-cube plus GUT/Sacred/LOL/Banger/LSV Retro provenance, and Picked/self-tags disappear. `--import-cube` performs an explicit one-time import; ordinary syncs never refill manually removed cards. Dry-run by default.
   - `API-NOTES.md` — Cube Cobra endpoint contracts and gotchas
   - Credentials via `CUBECOBRA_USERNAME` / `CUBECOBRA_PASSWORD` env vars (or interactive prompt)
+- `etude/` — publishing structure for [etude.gg](https://etude.gg) essays: shared post renderer (`etudelib/render.py`), one directory per post (`posts/<slug>/{post.md,components.py}`), `build.py` renders all posts to `site/`. First post: the LoL roto meta essay (formerly `roto/blog.md`); `roto/blog.py` remains as a thin wrapper.
 - `17lands/` — 17lands data analysis (migrated from the old `mtg_analysis` directory)
   - `lib17/` — fetch/metrics/analysis library
   - `bangers.py` — cards overperforming for their rarity (17Lands grade curve, both all + top players): `python3 bangers.py SOS`
