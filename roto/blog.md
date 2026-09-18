@@ -3,14 +3,14 @@
 I recently had the good fortune to play in some initial
 <a href="https://docs.google.com/spreadsheets/d/1i5IK8JKOeZpKZpV27YbqIFVNEkOQZq1rXRJQq-IBwCw/">rotisserie drafts</a> of the
 <a href="https://www.cubecobra.com/cube/list/0efda005-7243-457e-9d11-875e37d1b768">Lords of Limited cube</a>.
-Thanks to Ethan, Ben, and Greg of
-<a href="https://www.lordsoflimited.com">Lords of Limited</a> for envisioning,
+Thanks to Ethan and Ben of
+<a href="https://www.lordsoflimited.com">Lords of Limited</a>, and Greg from their Discord, for envisioning,
 designing, and administering the cube. Here I explore those drafts by
 asking which cards were maindecked together in which pods.
 
 I put together
 <a href="https://docs.google.com/spreadsheets/d/1_w-YcYynXZgzObp13fPUB1q8XNxN6IH7gFkyHgH8E8w/">a spreadsheet</a>
-of which cards each player maindecked. My unit of analysis is the
+of which cards each player maindecked. To do this analysis, I define a
 **package**:
 
 <div class='defn'><div class='dlabel'>Definition</div>
@@ -19,7 +19,7 @@ of which cards each player maindecked. My unit of analysis is the
 <span class='dbody'>a set of 2 or more non-land cards, all maindecked
 in the same deck, in every one of the 3 pods</span></div></div>
 
-Packages are a lens on the cube's attractive potential.
+Packages are a pattern in how people build decks in this cube.
 
 This was just 3 drafts, and the cube has already been majorly redesigned.
 Nothing here discusses which decks won, and it offers ~zero predictive
@@ -44,16 +44,15 @@ Let me walk you through it!
 
 {{lanes-viewer}}
 
-First, the packages of size 3 or more. There are 7, in roughly 3 macro
-lanes: 2 red aggro, 3 green, and 2 blue.
+First, the packages of size 3 or more. There are 7, and they fall into 3 groups.
 
-What does membership mean? These cards landed in the same deck in all
-three pods. Linear cards show up more often — only their lane wants them.
-But three drafts is a small sample, and most cards are sometimes
-contested, so chance plays a large part in which cards co-occurred.
+These cards:
+- were drafted and maindecked in every pod. They are considered "good cards" by the community, at least in their current decks.
+- are all selected by the same drafters. They play well in whatever strategy is shared by all of their drafters.
+- are more likely to be specific to those strategies, since they were never demonstrated to be attractive to any other strategy.
 
-Still, the more cards that truly run together, the likelier some subset
-surfaces here. Which cards show up here is not super important; what lanes they imply is more meaningful.
+Which cards specifically show up in these packages is a bit arbitrary; again, we only have 3 drafts here. However, the lanes from which those cards
+are drawn are anything but arbitrary. The larger and clearer the lane, the more likely two cards are to be desired together, and the more likely it is that *some* subset of that strategy ends up in a package.
 
 ## Two Red aggro packages
 
