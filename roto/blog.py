@@ -175,6 +175,9 @@ def render_doc(text, parts, deck_link=None):
         if name.startswith("deck:") and deck_link:
             _, num, pl = name.split(":", 2)
             return deck_link(int(num) - 1, pl)
+        if name.startswith("drafter:") and deck_link:
+            _, num, pl = name.split(":", 2)
+            return deck_link(int(num) - 1, pl, short=True)
         return parts[name]
 
     def sub(s):
@@ -242,9 +245,9 @@ def main():
     url_map = {(dr, pl): u for dr, pl, kind, u, used in links
                if used == "Y" and "manual-" not in u}
 
-    def deck_link(k, pl):
+    def deck_link(k, pl, short=False):
         url = url_map.get((drafts[k].name, pl))
-        lab = html.escape(f"{drafts[k].name} {pl}")
+        lab = html.escape(pl if short else f"{drafts[k].name} {pl}")
         dd = f" data-deck='{k}:{html.escape(pl)}'"
         return (f'<a href="{url}"{dd}>{lab}</a>' if url
                 else f'<a{dd}>{lab}</a>')

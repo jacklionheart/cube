@@ -164,7 +164,7 @@ Rectangles decks borrow elements from the 3 other lanes. Most borrow primarily f
 ## Gyruda
 
 Which brings us to the purple seat. In a statistical sense, it would
-be reasonable to say FOOMP drafted the most unique deck of all the drafters.
+be reasonable to say {{drafter:3:FOOMP}} drafted the most unique deck of all the drafters.
 FOOMP's is the only deck in all three
 pods with <i>no</i> package: not one pair of its non-land cards was
 maindecked together in both other pods.
