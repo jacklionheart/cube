@@ -35,7 +35,8 @@ a:hover { text-decoration-color: #1a1a1a; }
         font-size: 14px; color: #6b6b6b; margin: 2px 0 14px; }
 .mana { width: 13px; height: 13px; vertical-align: -1px; margin-right: 1px; }
 .cards { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 18px; }
-.cards img { width: 160px; border-radius: 6px; }
+.cards img { width: 160px; border-radius: 6px;
+             aspect-ratio: 488 / 680; }
 .cards.small img { width: 118px; }
 .todo { background: #fff8dc; padding: 2px 6px; font-family: -apple-system,
         'Segoe UI', Helvetica, sans-serif; font-size: 13px; }
@@ -60,7 +61,8 @@ th, td { padding: 6px 16px 6px 0; border-bottom: 1px solid #e8e8e8;
          vertical-align: top; }
 .pairs { margin: 8px 0 16px; }
 .pair { display: inline-flex; gap: 2px; margin: 3px 10px 3px 0; }
-.pair img { width: 128px; border-radius: 5px; }
+.pair img { width: 128px; border-radius: 5px;
+            aspect-ratio: 488 / 680; }
 [hidden] { display: none !important; }
 .explorer { display: grid; grid-template-columns: 120px 1fr; gap: 20px;
             width: min(920px, calc(100vw - 32px));

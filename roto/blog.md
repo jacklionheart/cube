@@ -197,7 +197,7 @@ I want to leave you with a list of bangers. Not every card that was maindecked i
 part of no package</span></div></div>
 
 These are the generically good cards of the format: everyone wants
-them, and they tie themselves to no particular strategy. There are 48
+them, and they can be used by multiple strategies even if they fit best into one lane. There are 48
 of them, led by white.
 <span class='todo'>[draft — make it yours]</span>
 
