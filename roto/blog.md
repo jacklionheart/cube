@@ -163,15 +163,13 @@ FOOMP wins one definition of "most original": no pair shared with both
 other pods. But I explored as a second definition: which decks had the 
 largest set of cards which had no pair as a subset -- i.e., no 2 of its cards were ever maindecked together in any other deck.
 
-The biggest such set of all belongs to ColdBrewNate:
+The biggest such set of all belongs to {{deck:3:ColdBrewNate}} — 18
+of its 37 nonland cards:
 <span class='todo'>[draft — make it yours]</span>
 
-{{originality-cbn}}
+{{ensemble-cbn}}
 
-But ColdBrewNate had a cheat code: a Yorion companion. A 60-card
-maindeck gets extra room for unique pairs just by being big — enough
-that all three Yorion decks deserve an asterisk on this measure. Set
-them aside, and the record for a 40-card deck is 16 — a tie between
+But ColdBrewNate had a cheat sky noodle: Yorion companion. The record for a 40-card deck is 16 — a tie between
 Mark and tox 🍉:
 <span class='todo'>[draft — make it yours]</span>
 
@@ -180,7 +178,14 @@ Mark and tox 🍉:
 % Decks by size of their largest unique ensemble (nonland cards, no pair
 % shared with any other deck). Yorion decks excluded.
 
-{{originality-winners}}
+{{deck:1:Mark}}: 16 of its 24 nonland cards form a group that exists
+nowhere else in ninety decks' worth of building:
+
+{{ensemble-mark}}
+
+{{deck:2:tox 🍉}}: likewise 16 of 24, a completely different sixteen:
+
+{{ensemble-tox}}
 
 ## Where the packages live
 

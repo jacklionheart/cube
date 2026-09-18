@@ -160,18 +160,23 @@ def mana(letters):
         f"{s}.svg' alt='{s}'>" for s in syms)
 
 
-def render_doc(text, parts):
+def render_doc(text, parts, deck_link=None):
     """The essay copy lives in blog.md: markdown-ish headings and
     paragraphs (raw HTML passes through), '%'-prefixed lines for
     captions/meta, and {{name}} slots for generated components (block
     when alone on a line, inline otherwise). {{mana:WR}} renders pips."""
     def resolve(name):
+        if name in parts:
+            return parts[name]
         if name.startswith("mana:"):
             return mana(name[5:])
+        if name.startswith("deck:") and deck_link:
+            _, num, pl = name.split(":", 2)
+            return deck_link(int(num) - 1, pl)
         return parts[name]
 
     def sub(s):
-        s = re.sub(r"\{\{([\w:-]+)\}\}",
+        s = re.sub(r"\{\{([^{}]+?)\}\}",
                    lambda m: resolve(m.group(1)), s)
         s = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
         s = re.sub(r"(?<![\w*])\*([^*\n]+)\*(?![\w*])", r"<i>\1</i>", s)
@@ -182,7 +187,7 @@ def render_doc(text, parts):
         block = block.strip()
         if not block:
             continue
-        if re.fullmatch(r"\{\{[\w:-]+\}\}", block):
+        if re.fullmatch(r"\{\{[^{}]+?\}\}", block):
             out.append(resolve(block[2:-2]))
         elif block.startswith("### "):
             out.append(f"<h3>{sub(block[4:])}</h3>")
@@ -884,21 +889,13 @@ showPairs('{order[0]}');
     max_size = max(sizes.values())
     leaders = sorted(dk for dk in sizes if sizes[dk] == max_size)
     assert max_size == 16 and len(leaders) == 2, (max_size, leaders)
-    ow = []
-    for lk, lpl in leaders:
-        ow.append(
-            f"<p>{deck_link(lk, lpl)}: {sizes[(lk, lpl)]} of its "
-            f"{len(by_deck_all[(lk, lpl)])} nonland cards form a group "
-            "that exists nowhere else in ninety decks' worth of "
-            "building:</p>")
-        ow.append(gallery(ue[(lk, lpl)], shuffle=True))
-    parts["originality-winners"] = "\n".join(ow)
+    assert leaders == [(0, "Mark"), (1, "tox 🍉")], leaders
+    parts["ensemble-mark"] = gallery(ue[(0, "Mark")], shuffle=True)
+    parts["ensemble-tox"] = gallery(ue[(1, "tox 🍉")], shuffle=True)
     cbn = (2, "ColdBrewNate")
     assert len(ue[cbn]) == 18 and len(by_deck_all[cbn]) == 37, \
         (len(ue[cbn]), len(by_deck_all[cbn]))  # blog.md hardcodes
-    parts["originality-cbn"] = (
-        f"<p>{deck_link(*cbn)}: 18 of its 37 nonland cards:</p>"
-        + gallery(ue[cbn], shuffle=True))
+    parts["ensemble-cbn"] = gallery(ue[cbn], shuffle=True)
     blade = (0, "BladeTheKing")
     assert len(ue[blade]) == 13 and len(by_deck_all[blade]) == 35, \
         (len(ue[blade]), len(by_deck_all[blade]))  # blog.md hardcodes
@@ -929,7 +926,8 @@ showPairs('{order[0]}');
     out = [f"<meta charset='utf-8'>"
            f"<title>The Lords of Limited Rotisserie Meta</title>"
            f"<style>{CSS}</style>"]
-    out += render_doc((HERE / "blog.md").read_text(), parts)
+    out += render_doc((HERE / "blog.md").read_text(), parts,
+                      deck_link=deck_link)
     out.append("<script>const deckImgs = "
                + _json.dumps(deck_imgs, separators=(",", ":"))
                + ";</script>")
