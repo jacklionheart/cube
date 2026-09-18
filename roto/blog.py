@@ -84,6 +84,15 @@ th, td { padding: 6px 16px 6px 0; border-bottom: 1px solid #e8e8e8;
 .sRect { background: #f6f1e2; }
 .sFoomp { background: #f0e7f8; }
 .fdot { color: #9a6bb8; }
+.defn { background: #fafaf7; border: 1px solid #e8e6e0;
+        border-radius: 8px; padding: 14px 20px; margin: 22px 0; }
+.defn .dlabel { font: 600 11px -apple-system, 'Segoe UI', Helvetica,
+        sans-serif; text-transform: uppercase; letter-spacing: .08em;
+        color: #999; margin-bottom: 8px; }
+.defn .deq { display: flex; align-items: baseline; gap: 14px; }
+.defn .dterm { font-weight: 700; font-style: italic;
+        white-space: nowrap; }
+.defn .dsym { color: #8a8a8a; }
 ul { list-style: none; padding-left: 4px; margin: 14px 0 18px; }
 li { margin: 5px 0; }
 #hovercard { position: fixed; display: none; z-index: 10;
@@ -168,6 +177,9 @@ def render_doc(text, parts):
             items = "".join(f"<li>{sub(l[2:])}</li>"
                             for l in block.splitlines())
             out.append(f"<ul>{items}</ul>")
+        elif block.startswith("<"):
+            # raw HTML block: pass through without <p> wrapping
+            out.append(sub(" ".join(block.splitlines())))
         else:
             out.append(f"<p>{sub(' '.join(block.splitlines()))}</p>")
     return out

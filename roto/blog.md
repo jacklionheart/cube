@@ -11,8 +11,15 @@ asking which cards were maindecked together in which pods.
 I put together
 <a href="https://docs.google.com/spreadsheets/d/1_w-YcYynXZgzObp13fPUB1q8XNxN6IH7gFkyHgH8E8w/">a spreadsheet</a>
 of which cards each player maindecked. My unit of analysis is the
-**package**: any group of 2 or more non-land cards maindecked together in
-all 3 pods. Packages are a lens on the cube's attractive potential.
+**package**:
+
+<div class='defn'><div class='dlabel'>Definition</div>
+<div class='deq'><span class='dterm'>package</span>
+<span class='dsym'>≔</span>
+<span class='dbody'>a set of 2 or more non-land cards, all maindecked
+in the same deck, in every one of the 3 pods</span></div></div>
+
+Packages are a lens on the cube's attractive potential.
 
 This was just 3 drafts, and the cube has already been majorly redesigned.
 Nothing here discusses which decks won, and it offers ~zero predictive
