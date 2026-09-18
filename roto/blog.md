@@ -10,7 +10,7 @@ asking which cards were maindecked together in which pods.
 
 I put together
 <a href="https://docs.google.com/spreadsheets/d/1_w-YcYynXZgzObp13fPUB1q8XNxN6IH7gFkyHgH8E8w/">a spreadsheet</a>
-of which cards each player maindecked. To do this analysis, I define a
+of which cards each drafter maindecked. To do this analysis, I define a
 **package**:
 
 <div class='defn'><div class='dlabel'>Definition</div>
@@ -18,21 +18,31 @@ of which cards each player maindecked. To do this analysis, I define a
 <span class='dsym'>≔</span>
 <span class='dbody'>a set of 2 or more non-land cards that were all drafted and maindecked together by the same drafter in all 3 pods</span></div></div>
 
-Packages are a pattern in how people build decks in this cube. This was just 3 drafts, and the cube has already been majorly redesigned.
-Nothing here discusses which decks won, and it offers ~zero predictive
-power about future drafts. Still, it's fun to look at what happened! To
-skip to the conclusion, here is what I see at each pod:
+Packages are a pattern in how drafters build decks in this cube. Throughout this post I will use **lane** for a strategy; a package is the fingerprint a lane leaves in the data.
+
+One thing you will not find here is win rates. A package records what
+drafters wanted to build, not whether it worked; deck strength, play
+skill, and matchup luck are all invisible to this analysis. Nothing
+here is a power ranking of the lanes or of the drafters.
+<span class='todo'>[draft — make it yours]</span>
+
+To skip to the conclusion, here is what I see at each pod:
 
 * {{mana:R}} 2 Red aggro decks
 * {{mana:G}} 2 Green ramp/graveyard decks
-* {{mana:U}} 2 Blue spell/looting decks
-* {{mana:W}} 3 White rectangle decks
+* {{mana:U}} 2 Blue spells/looting decks
+* {{mana:W}} 3 White Rectangles decks
 * <span class='fdot'>●</span> 1 crazy companion
+
+How to read the chart below: every drafter gets a seat, colored by the
+strategy their deck served — we will define everything as we go.
+Throughout this post, hover any drafter's name to preview their deck.
+<span class='todo'>[draft — make it yours]</span>
 
 {{seat-chart}}
 
 % Every drafter at every pod, in draft order. Tinted = owns one of the 7
-% big packages, colored by macro lane. Cream = White Rectangles.
+% big packages, colored by lane. Cream = White Rectangles.
 % Purple = the companion deck.
 
 Let me walk you through it!
@@ -41,14 +51,24 @@ Let me walk you through it!
 
 {{lanes-viewer}}
 
+% The 7 big packages — packages of size 3 or more — grouped by lane.
+% Click a package to see its cards.
+
 First, the packages of size 3 or more. There are 7, and they fall into 3 groups.
+
+A caveat before you extract any heuristics: this is archaeology, not a
+draft guide. This was just 3 pods, and the cube has already been
+majorly redesigned — partly in response to these very drafts — so none
+of this predicts the next one. Read the lanes as a record of what one
+metagame discovered, not as advice.
+<span class='todo'>[draft — make it yours]</span>
 
 These cards:
 - were drafted and maindecked in every pod. They are considered "good cards" by the community, at least in their current decks.
 - are all selected by the same drafters. They play well in whatever strategy is shared by all of their drafters.
 - are more likely to be specific to those strategies, since they were never demonstrated to be attractive to any other strategy.
 
-Which cards specifically show up in these packages is a bit arbitrary; again, we only have 3 drafts here. However, the lanes from which those cards
+Which cards specifically show up in these packages is a bit arbitrary; again, we only have 3 pods here. However, the lanes from which those cards
 are drawn are anything but arbitrary. The larger and clearer the lane, the more likely two cards are to be desired together, and the more likely it is that *some* subset of that strategy ends up in a package.
 
 ## Two Red aggro packages
@@ -57,10 +77,10 @@ The RW tokens package, at 9 cards, is the largest in the data; the RB
 sacrifice package has only 3. The difference is competition. Only the
 sacrifice decks contested the tokens cards, and only lightly, so all 3
 tokens drafters took many of the same cards. The sacrifice decks varied
-far more, borrowing from both the tokens lane and what I will call the
+far more, borrowing from both the tokens package and what I will call the
 "White Rectangles" lane. Aviseras drafted Weaponize the Monsters and
-built sacrifice synergies into his token deck, but took none of this
-particular package; in all 3 pods, different players drafted the two packages.
+built sacrifice synergies into his tokens deck, but took none of this
+particular package; in all 3 pods, different drafters drafted the two packages.
 
 ### {{mana:WR}} Tokens
 
@@ -73,7 +93,7 @@ particular package; in all 3 pods, different players drafted the two packages.
 ## Three Green packages for 2 decks
 
 There are 3 green packages — Temur Ramp, Golgari Ramp, and Golgari
-Graveyard — but they represent just two lanes — each pod had only 2 drafters drafting the 3 packages.
+Graveyard — but they represent just two strategies — each pod had only 2 drafters drafting the 3 packages.
 
 Together they show green's two ways of building an inevitable board —
 ramp and the graveyard — and the two mana bases used to do it: Temur and
@@ -93,12 +113,12 @@ Golgari. One is the Temur ramp package, another the Golgari graveyard package, a
 
 ## Two Blue packages
 
-As with Red, the Blue lanes split cleanly: in each pod, different
+As with Red, the Blue lane splits cleanly: in each pod, different
 drafters took spells-matters and looting cards. The spells package has 5 cards,
 looting only 3 — the gap reflects looting's open-endedness; its decks
 were the most distinct of any package's. The spells decks ranged from
-tempo to control, wider than tokens, but their larger core marks a
-clearer foundation — good cheap spells — than the core of the mysterious looting deck.
+tempo to control, wider than tokens, but their larger package marks a
+clearer foundation — good cheap spells — than the mysterious looting package.
 
 ### {{mana:UR}} Spells
 
@@ -110,23 +130,28 @@ clearer foundation — good cheap spells — than the core of the mysterious loo
 
 # The 4th Lane: White Rectangles
 
-Those 7 lanes describe 6 drafters at each pod. That's all that shows up when you look for packages of size 3 or more.
+Those 7 packages describe 6 drafters at each pod. That's all that shows up when you look for packages of size 3 or more.
 However, if you look at the **pairs**, packages of size 2, you can find the 4th lane: White Rectangles, which covers all but 1 of the other drafters (we will get to them, eventually).
 
 
-Half of the pairs showed up either only or mostly in decks that also played larger packages. These pairs can be thought of as contested cards within the 3 lanes above: in most pods
+Half of the pairs showed up either only or mostly in decks that also played big packages. These pairs can be thought of as contested cards within the 3 lanes above: in most pods
 they went to those lanes, but for 5 of the 7, one pod's White Rectangles drafter took them instead. But the other half were drafted mostly by decks outside the 3 established lanes. If you look at these 7 pairs, they
 are all clearly "rectangles" cards, mostly W and touching U and B.
 
 {{rectangles-gallery}}
 
+% The 7 pairs that define the White Rectangles lane.
+
 The contested pairs, for the record:
 
 {{fam-pairs-viewer}}
 
+% Each contested pair with its three homes: pip labels mark package
+% owners; italic names are the rectangles drafters who fought for them.
+
 What's different about the White Rectangles lane is that it fights with everyone. While the cards that define the lane are all Esper cards, these cards can be played alongside any of the other three lanes.
 For the most part, the synergistic pairs that are sought out by the Blue, Red, and Green lanes are disjoint, and they do not fight with each other. But they all want to play some rectangles cards, and a rectangles
-core can be made to play well with cards from any of the three other lanes.
+shell can be made to play well with cards from any of the three other lanes.
 
 Rectangles decks borrow elements from the 3 other lanes. Most borrow primarily from one; some are more complex mixtures. Adding 3 rectangles drafters to a pod is kind of like adding another drafter to each of the other lanes, but mixed rather than distilled.
 
@@ -142,13 +167,13 @@ Which brings us to the purple seat. In a statistical sense, it would
 be reasonable to say FOOMP drafted the most unique deck of all the drafters.
 FOOMP's is the only deck in all three
 pods with <i>no</i> package: not one pair of its non-land cards was
-maindecked together at both other pods.
+maindecked together in both other pods.
 
 The other 27 drafters all shared at least one pair with the other two pods:
 
 {{teams-per-deck}}
 
-% Decks by number of packages (pairs or cores) in their maindeck.
+% Decks by number of packages (of any size) in their maindeck.
 
 There's a mechanical reason for this: FOOMP's deck has a Gyruda companion. In my opinion, it is
 an awesome statistical artifact validating how companions make deckbuilding truly unique.
@@ -156,6 +181,8 @@ an awesome statistical artifact validating how companions make deckbuilding trul
 {{foomp-link}}
 
 {{foomp-gallery}}
+
+% FOOMP's maindeck — every card an even mana value, per Gyruda.
 
 ## The most original decks
 
@@ -200,5 +227,7 @@ These are the generically good cards of the format: everyone wants
 them, and they can be used by multiple strategies even if they fit best into one lane. There are 48
 of them, led by white.
 <span class='todo'>[draft — make it yours]</span>
+
+% The 48 bangers, tabbed by color.
 
 {{bangers-gallery}}
