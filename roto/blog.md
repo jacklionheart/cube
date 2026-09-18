@@ -178,25 +178,27 @@ Mark and tox 🍉:
 % Decks by size of their largest unique ensemble (nonland cards, no pair
 % shared with any other deck). Yorion decks excluded.
 
-{{deck:1:Mark}}: 16 of its 24 nonland cards form a group that exists
-nowhere else in ninety decks' worth of building:
+{{deck:1:Mark}}: 16 of its 24 nonland cards did not co-occur elsewhere:
 
 {{ensemble-mark}}
 
-{{deck:2:tox 🍉}}: likewise 16 of 24, a completely different sixteen:
+{{deck:2:tox 🍉}}: 16 of its 24 nonland did not co-occur elsewhere:
 
 {{ensemble-tox}}
 
-## Where the packages live
+## Bangers
 
-Add the pairs to the cores and count where the packages live:
+Not every card that was maindecked in all 3 pods joined a package.
 
-{{teams-chart}}
+<div class='defn'><div class='dlabel'>Definition</div>
+<div class='deq'><span class='dterm'>banger</span>
+<span class='dsym'>≔</span>
+<span class='dbody'>a card that was maindecked in all 3 pods but is
+part of no package</span></div></div>
 
-% Cards in packages of each color identity (packages of two or more colors).
+These are the generically good cards of the format: everyone wants
+them, and they tie themselves to no particular strategy. There are 48
+of them, led by white.
+<span class='todo'>[draft — make it yours]</span>
 
-% The two-card packages, by color:
-
-{{pair-tabs}}
-
-% <span class='todo'>TODO: continue — next sections from Jack's outline</span>
+{{bangers-gallery}}

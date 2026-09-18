@@ -896,6 +896,28 @@ showPairs('{order[0]}');
     assert len(ue[cbn]) == 18 and len(by_deck_all[cbn]) == 37, \
         (len(ue[cbn]), len(by_deck_all[cbn]))  # blog.md hardcodes
     parts["ensemble-cbn"] = gallery(ue[cbn], shuffle=True)
+
+    # bangers: all-3-pod cards that joined no package
+    in_pkg = {c for _, cards in groups for c in cards}
+    bangers = sorted(c for c, sig in owners.items()
+                     if None not in sig and c not in in_pkg)
+    assert len(bangers) == 48, len(bangers)  # blog.md hardcodes
+    by_bc = {}
+    for c in bangers:
+        by_bc.setdefault(colors_of([c]), []).append(c)
+    order_bc = sorted(by_bc, key=canon_key)
+    bt = ["<div class='tabs'>"]
+    bpanes = []
+    for i, cl in enumerate(order_bc):
+        on = " class='on'" if i == 0 else ""
+        bt.append(f"<button{on} data-group='bangers' "
+                  f"data-show='bg-{i}'>{mana(cl)} {len(by_bc[cl])}"
+                  f"</button>")
+        hid = "" if i == 0 else " hidden"
+        bpanes.append(f"<div data-pane='bangers' id='bg-{i}'{hid}>"
+                      + gallery(by_bc[cl], small=True) + "</div>")
+    bt.append("</div>")
+    parts["bangers-gallery"] = "".join(bt) + "\n".join(bpanes)
     blade = (0, "BladeTheKing")
     assert len(ue[blade]) == 13 and len(by_deck_all[blade]) == 35, \
         (len(ue[blade]), len(by_deck_all[blade]))  # blog.md hardcodes
