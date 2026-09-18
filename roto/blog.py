@@ -93,7 +93,8 @@ th, td { padding: 6px 16px 6px 0; border-bottom: 1px solid #e8e8e8;
 .defn .dterm { font-weight: 700; font-style: italic;
         white-space: nowrap; }
 .defn .dsym { color: #8a8a8a; }
-ul { list-style: none; padding-left: 4px; margin: 14px 0 18px; }
+ul { margin: 14px 0 18px; padding-left: 26px; }
+ul.plain { list-style: none; padding-left: 4px; }
 li { margin: 5px 0; }
 #hovercard { position: fixed; display: none; z-index: 10;
              pointer-events: none; }
@@ -173,10 +174,30 @@ def render_doc(text, parts):
         elif block.startswith("%"):
             txt = " ".join(l.lstrip("% ") for l in block.splitlines())
             out.append(f"<p class='meta'>{sub(txt)}</p>")
-        elif all(l.startswith(("* ", "+ ", "- ")) for l in block.splitlines()):
-            items = "".join(f"<li>{sub(l[2:])}</li>"
-                            for l in block.splitlines())
-            out.append(f"<ul>{items}</ul>")
+        elif any(l.startswith(("* ", "+ ", "- ")) for l in block.splitlines()):
+            # stem lines render as a paragraph, bullet runs as a list;
+            # lists of pips/HTML chips get class='plain' (no markers)
+            lines = block.splitlines()
+            i = 0
+            while i < len(lines):
+                if lines[i].startswith(("* ", "+ ", "- ")):
+                    items = []
+                    while (i < len(lines)
+                           and lines[i].startswith(("* ", "+ ", "- "))):
+                        items.append(lines[i][2:])
+                        i += 1
+                    plain = all(it.startswith(("{{", "<"))
+                                for it in items)
+                    cls = " class='plain'" if plain else ""
+                    out.append(f"<ul{cls}>" + "".join(
+                        f"<li>{sub(it)}</li>" for it in items) + "</ul>")
+                else:
+                    para = []
+                    while (i < len(lines)
+                           and not lines[i].startswith(("* ", "+ ", "- "))):
+                        para.append(lines[i])
+                        i += 1
+                    out.append(f"<p>{sub(' '.join(para))}</p>")
         elif block.startswith("<"):
             # raw HTML block: pass through without <p> wrapping
             out.append(sub(" ".join(block.splitlines())))
