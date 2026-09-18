@@ -130,6 +130,12 @@ itself. And in every case, each rectangles deck's largest overlap of all
 was with the other rectangles decks — the lane is real.
 <span class='todo'>[draft — make it yours]</span>
 
+{{rect-compete-chart}}
+
+% Cross-pod shared cards between each rectangles deck and the
+% {{mana:R}} aggro, {{mana:G}} green, and {{mana:U}} blue lanes.
+% Rectangles-to-rectangles overlap (each deck's largest) not shown.
+
 ## Contested pairs
 
 There are 7 other pairs that were not part of any lane, but were drafted primarily by drafters within the three non-rectangles lanes. Two such pairs were always drafted by drafters within the same macro lane -- these can be seen as cards shared between themes in the same macro strategy. Five were drafted twice by a drafter in one lane and once by a "rectangles" drafter. These can be seen as cards that were fought over between rectangles and other lanes. 

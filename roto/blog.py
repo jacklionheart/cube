@@ -612,6 +612,47 @@ document.addEventListener('click', e => {
     fv.append("</div></div>")
     parts["fam-pairs-viewer"] = "".join(fv)
 
+    # cross-pod shared cards: each rectangles deck vs the macro lanes
+    bd_all = deck_sets(owners)
+    fam_sets = {}
+    for lsig, lc in lanes:
+        fm = FAMILY[core_name(lc)]
+        for kk, pp in enumerate(lsig):
+            fam_sets.setdefault((kk, pp), set()).add(fm)
+    SEG = [("Aggro", "#cf7f6b"), ("Green", "#7fa878"),
+           ("Blue", "#7f9cc9")]
+    hc = []
+    for k, d in enumerate(drafts):
+        hc.append(f"<div class='sbh'>{d.name}</div>")
+        hc.append("<div class='vchart'>")
+        for pl in d.players:
+            if (k, pl) in lane_of_deck or not coreless_label(k, pl):
+                continue
+            cnt = Counter()
+            # count shared cards with each lane family's decks
+            for k2, d2 in enumerate(drafts):
+                if k2 == k:
+                    continue
+                for p2 in d2.players:
+                    n = len(bd_all[(k, pl)] & bd_all[(k2, p2)])
+                    for fm in fam_sets.get((k2, p2), ()):
+                        cnt[fm] += n
+            bars = "".join(
+                "<div style='display:flex;flex-direction:column;"
+                "align-items:center;justify-content:flex-end'>"
+                f"<span class='vnum'>{cnt[fm] or ''}</span>"
+                f"<div class='vbar' style='height:{cnt[fm] * 8}px;"
+                f"background:{col};width:16px' title='{fm}: {cnt[fm]} "
+                f"shared cards'></div></div>"
+                for fm, col in SEG)
+            hc.append(
+                "<div class='vcol'>"
+                "<div style='display:flex;align-items:flex-end;gap:3px;"
+                "height:100%'>" + bars + "</div>"
+                f"<span class='vlab'>{html.escape(pl)}</span></div>")
+        hc.append("</div>")
+    parts["rect-compete-chart"] = "\n".join(hc)
+
     # --- which lanes do the no-lane decks fit into? -------------------
     def pair_label(psig):
         for lsig, lcards in lanes:
