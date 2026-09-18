@@ -1,7 +1,7 @@
-# The Lords of Limited Rotisserie Meta
+# Rotisserie Drating the The Lords of Limited Cube
 
 I recently had the good fortune to play in some initial
-<a href="https://docs.google.com/spreadsheets/d/1i5IK8JKOeZpKZpV27YbqIFVNEkOQZq1rXRJQq-IBwCw/">rotisserie drafts</a> of the
+🦃 <a href="https://docs.google.com/spreadsheets/d/1i5IK8JKOeZpKZpV27YbqIFVNEkOQZq1rXRJQq-IBwCw/">rotisserie drafts</a> 🦃 of the
 <a href="https://www.cubecobra.com/cube/list/0efda005-7243-457e-9d11-875e37d1b768">Lords of Limited cube</a>.
 Thanks to Ethan and Ben of
 <a href="https://www.lordsoflimited.com">Lords of Limited</a>, and Greg from their Discord, for envisioning,
@@ -232,22 +232,9 @@ of them, led by white.
 
 {{bangers-gallery}}
 
-## Appendix: checking the work
+## Appendix: 
 
 Everything in this post regenerates from
-<a href="https://docs.google.com/spreadsheets/d/1_w-YcYynXZgzObp13fPUB1q8XNxN6IH7gFkyHgH8E8w/">the spreadsheet</a>
+<a href="https://docs.google.com/spreadsheets/d/1_w-YcYynXZgzObp13fPUB1q8XNxN6IH7gFkyHgH8E8w/">this spreadsheet</a>
 and a few hundred lines of Python in
 <a href="https://github.com/jacklionheart/cube/tree/main/roto">the repo</a>.
-
-Are 7 big packages a lot? A permutation test says yes. Keep every
-drafter's picks, but re-deal each maindeck as a random same-size subset
-of their own pool, 2,000 times: random deckbuilding averages 3.1 big
-packages covering about 10 cards, with the largest around 4 — and it
-never once produced this data's 34 package-cards or a 9-card package
-(for 7 big packages, p = .003). The lanes are deliberate deckbuilding,
-not an artifact of who happened to draft what.
-<span class='todo'>[draft — make it yours]</span>
-
-One note on generalizing: the definitions here are tuned to 3 pods —
-"all 3 pods" is a strict bar. For a bigger season you would loosen
-"all pods" to "more than half." That's a different post.
