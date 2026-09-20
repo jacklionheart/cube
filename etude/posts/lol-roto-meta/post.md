@@ -204,22 +204,3 @@ of them, led by white.
 % The 48 bangers, tabbed by color.
 
 {{bangers-gallery}}
-
-## Appendix
-
-Everything in this post regenerates from
-<a href="https://docs.google.com/spreadsheets/d/1_w-YcYynXZgzObp13fPUB1q8XNxN6IH7gFkyHgH8E8w/">this spreadsheet</a>
-and a few hundred lines of Python in
-<a href="https://github.com/jacklionheart/cube/tree/main/roto">the repo</a>.
-
-Are 7 big packages a lot? A permutation test says yes. Keep every
-drafter's picks, but re-deal each maindeck as a random same-size subset
-of their own pool, 2,000 times: random deckbuilding averages 3.1 big
-packages covering about 10 cards, with the largest around 4 — and it
-never once produced this data's 34 package-cards or a 9-card package
-(for 7 big packages, p = .003). The lanes are deliberate deckbuilding,
-not an artifact of who happened to draft what.
-
-One note on generalizing: the definitions here are tuned to 3 pods —
-"all 3 pods" is a strict bar. For a bigger season you would loosen
-"all pods" to "more than half." That's a different post.
