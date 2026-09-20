@@ -1,4 +1,4 @@
-# Rotisserie Drating the The Lords of Limited Cube
+# Rotisserie Drafting the Lords of Limited Cube
 
 I recently had the good fortune to play in some initial
 🍗 <a href="https://docs.google.com/spreadsheets/d/1i5IK8JKOeZpKZpV27YbqIFVNEkOQZq1rXRJQq-IBwCw/">rotisserie drafts</a> 🍗 of the
@@ -232,7 +232,7 @@ of them, led by white.
 
 {{bangers-gallery}}
 
-## Appendix: 
+## Appendix
 
 Everything in this post regenerates from
 <a href="https://docs.google.com/spreadsheets/d/1_w-YcYynXZgzObp13fPUB1q8XNxN6IH7gFkyHgH8E8w/">this spreadsheet</a>

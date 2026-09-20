@@ -27,7 +27,7 @@ from packages import (card_colors, deck_sets, load, load_scryfall,  # noqa: E402
                       unique_ensembles)
 from roto_summary import load_decks  # noqa: E402
 
-TITLE = "The Lords of Limited Rotisserie Meta"
+TITLE = "Rotisserie Drafting the Lords of Limited Cube"
 SCRIPTS = ""  # set by build(): the deckImgs data for [data-deck] hovers
 
 

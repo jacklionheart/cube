@@ -9,6 +9,7 @@ Usage:
 
 import importlib.util
 import pathlib
+import re
 import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
@@ -62,6 +63,9 @@ def main():
         sys.exit("no posts found under posts/")
     for d in dirs:
         html = build_post(d)
+        # site/ is the publish artifact: draft markers stay visible in
+        # dev builds but never ship
+        html = re.sub(r"\s*<span class='todo'>.*?</span>", "", html)
         dest = SITE / d.name / "index.html"
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_text(html)
