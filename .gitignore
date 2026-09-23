@@ -6,10 +6,10 @@ __pycache__/
 .DS_Store
 cubecobra/backups/
 .lf/prompts/
-roto/sources/
-roto/out/
-roto/live-snapshot.xlsx
-samp-roto/sources/
-samp-roto/out/
-etude/site/
+roto/lol/sources/
+roto/lol/out/
+roto/lol/live-snapshot.xlsx
+roto/samp/sources/
+roto/samp/out/
+blog/site/
 .claude/

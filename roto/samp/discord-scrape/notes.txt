@@ -1,0 +1,58 @@
+Dom (slickshot): deck posted as image only -> dom-slickshot-deck.png, needs OCR into deckcache manual JSON
+mockingbird: COMPLETE - all 10 players (verified via /0 top jump)
+aven: COMPLETE - pod ran with 9 players, all 9 posted (JiRock has rebuild)
+slickshot: COMPLETE via /0 - 9 players with links + Dom (image only, dom-slickshot-deck.png)
+raven-eagle: COMPLETE via /0 - all 10 players
+hard-academic: COMPLETE via /0 - all 10 players
+goose-mother: COMPLETE via /0 - all 10 players
+yorion: COMPLETE via /0 - all 10 players
+skycoach: COMPLETE - all 10 players posted links
+Dom (slickshot): transcribed -> deckcache/manual-dom-slickshot.json (validated vs picks); Baleful Rocketman/Rob/aidybaby + sinkhole/eagles channels still blocked on Chrome extension
+eagles: murmurtwin posted an image-only deck update 9/11 (swap description); linked deck used as current
+sinkhole+eagles scraped (all 20 decks, links); aidybaby transcribed from v2 image; rocketman/rob images + tenderdrafter search still pending (Discord logged out mid-capture, Chrome multi-download block ate 3 images)
+FULL COVERAGE 129/129: rocketman+rob (baleful) + tendertouch (kishla, found via from:has:image search in decks-kishla) transcribed from images
+
+=== all-drafts backfill (2026-09-16) ===
+37 drafts total. Sources: Google Sheets for all pods with player names
+(s3 pods bob/bbe/goyf/seize/term/lili + blightning/maelstrom/ravine/
+rabbit/pyrogoyf/innistrad/cabal/inquisition + 11 s4 sheets); RTB API for
+the rest (lightning-bolt@dpa20, birds-of-paradise@20*, zendikar, tarkir,
+ravnica*, lorwyn, dark-ascension* (12p), fate-reforged, scavenging-ooze@20,
+kappa@23, kishla, raven-eagle). * = one seat redacted their picks on RTB
+and no sheet exists: Birds of Paradise, Ravnica, Dark Ascension each have
+one blank player column. Old RTB drafts store no player names -> "Seat N"
+labels. Maelstrom sheet's Cube tab was truncated; rebuilt from RTB
+(values-only workbook). Fate Reforged runs THREE Mishra's Baubles
+(dedupe now numbers 2,3). dpa (double-pick-after round) validated
+against RTB pickN per draft; liliana/rabbit/pyrogoyf/birds/lightning-bolt
+have 7-9 true out-of-order makeup picks the model can't represent.
+Deck coverage (updated later 2026-09-16, after Discord login was
+restored): scraped ALL old decks channels — 13 s3 pods (deck-bob-03-07
+[singular "deck"!], decks-bbe/goyf/seize/blight-03-07, term/maels-03-19,
+ravine/lili/ooze/cabal-04-04, rabbit/kappa-06-26) plus the s1/s2 ones
+the mission didn't know existed: decks-bolt/birds-10-25,
+zen/tar/rav/lor/inn/pyro/dka-12-25, frf-01-26. Channel ids in
+channels_old.json + per-pod scrape jsons (keys u/t/l/i). The s1/s2
+channels are muted-hidden in the sidebar; found via quick switcher
+(#decks-... queries; switcher search is laggy — backspace+retype
+retriggers it; select results with JS dispatchEvent, NOT Enter: Enter
+after the modal auto-closes types into the message composer).
+build_decks_all.py assigns decks to players by CONTENT (pool cards vs
+draft-grid picks) because RTB pods label players "Seat N" and Discord
+message grouping hides some authors; whole-pool dump links (>100 cards)
+fall back to author name; a pool matching NO seat goes to the draft's
+single blank (RTB-redacted) seat by elimination — that recovered the
+redacted-seat decks for Birds (Seat 5), Ravnica (Seat 4), Dark
+Ascension (Seat 2). decks_all.tsv = 371 links (221 old + 150 s4).
+Not OCR'd this pass (image-only decks, noted): ALL of Lightning Bolt
+(s1, 10 players, pre-sealeddeck era), most of Birds (8 of 10),
+Lorwyn Seats 2/8/9/10, goyf rocketman, seize angelbbg/tendertouch/
+jacklionheart/aidybaby, maels rocketman, cabal Kyle/Drake, tar Seat 4,
+inn 2 seats, dka 1 seat.
+Gaps: no decks channel exists for Inquisition (s3). decks-yotia-01-26
+(🚁) exists but matches NO draft in RTB or the sheets (not one of the
+37) — unexplored, likely a side event; quick-switcher kept freezing the
+renderer (3 attempts) so it was skipped. Scavenging Ooze + Kappa
+Cannoneer have no Google Sheet (checked ooze draft-discussion /0 and
+pins: nothing), so their players stay "Seat N"; their decks were
+content-matched to seats.
