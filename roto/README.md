@@ -1,69 +1,49 @@
-# roto
+# Rotisserie analysis
 
-Analysis of Lords of Limited cube rotisserie drafts → one Google Sheet:
-[LoL Cube Roto — Pick Summary](https://docs.google.com/spreadsheets/d/1_w-YcYynXZgzObp13fPUB1q8XNxN6IH7gFkyHgH8E8w/edit)
+Analysis and spreadsheet tooling live here. Article prose, presentation,
+and publishing live in [`../blog/`](../blog/README.md).
 
-## Quick updates
+## Shared code
 
-- **New matches played** (source spreadsheets' Matches tabs changed):
-  `python3 refresh.py`
-- **New deck link posted** in #roto-decks: add a row to `decks.tsv`
-  (`draft<TAB>player<TAB>initial|rebuild<TAB>url`), then `python3 refresh.py`.
-  A `rebuild` row supersedes an `initial` for the same player.
-- Add `--verify` to any run to round-trip the formula build through a temp
-  Google Sheet and diff every computed cell against a values build before
-  publishing. `--dry-run` builds without publishing.
+- `draft.py`: template parsing, draft/pick records, snake and double-pick ordering.
+- `decks.py`: submitted pools, name normalization, companions, coverage checks.
+- `colors.py`: metadata-based color and land rules; flashback is an explicit option.
+- `packages.py`: owner signatures, co-occurrence, package graphs, flex/pair sets,
+  Jaccard clusters, backbone depth, ensembles, and null models.
+- `mining.py`: draft-supported frequent itemsets, including tolerated misses.
+- `sources.py`: downloads and pool prefetching.
+- `sheets.py`: Google credentials, upload/update, and formula verification.
+- `xlstyle.py`: workbook palette and cell styling.
 
-## Files
+These modules take data, paths, and settings as arguments. They must not
+import a cube directory or know a live Sheet ID. New reusable analysis
+belongs here; do not copy it into each cube.
 
-- `refresh.py` — one-command pipeline: download the three source draft
-  spreadsheets → fetch missing sealeddeck pools → rebuild → (verify) →
-  update the Sheet in place (same URL/permissions; sheet id hardcoded here)
-- `roto_summary.py` — parses the LoL roto-template exports (Draft grid,
-  Cube list, Matches) and builds the workbook. Pick Summary and Win Rates
-  are computed by in-cell formulas from the data tabs (Card List, Draft N,
-  Records, Decks); `--values` writes precomputed values instead (used for
-  verification)
-- `packages.py` — package analysis library + CLI over the maindecks:
-  strict signature packages, 2-of-3 edges and archetype components
-  (default), per-package halos (`--loose`), mermaid graph (`--mermaid`),
-  a permutation test (`--null [--iters N] [--seed S]`) that re-splits
-  each player's picks into random same-size maindecks to check the
-  observed package structure against chance (deckbuild stage only —
-  picks stay as drafted), straddle detection (`--straddles`: decks whose 2-of-3 cores pair them with two+ decks of one other draft), and relaxed definitions (`--relax K1 K2`:
-  tolerate k1 missing cards per deck / k2 missing drafts — (0,1) yields
-  cross-draft deck-pair intersections, (1,0) strict cores + per-draft
-  flex buckets; both also ship as sheet tabs). Importable primitives:
-  `maindeck_owners`, `co_maindeck_counts`, `signature_groups`,
-  `package_edges`, `components`, `halos`, `deck_sets`, `pair_packages`,
-  `flex_packages`, `never_drafted`, `never_maindecked`,
-  `late_first_pick`, `null_model`
-- `upload_sheet.py` — xlsx → native Google Sheet via Drive API
-  (`--update <fileId>` replaces content in place). OAuth: installed-app
-  client from ~/Downloads (GCP project `hootro`), token cached at
-  `~/.config/cube-roto/token.json`, scope `drive.file`
-- `decks.tsv` — deck links per draft/player (from #roto-decks on the LoL
-  Discord). `deckcache/` holds fetched sealeddeck pool JSONs, plus
-  `manual-balbadorf-d3.json`, transcribed by OCR from a screenshot
-  (no link was posted; kind `ocr` in the tsv)
-- `sources/`, `out/` — downloaded inputs and built workbooks (gitignored)
+## Cube-specific inputs and policy
 
-## Gotchas
+[`lol/`](lol/README.md) and [`samp/`](samp/README.md) own source registries,
+local caches, deck TSVs, aliases, pick-order defaults, package thresholds,
+workbook layouts, and exploration scripts. Their `packages.py` and
+`roto_summary.py` retain compatible imports while delegating common work.
 
-- sealeddeck card names are lowercase, accent-stripped, and use only the
-  front half of split/room cards; matching handles all three
-- Unlisted picks count as "not maindecked" — safe only because every deck
-  is either a full 40 or lists all 45 picks (`check_deck_coverage` warns)
-- Companions sit in the sideboard slot of exported pools but count as
-  maindecked (zone `companion`) — only if the maindeck actually satisfies
-  their deckbuilding requirement (`companion_ok`, using `scryfall.json`
-  cmc/type data; e.g. Mark's D1 Lurrus deck fails MV≤2 and stays a true
-  sideboard card). Yorion's 60-card check also accepts >40 listed cards in
-  a pool that omits basics (some pools skip them entirely, e.g.
-  ColdBrewNate's). Kaheera/Jegantha/Umori/Zirda checks are unimplemented
-  and warn if ever seen in a sideboard. `scryfall.json` is keyed by cube
-  card names; regenerate via Scryfall /cards/collection if the cube changes
-- Draft 3 has 10 players (vs 9), so overall pick numbers aren't directly
-  comparable across drafts; heat scales normalize per draft
-- urllib SSL is broken on this python install; all fetching goes through
-  curl (see `refresh.py:prefetch_pools`)
+Run `python3 refresh.py --dry-run` **from the relevant cube directory** to
+refresh and build locally. Omitting `--dry-run` updates that cube's live
+Google Sheet. `samp/refresh_all.py` handles the separate all-seasons sheet.
+
+LoL uses ordinary snake picks; Samp's default doubles picks after round 25,
+with per-draft overrides for older seasons. LoL signatures require every
+draft; Samp permits partial signatures. These are caller choices, not
+branches on a cube name inside the shared algorithms.
+
+## Verification
+
+From the repository root:
+
+```sh
+python3 -m unittest discover -s roto/tests
+python3 -m unittest discover -s blog/tests
+python3 blog/build.py
+```
+
+Keep sources and generated workbooks in each cube's ignored `sources/` and
+`out/` folders. Builds use local caches; refreshing sources is a separate step.
