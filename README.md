@@ -1,6 +1,7 @@
-# cube
+# cubeds
 
-Cube building and MTG limited analysis.
+[cubeds](https://github.com/jacklionheart/cubeds) is a toolkit for cube building,
+MTG limited analysis, and data-driven blog posts.
 
 ## Layout
 

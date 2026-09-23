@@ -174,7 +174,7 @@ First Pick).
 ## 6. For the tinkerers (samp's section / appendix)
 
 - The reproducible kit: everything regenerates from the three source
-  sheets + a TSV of deck links (`refresh.py`; ~/src/cube/roto).
+  sheets + a TSV of deck links (`roto/lol/refresh.py` in the cubeds repository).
 - Precise definitions worth stealing: owner-signature packages;
   2-of-3-agreement edges; halos; companion adjudication (requirement-
   checked, not name-checked); the pod-size normalization trap (9 vs 10

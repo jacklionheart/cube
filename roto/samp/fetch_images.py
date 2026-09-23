@@ -7,7 +7,10 @@ import subprocess
 import time
 
 HERE = pathlib.Path(__file__).parent
-UA = "cube-roto-analysis/1.0 (jack@loopflow.studio)"
+UA = "cubeds/1.0 (roto analysis; jack@loopflow.studio)"
+
+
+NAME_ALIASES = {"Outsmart the Amateur": "School Daze"}
 
 
 NAME_ALIASES = {"Outsmart the Amateur": "School Daze"}
