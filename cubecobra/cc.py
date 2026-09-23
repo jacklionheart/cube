@@ -21,7 +21,7 @@ import requests
 
 BASE = "https://cubecobra.com"
 BACKUP_DIR = pathlib.Path(__file__).resolve().parent / "backups"
-USER_AGENT = "jacklionheart-cube-scripts/1.0 (personal cube maintenance; jack@loopflow.studio)"
+USER_AGENT = "cubeds/1.0 (personal cube maintenance; jack@loopflow.studio)"
 PAUSE_SECONDS = 1.0
 READ_ATTEMPTS = 5
 READ_RETRY_STATUSES = frozenset({429, 500, 502, 503, 504})

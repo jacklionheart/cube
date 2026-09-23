@@ -17,7 +17,7 @@ import openpyxl
 
 HERE = pathlib.Path(__file__).parent
 BATCH = 75
-UA = "cube-roto-analysis/1.0 (jack@loopflow.studio)"
+UA = "cubeds/1.0 (roto analysis; jack@loopflow.studio)"
 FIELDS = ("cmc", "type_line", "colors", "color_identity",
           "produced_mana", "oracle_text")
 
